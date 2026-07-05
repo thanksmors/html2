@@ -1,0 +1,2285 @@
+<!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
+<!doctype html>
+<html lang="en" data-artifact="09-implementation-notes">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ═══ artifact-shell v3 ═══ -->
+<style id="artifact-shell-css">
+/* artifact-shell v3 — stripped; source: shell/artifact-shell.css */
+@layer tokens, palette, type, finish, base, components, utilities;
+@layer tokens {
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #C05A34; }
+@property --bg     { syntax: "<color>"; inherits: true; initial-value: #FAF9F5; }
+@property --ink    { syntax: "<color>"; inherits: true; initial-value: #141413; }
+:root {
+color-scheme: light dark;
+--bg:              light-dark(oklch(98.1% .006 84),  oklch(21% .006 84));
+--surface:         light-dark(oklch(100% 0 0),       oklch(25.5% .007 84));
+--surface-2:       light-dark(oklch(94.7% .009 92),  oklch(29% .008 84));
+--ink:             light-dark(oklch(19.6% .004 106), oklch(94% .006 84));
+--ink-muted:       light-dark(oklch(60.5% .008 97),  oklch(66% .01 90));
+--accent:          light-dark(oklch(62% .125 42),    oklch(72% .12 42));
+--accent-contrast: light-dark(oklch(98.1% .006 84),  oklch(21% .006 84));
+--line:            light-dark(oklch(84.8% .008 96),  oklch(35% .008 84));
+--positive:        light-dark(oklch(60% .07 130),    oklch(68% .08 130));
+--warning:         light-dark(oklch(66% .12 75),     oklch(74% .12 80));
+--negative:        light-dark(oklch(52% .14 30),     oklch(66% .15 30));
+--focus: var(--accent);
+--ink-subtle:    color-mix(in oklch, var(--ink) 82%, var(--bg));
+--accent-strong: color-mix(in oklch, var(--accent), var(--ink) 22%);
+--tint:          color-mix(in oklch, var(--accent) 20%, var(--surface));
+--line-strong:   color-mix(in oklch, var(--line), var(--ink) 30%);
+--shadow-color:  color-mix(in oklch, var(--ink) 12%, transparent);
+--shadow-1: 0 1px 3px var(--shadow-color);
+--shadow-2: 0 12px 32px var(--shadow-color);
+--font-display: Palatino, "Palatino Linotype", P052, "URW Palladio L", Georgia, ui-serif, serif;
+--font-body: system-ui, "Segoe UI", Ubuntu, Roboto, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: ui-monospace, "SF Mono", "Cascadia Code", "DejaVu Sans Mono", "Liberation Mono", Consolas, monospace;
+--display-weight: 600;
+--display-track: 0em;
+--lh-body: 1.6;
+--radius-s: 4px; --radius-m: 8px; --radius-l: 12px; --radius-full: 999px;
+--border-w: 1.5px;
+--line-style: solid;
+--space: 1rem;
+--dur-1: 120ms; --dur-2: 240ms; --dur-3: 420ms;
+--ease-out: cubic-bezier(.2, .7, .2, 1);
+--ease-spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%,
+1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%,
+1.129 32.8%, 1.051 39.6%, 1.017 43.1%, .991, .977 51%, .974 53.8%,
+.975 57.1%, .997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+}
+:root[data-mode="light"] { color-scheme: light; }
+:root[data-mode="dark"]  { color-scheme: dark; }
+:root[data-density="compact"] { --space: .8rem; --radius-m: 6px; --radius-l: 9px; }
+:root[data-textsize="s"]  { zoom: .9; }
+:root[data-textsize="l"]  { zoom: 1.1; }
+:root[data-textsize="xl"] { zoom: 1.25; }
+:root {
+--ivory: var(--bg); --paper: var(--surface); --white: var(--surface);
+--slate: var(--ink); --clay: var(--accent); --clay-d: var(--accent-strong);
+--oat: var(--tint); --olive: var(--positive); --rust: var(--negative);
+--g100: var(--surface-2); --gray-50: var(--surface-2);
+--gray-100: var(--surface-2); --gray-150: var(--surface-2);
+--g200: var(--line); --g300: var(--line);
+--gray-200: var(--line); --gray-300: var(--line);
+--g500: var(--ink-muted); --gray-500: var(--ink-muted);
+--g700: var(--ink-subtle); --gray-700: var(--ink-subtle); --gray-800: var(--ink-subtle);
+--serif: var(--font-display); --sans: var(--font-body); --mono: var(--font-mono);
+}
+}
+@layer palette {
+[data-palette="newsprint"] {
+--bg:        light-dark(oklch(96.5% .002 90), oklch(18% 0 0));
+--surface:   light-dark(oklch(99% .001 90),   oklch(22% 0 0));
+--surface-2: light-dark(oklch(93% .002 90),   oklch(26% 0 0));
+--ink:       light-dark(oklch(15% 0 0),       oklch(93% .002 90));
+--ink-muted: light-dark(oklch(48% .002 90),   oklch(65% .002 90));
+--accent:    light-dark(oklch(50% .19 27),    oklch(64% .17 27));
+--accent-contrast: oklch(98% .002 90);
+--line:      light-dark(oklch(80% .002 90),   oklch(34% 0 0));
+}
+[data-palette="paperback"] {
+--bg:        light-dark(oklch(95.5% .022 85), oklch(23% .02 60));
+--surface:   light-dark(oklch(97.8% .018 85), oklch(27% .022 60));
+--surface-2: light-dark(oklch(92.5% .025 85), oklch(31% .022 60));
+--ink:       light-dark(oklch(28% .03 60),    oklch(91% .02 80));
+--ink-muted: light-dark(oklch(52% .035 65),   oklch(68% .03 75));
+--accent:    light-dark(oklch(56% .11 55),    oklch(72% .11 65));
+--accent-contrast: light-dark(oklch(97.8% .018 85), oklch(23% .02 60));
+--line:      light-dark(oklch(84% .03 80),    oklch(37% .025 60));
+}
+[data-palette="swiss"] {
+--bg:        light-dark(oklch(100% 0 0),      oklch(17% 0 0));
+--surface:   light-dark(oklch(100% 0 0),      oklch(21% 0 0));
+--surface-2: light-dark(oklch(95% 0 0),       oklch(25% 0 0));
+--ink:       light-dark(oklch(13% 0 0),       oklch(95% 0 0));
+--ink-muted: light-dark(oklch(50% 0 0),       oklch(66% 0 0));
+--accent:    light-dark(oklch(58% .22 29),    oklch(66% .2 29));
+--accent-contrast: oklch(100% 0 0);
+--line:      light-dark(oklch(88% 0 0),       oklch(32% 0 0));
+}
+[data-palette="terminal"] {
+--bg:        light-dark(oklch(95% .015 150),  oklch(16% .02 150));
+--surface:   light-dark(oklch(97.5% .01 150), oklch(19.5% .025 150));
+--surface-2: light-dark(oklch(91% .02 150),   oklch(23% .03 150));
+--ink:       light-dark(oklch(23% .03 150),   oklch(88% .09 150));
+--ink-muted: light-dark(oklch(48% .04 150),   oklch(64% .06 150));
+--accent:    light-dark(oklch(48% .13 150),   oklch(78% .18 150));
+--accent-contrast: light-dark(oklch(97.5% .01 150), oklch(16% .02 150));
+--line:      light-dark(oklch(80% .04 150),   oklch(32% .05 150));
+}
+[data-palette="brutalist"] {
+--bg:        light-dark(oklch(98% 0 0),       oklch(15% 0 0));
+--surface:   light-dark(oklch(100% 0 0),      oklch(20% 0 0));
+--surface-2: light-dark(oklch(93% .02 95),    oklch(25% .01 95));
+--ink:       light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+--ink-muted: light-dark(oklch(38% 0 0),       oklch(72% 0 0));
+--accent:    light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+--accent-contrast: light-dark(oklch(97% 0 0), oklch(10% 0 0));
+--tint:      light-dark(oklch(86% .17 95),    oklch(78% .15 95));
+--line:      light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+}
+[data-palette="glass"] {
+--bg:        light-dark(oklch(96% .012 290),  oklch(18% .03 290));
+--surface:   light-dark(oklch(100% 0 0 / .62), oklch(26% .03 290 / .55));
+--surface-2: light-dark(oklch(97% .01 290 / .7), oklch(31% .035 290 / .6));
+--ink:       light-dark(oklch(22% .03 290),   oklch(94% .01 290));
+--ink-muted: light-dark(oklch(50% .04 290),   oklch(70% .03 290));
+--accent:    light-dark(oklch(54% .19 290),   oklch(74% .15 290));
+--accent-contrast: light-dark(oklch(98% .005 290), oklch(18% .03 290));
+--line:      light-dark(oklch(85% .025 290 / .8), oklch(40% .04 290 / .7));
+--shadow-color: color-mix(in oklch, oklch(30% .1 290) 18%, transparent);
+}
+[data-palette="synthwave"] {
+--bg:        light-dark(oklch(95% .02 300),   oklch(17% .05 290));
+--surface:   light-dark(oklch(98% .012 300),  oklch(22% .06 290));
+--surface-2: light-dark(oklch(91.5% .03 300), oklch(26.5% .07 290));
+--ink:       light-dark(oklch(24% .06 300),   oklch(93% .03 320));
+--ink-muted: light-dark(oklch(50% .08 310),   oklch(70% .08 320));
+--accent:    light-dark(oklch(56% .23 340),   oklch(72% .22 340));
+--accent-contrast: light-dark(oklch(98% .01 340), oklch(17% .05 290));
+--line:      light-dark(oklch(83% .05 310),   oklch(37% .09 300));
+}
+[data-palette="pastel"] {
+--bg:        light-dark(oklch(97.5% .015 330), oklch(24% .025 320));
+--surface:   light-dark(oklch(99.4% .006 330), oklch(28% .028 320));
+--surface-2: light-dark(oklch(94.5% .022 300), oklch(32% .03 315));
+--ink:       light-dark(oklch(30% .04 320),    oklch(93% .015 330));
+--ink-muted: light-dark(oklch(56% .05 325),    oklch(70% .04 325));
+--accent:    light-dark(oklch(63% .14 350),    oklch(76% .13 350));
+--accent-contrast: light-dark(oklch(99.4% .006 330), oklch(24% .025 320));
+--line:      light-dark(oklch(88% .03 320),    oklch(38% .04 320));
+}
+[data-palette="notebook"] {
+--bg:        light-dark(oklch(98% .008 100),  oklch(22% .01 100));
+--surface:   light-dark(oklch(99.5% .004 100), oklch(26% .012 100));
+--surface-2: light-dark(oklch(94.5% .012 100), oklch(30% .012 100));
+--ink:       light-dark(oklch(25% .015 262),  oklch(92% .008 100));
+--ink-muted: light-dark(oklch(52% .02 262),   oklch(67% .015 100));
+--accent:    light-dark(oklch(46% .17 262),   oklch(72% .13 262));
+--accent-contrast: light-dark(oklch(99.5% .004 100), oklch(22% .01 100));
+--line:      light-dark(oklch(84% .015 100),  oklch(36% .015 100));
+}
+[data-palette="solarized"] {
+--bg:        light-dark(oklch(96.5% .025 90), oklch(27% .035 235));
+--surface:   light-dark(oklch(99% .016 95),   oklch(30.5% .04 235));
+--surface-2: light-dark(oklch(92.5% .03 90),  oklch(34% .04 235));
+--ink:       light-dark(oklch(42% .025 220),  oklch(88% .02 90));
+--ink-muted: light-dark(oklch(58% .02 220),   oklch(68% .025 200));
+--accent:    light-dark(oklch(56% .12 240),   oklch(68% .11 240));
+--accent-contrast: light-dark(oklch(98% .016 95), oklch(27% .035 235));
+--line:      light-dark(oklch(87% .028 90),   oklch(38% .04 235));
+}
+:root[data-custom-accent] {
+--accent: var(--user-accent);
+--accent-contrast: oklch(from var(--user-accent)
+clamp(.13, (.66 - l) * infinity, .985) .01 h);
+--focus: var(--user-accent);
+}
+}
+@layer type {
+[data-type="paperback"] {
+--font-display: Baskerville, "Baskerville Old Face", "Libre Baskerville", "URW Bookman", "Bookman Old Style", "Noto Serif", serif;
+--font-body: Charter, "Bitstream Charter", "Iowan Old Style", "Noto Serif", "Liberation Serif", Georgia, serif;
+--font-mono: "Nimbus Mono PS", "Courier Prime", "Courier New", monospace;
+--lh-body: 1.68;
+}
+[data-type="grotesk"] {
+--font-display: "Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+--font-body: "Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
+--display-weight: 700; --display-track: -.02em;
+}
+[data-type="geometric"] {
+--font-display: Futura, "Futura PT", Avenir, "Century Gothic", "URW Gothic", "Avant Garde", Ubuntu, sans-serif;
+--font-body: Avenir, "Avenir Next", "Century Gothic", "URW Gothic", Ubuntu, "Noto Sans", sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", monospace;
+--display-weight: 500; --display-track: .03em;
+}
+[data-type="humanist"] {
+--font-display: Optima, Candara, Seravek, Ubuntu, "Noto Sans", sans-serif;
+--font-body: Seravek, Candara, Ubuntu, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: "Ubuntu Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+--lh-body: 1.62;
+}
+[data-type="slab"] {
+--font-display: Rockwell, "Rockwell Nova", "Roboto Slab", "DejaVu Serif", "Nimbus Roman", serif;
+--font-body: system-ui, Ubuntu, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", monospace;
+--display-weight: 700;
+}
+[data-type="typewriter"] {
+--font-display: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--font-body: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--font-mono: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--display-weight: 700; --lh-body: 1.7;
+}
+[data-type="terminal"] {
+--font-display: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--font-body: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--lh-body: 1.55; --display-track: .01em;
+}
+[data-type="casual"] {
+--font-display: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Comic Neue", cursive;
+--font-body: "Comic Neue", "Segoe UI", Ubuntu, "Noto Sans", sans-serif;
+--font-mono: "Ubuntu Mono", ui-monospace, monospace;
+--lh-body: 1.65;
+}
+}
+@layer finish {
+[data-finish="sharp"] {
+--radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --radius-full: 0px;
+--border-w: 2px;
+--shadow-1: none; --shadow-2: none;
+--display-track: -.01em;
+}
+[data-finish="pill"] {
+--radius-s: 10px; --radius-m: 18px; --radius-l: 26px;
+--shadow-1: 0 2px 8px var(--shadow-color);
+--shadow-2: 0 20px 48px var(--shadow-color);
+--space: 1.1rem;
+}
+[data-finish="brutal"] {
+--radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --radius-full: 0px;
+--border-w: 2.5px;
+--shadow-1: 3px 3px 0 var(--ink);
+--shadow-2: 6px 6px 0 var(--ink);
+--line-strong: var(--ink);
+}
+[data-finish="hairline"] {
+--radius-s: 2px; --radius-m: 3px; --radius-l: 4px;
+--border-w: 1px;
+--shadow-1: none; --shadow-2: none;
+--display-track: .01em;
+}
+[data-finish="glow"] {
+--radius-s: 3px; --radius-m: 6px; --radius-l: 10px;
+--border-w: 1px;
+--shadow-1: 0 0 10px color-mix(in oklch, var(--accent) 45%, transparent);
+--shadow-2: 0 0 26px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+[data-finish="sketch"] {
+--radius-s: 6px; --radius-m: 9px; --radius-l: 12px;
+--line-style: dashed;
+--shadow-1: none; --shadow-2: none;
+}
+}
+@layer base {
+:where(body) { font-family: var(--font-body); line-height: var(--lh-body, 1.6); }
+:where(h1, h2, h3, h4) {
+font-family: var(--font-display);
+font-weight: var(--display-weight, 600);
+letter-spacing: var(--display-track, 0em);
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+:where(a) {
+transition: text-underline-offset var(--dur-1) var(--ease-out),
+text-decoration-thickness var(--dur-1) var(--ease-out), color var(--dur-1);
+}
+:where(a:hover) { text-underline-offset: 4px; }
+:where(button, [role="button"], summary):where(:not([disabled])) {
+transition: translate var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+:where(button, [role="button"], summary):where(:not([disabled])):hover { translate: 0 -1px; }
+:where(button, [role="button"], summary):where(:not([disabled])):active {
+translate: 0 0; transition-duration: 60ms;
+}
+:where(summary) { cursor: pointer; }
+:root:not([data-editing]) [data-edit] {
+text-decoration-line: underline;
+text-decoration-style: dashed;
+text-decoration-color: transparent;
+text-decoration-thickness: 1px;
+text-underline-offset: 3px;
+transition: text-decoration-color var(--dur-2) var(--ease-out) 300ms;
+}
+:root:not([data-editing]) [data-edit]:hover {
+text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+*, *::before, *::after {
+animation-duration: .01ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: .01ms !important;
+scroll-behavior: auto !important;
+}
+::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+animation-duration: .01ms !important;
+}
+}
+@media print {
+:root { zoom: 1 !important; }
+:root, [data-palette], [data-theme] {
+color-scheme: light;
+--bg: #fff; --surface: #fff; --surface-2: #F0EEE6;
+--ink: #141413; --ink-muted: #57564F; --accent: #B85C3E;
+--accent-contrast: #fff; --line: #C9C7BD;
+--positive: #5C6F44; --warning: #8A6320; --negative: #A04024;
+--shadow-1: none; --shadow-2: none;
+}
+.a2-gear, .a2-toast, .a2-veil, .a2-panel, .a2-editpill, .a2-handle,
+.a3-nav, .a3-burger { display: none !important; }
+body.a3-with-sidebar { margin-inline-start: 0 !important; }
+[data-edit] { outline: none !important; text-decoration: none !important; }
+details { &::details-content { content-visibility: visible; display: block; } }
+details > summary { list-style: none; }
+* { box-shadow: none !important; text-shadow: none !important; }
+}
+}
+@layer components {
+.a2-gear {
+position: fixed; inset-block-end: 18px; inset-inline-end: 18px; z-index: 999;
+inline-size: 44px; block-size: 44px; border-radius: 50%;
+border: var(--border-w) solid var(--line);
+background: var(--surface); color: var(--ink);
+display: grid; place-items: center; cursor: pointer;
+box-shadow: var(--shadow-1);
+transition: rotate var(--dur-2) var(--ease-spring), box-shadow var(--dur-1) var(--ease-out);
+&:hover { rotate: 30deg; box-shadow: var(--shadow-2); }
+& svg { inline-size: 20px; block-size: 20px; }
+}
+.a2-panel {
+position: fixed; inset: auto 16px 72px auto; z-index: 1000;
+margin: 0; padding: 12px; inline-size: 316px;
+max-block-size: min(70vh, 560px); overflow: auto; overscroll-behavior: contain;
+border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-l);
+background: var(--surface); color: var(--ink);
+box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13px; line-height: 1.45;
+display: none; opacity: 0; translate: 0 8px; scale: .98;
+transition: opacity var(--dur-2) var(--ease-out),
+translate var(--dur-2) var(--ease-spring), scale var(--dur-2) var(--ease-spring),
+display var(--dur-2) allow-discrete;
+&.is-open {
+display: block; opacity: 1; translate: 0 0; scale: 1;
+@starting-style { opacity: 0; translate: 0 8px; scale: .98; }
+}
+}
+.a2-panel h3 {
+margin: 12px 0 7px; font: 600 10.5px/1 var(--font-mono);
+letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted);
+&:first-child { margin-block-start: 2px; }
+}
+.a2-seg {
+display: grid; grid-auto-flow: column; gap: 2px; padding: 2px;
+background: var(--surface-2); border-radius: var(--radius-m);
+& label {
+position: relative; text-align: center; padding: 5px 4px;
+border-radius: calc(var(--radius-m) - 2px); cursor: pointer; color: var(--ink-muted);
+&:has(input:checked) { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
+& input { position: absolute; opacity: 0; pointer-events: none; }
+}
+}
+.a2-tabs { position: sticky; inset-block-start: 0; background: var(--surface); z-index: 1; padding-block-end: 6px; }
+.a2-tabpanel[hidden] { display: none; }
+.a2-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.a2-tile {
+position: relative; padding: 8px 6px 7px; cursor: pointer; text-align: center;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: linear-gradient(160deg, var(--bg) 0 55%, var(--accent) 55% 80%, var(--ink) 80%);
+color: var(--ink); font-size: 11.5px; line-height: 1.15;
+transition: scale var(--dur-1) var(--ease-spring), border-color var(--dur-1);
+& .a2-tile-name {
+display: block; margin-block-start: 22px; padding: 2px 3px;
+background: color-mix(in oklch, var(--surface) 82%, transparent);
+border-radius: var(--radius-s);
+}
+&:hover { scale: 1.05; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 1px; }
+& .a2-del {
+position: absolute; inset-block-start: 2px; inset-inline-end: 2px;
+border: 0; background: none; color: var(--ink-muted); cursor: pointer;
+font-size: 12px; line-height: 1; padding: 2px 4px; border-radius: var(--radius-s);
+&:hover { color: var(--negative); }
+}
+}
+.a2-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.a2-swatch {
+aspect-ratio: 1; border-radius: var(--radius-s); cursor: pointer; padding: 0;
+border: var(--border-w) solid var(--line);
+background: linear-gradient(135deg, var(--bg) 0 45%, var(--accent) 45% 75%, var(--ink) 75%);
+transition: scale var(--dur-1) var(--ease-spring), border-color var(--dur-1);
+&:hover { scale: 1.12; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 1px; }
+}
+.a2-typerows { display: flex; flex-direction: column; gap: 3px; }
+.a2-typerow {
+display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+padding: 6px 9px; cursor: pointer; text-align: start;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); font-size: 14.5px;
+transition: border-color var(--dur-1), background var(--dur-1);
+& small { font: 10.5px var(--font-mono); color: var(--ink-muted); white-space: nowrap; }
+&:hover { border-color: var(--line-strong); background: var(--surface-2); }
+&[aria-checked="true"] { border-color: var(--focus); outline: 1.5px solid var(--focus); outline-offset: 0; }
+}
+.a2-finchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.a2-finchip {
+padding: 6px 12px; cursor: pointer; font-size: 12.5px;
+border: var(--border-w) var(--line-style) var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1);
+transition: scale var(--dur-1) var(--ease-spring);
+&:hover { scale: 1.06; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 1.5px solid var(--focus); }
+}
+.a2-row {
+display: flex; align-items: center; justify-content: space-between;
+gap: 8px; margin-block-start: 10px;
+}
+.a2-accentrow {
+display: flex; align-items: center; gap: 8px;
+& input[type="color"] {
+inline-size: 42px; block-size: 30px; padding: 2px; cursor: pointer;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-s);
+background: var(--surface);
+}
+}
+.a2-switch {
+appearance: none; margin: 0; cursor: pointer; flex: none;
+inline-size: 36px; block-size: 21px; border-radius: var(--radius-full);
+background: var(--surface-2); border: var(--border-w) solid var(--line);
+transition: background var(--dur-2) var(--ease-out);
+&::before {
+content: ""; display: block; inline-size: 15px; block-size: 15px;
+border-radius: 50%; margin: 1.5px; background: var(--ink-muted);
+transition: translate var(--dur-2) var(--ease-spring), background var(--dur-2);
+}
+&:checked { background: var(--accent); border-color: var(--accent);
+&::before { translate: 14px 0; background: var(--accent-contrast); } }
+}
+.a2-btn {
+font: inherit; padding: 6px 10px; cursor: pointer;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink);
+transition: border-color var(--dur-1), background var(--dur-1), scale var(--dur-1) var(--ease-spring);
+&:hover { border-color: var(--line-strong); background: var(--surface-2); }
+&:active { scale: .96; }
+}
+.a2-btnrow { display: flex; gap: 6px; flex-wrap: wrap; margin-block-start: 10px; }
+.a2-namefield {
+font: inherit; flex: 1; min-inline-size: 0; padding: 6px 9px;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink);
+}
+.a2-toast {
+position: fixed; inset-block-end: 76px; inset-inline-start: 50%;
+translate: -50% 0; z-index: 1001;
+max-inline-size: min(90vw, 440px);
+padding: 10px 14px; border-radius: var(--radius-m);
+border: var(--border-w) solid var(--line);
+background: var(--surface); color: var(--ink); box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13.5px;
+display: flex; align-items: center; gap: 12px;
+transition: opacity var(--dur-2), translate var(--dur-2) var(--ease-spring),
+display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; translate: -50% 12px; }
+&[hidden] { opacity: 0; translate: -50% 12px; display: none; }
+& button { font: inherit; font-weight: 600; border: 0; background: none;
+color: var(--accent); cursor: pointer; padding: 0; }
+}
+:root[data-editing] [data-edit] {
+outline: 1.5px dashed color-mix(in oklch, var(--accent) 55%, transparent);
+outline-offset: 3px; border-radius: 2px;
+transition: outline-color var(--dur-1), background var(--dur-1);
+&:hover { outline-color: var(--accent); }
+&:focus { outline: 2px solid var(--accent); background: color-mix(in oklch, var(--accent) 7%, transparent); }
+}
+.a2-editpill {
+position: fixed; inset-block-start: 14px; inset-inline-end: 14px; z-index: 999;
+font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase;
+padding: 7px 12px; border-radius: var(--radius-full);
+background: var(--accent); color: var(--accent-contrast); box-shadow: var(--shadow-1);
+transition: opacity var(--dur-2), display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; }
+&[hidden] { opacity: 0; display: none; }
+}
+.a2-blockhost { position: relative; }
+.a2-handle {
+position: absolute; inset-block-start: 4px; inset-inline-start: -34px; z-index: 5;
+inline-size: 26px; block-size: 26px; cursor: grab;
+display: grid; place-items: center;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-s);
+background: var(--surface); color: var(--ink-muted);
+font-size: 13px; line-height: 1; user-select: none;
+box-shadow: var(--shadow-1);
+&:hover { color: var(--ink); border-color: var(--line-strong); }
+&:active { cursor: grabbing; }
+@media (max-width: 900px) { inset-inline-start: 2px; }
+}
+[data-block].a2-dragover { outline: 2px dashed var(--accent); outline-offset: 4px; }
+.a2-veil {
+position: fixed; inset: 0; z-index: 1002;
+display: grid; place-items: center;
+background: color-mix(in oklch, var(--bg) 72%, transparent);
+backdrop-filter: blur(3px);
+border: 3px dashed var(--accent); border-radius: var(--radius-l);
+font: 600 15px var(--font-body); color: var(--ink);
+transition: opacity var(--dur-2), display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; }
+&[hidden] { opacity: 0; display: none; }
+}
+.a3-nav a { color: inherit; text-decoration: none; }
+.a3-nav a[aria-current] { color: var(--accent); }
+.a3-dock {
+position: fixed; inset-block-end: 14px; inset-inline: 0; z-index: 998;
+margin-inline: auto; inline-size: max-content;
+display: flex; align-items: center; gap: 4px; padding: 6px;
+border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-full);
+background: var(--surface); box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 15px;
+}
+.a3-ic {
+display: grid; place-items: center; inline-size: 34px; block-size: 34px;
+border: 0; border-radius: var(--radius-full); cursor: pointer;
+background: none; color: var(--ink); font-size: 16px; line-height: 1;
+transition: background var(--dur-1);
+&:hover { background: var(--surface-2); }
+&[data-dim] { opacity: .3; cursor: default; }
+}
+.a2-gear.a2-in-dock {
+position: static; inline-size: 34px; block-size: 34px;
+border: 0; box-shadow: none; background: none;
+& svg { inline-size: 17px; block-size: 17px; }
+}
+.a3-pop {
+position: absolute; inset-block-end: calc(100% + 10px); inset-inline-start: 50%;
+translate: -50% 0;
+min-inline-size: 200px; max-block-size: 50vh; overflow: auto;
+padding: 8px; border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-l); background: var(--surface);
+box-shadow: var(--shadow-2); font-size: 13.5px;
+display: none; opacity: 0;
+transition: opacity var(--dur-2) var(--ease-out), display var(--dur-2) allow-discrete;
+&.is-open { display: block; opacity: 1; @starting-style { opacity: 0; } }
+& a { display: block; padding: 6px 10px; border-radius: var(--radius-s);
+&:hover { background: var(--surface-2); } }
+}
+.a3-topbar {
+position: sticky; inset-block-start: 0; z-index: 998;
+display: flex; align-items: center; gap: 10px;
+padding: 8px 18px;
+background: color-mix(in oklch, var(--bg) 85%, transparent);
+backdrop-filter: blur(8px);
+border-block-end: 1px var(--line-style) var(--line);
+font-family: var(--font-body); font-size: 13px;
+& > a:hover { color: var(--accent); }
+& .a3-sep { color: var(--ink-muted); }
+& .a3-flex { flex: 1; }
+& .a3-seclinks { display: flex; gap: 14px; overflow-x: auto;
+& a { color: var(--ink-muted); white-space: nowrap;
+&:hover { color: var(--ink); } } }
+@media (max-width: 720px) { & .a3-seclinks { display: none; } }
+}
+.a3-switch {
+font: inherit; max-inline-size: 260px; padding: 4px 6px;
+border: 1px var(--line-style) var(--line); border-radius: var(--radius-s);
+background: var(--surface); color: var(--ink);
+}
+.a3-sidebar {
+display: none;
+@media (min-width: 1200px) {
+display: flex; flex-direction: column; gap: 10px;
+position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 998;
+inline-size: 220px; padding: 20px 14px;
+background: var(--surface);
+border-inline-end: 1px var(--line-style) var(--line);
+overflow-y: auto; font-family: var(--font-body); font-size: 13px;
+& .a3-side-home { color: var(--ink-muted); &:hover { color: var(--ink); } }
+& .a3-side-secs { display: flex; flex-direction: column; gap: 2px; margin-block-start: 8px;
+& a { padding: 5px 8px; border-radius: var(--radius-s); color: var(--ink-muted);
+border-inline-start: 2px solid transparent;
+&:hover { background: var(--surface-2); color: var(--ink); }
+&[aria-current] { color: var(--accent); border-inline-start-color: var(--accent); } } }
+}
+}
+@media (min-width: 1200px) {
+body.a3-with-sidebar { margin-inline-start: 220px; }
+}
+.a3-tabs {
+position: sticky; inset-block-start: 0; z-index: 998;
+display: flex; gap: 4px; padding: 0 14px;
+background: color-mix(in oklch, var(--bg) 88%, transparent);
+backdrop-filter: blur(8px);
+border-block-end: 1px var(--line-style) var(--line);
+overflow-x: auto; scroll-snap-type: x proximity;
+font-family: var(--font-body); font-size: 13px;
+& a { padding: 11px 12px 9px; white-space: nowrap; scroll-snap-align: start;
+color: var(--ink-muted); border-block-end: 2px solid transparent;
+&:hover { color: var(--ink); }
+&[aria-current] { color: var(--ink); border-block-end-color: var(--accent); } }
+}
+.a3-burger {
+position: fixed; inset-block-start: 14px; inset-inline-start: 14px; z-index: 999;
+inline-size: 40px; block-size: 40px; cursor: pointer;
+border: var(--border-w) var(--line-style) var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); font-size: 16px;
+box-shadow: var(--shadow-1);
+}
+.a3-drawer {
+position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 1001;
+inline-size: min(300px, 85vw); padding: 18px 16px; overflow-y: auto;
+background: var(--surface);
+border-inline-end: var(--border-w) var(--line-style) var(--line);
+box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13.5px;
+translate: -105% 0;
+transition: translate var(--dur-2) var(--ease-out);
+&.is-open { translate: 0 0; }
+& h3 { margin: 14px 0 6px; font: 600 10.5px/1 var(--font-mono);
+letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted);
+&:first-child { margin-block-start: 0; } }
+& h4 { margin: 10px 0 3px; font: 600 11.5px var(--font-body); color: var(--ink-subtle); }
+& a { display: block; padding: 5px 8px; border-radius: var(--radius-s); color: var(--ink-muted);
+&:hover { background: var(--surface-2); color: var(--ink); }
+&[aria-current] { color: var(--accent); } }
+}
+.a3-dots {
+position: fixed; inset-block-start: 50%; inset-inline-end: 12px; z-index: 998;
+translate: 0 -50%;
+display: none; flex-direction: column; gap: 10px;
+@media (min-width: 900px) { display: flex; }
+& a { position: relative; display: grid; place-items: center; padding: 3px;
+& i { display: block; inline-size: 9px; block-size: 9px; border-radius: 50%;
+border: 1.5px solid var(--ink-muted); background: transparent;
+transition: background var(--dur-1), border-color var(--dur-1), scale var(--dur-1) var(--ease-spring); }
+& b {
+position: absolute; inset-inline-end: calc(100% + 8px); inset-block-start: 50%;
+translate: 0 -50%; white-space: nowrap;
+font: 500 12px var(--font-body); color: var(--ink);
+background: var(--surface); border: 1px var(--line-style) var(--line);
+border-radius: var(--radius-s); padding: 3px 8px; box-shadow: var(--shadow-1);
+opacity: 0; pointer-events: none; transition: opacity var(--dur-1);
+}
+&:hover, &:focus-visible { & i { scale: 1.25; border-color: var(--ink); } & b { opacity: 1; } }
+&[aria-current] i { background: var(--accent); border-color: var(--accent); }
+}
+}
+}
+@layer utilities {
+[data-reveal] {
+opacity: 1; translate: 0 0;
+transition: opacity var(--dur-3) var(--ease-out) calc(var(--reveal-i, 0) * 40ms),
+translate var(--dur-3) var(--ease-spring) calc(var(--reveal-i, 0) * 40ms);
+@starting-style { opacity: 0; translate: 0 10px; }
+}
+@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
+[data-reveal="scroll"] {
+transition: none;
+animation: a2-rise both;
+animation-timeline: view();
+animation-range: entry 0% entry 60%;
+}
+}
+}
+@keyframes a2-rise { from { opacity: 0; translate: 0 14px; } }
+::view-transition-old(root), ::view-transition-new(root) {
+animation-duration: var(--dur-2);
+}
+}
+</style>
+<script id="artifact-shell">
+/* artifact-shell v3 — stripped; source: shell/artifact-shell.js */
+(() => {
+"use strict";
+const VERSION = 3;
+const ARTIFACTS = [{"path":"../21-theme-lab.html","title":"The Theme Lab","category":"Reference"},{"path":"../32-kit-gallery.html","title":"The Kit","category":"Reference"},{"path":"../01-exploration-code-approaches.html","title":"Three code approaches","category":"Exploration & Planning"},{"path":"../02-exploration-visual-designs.html","title":"Visual design directions","category":"Exploration & Planning"},{"path":"../16-implementation-plan.html","title":"Implementation plan","category":"Exploration & Planning"},{"path":"../26-decision-matrix.html","title":"Decision matrix","category":"Exploration & Planning"},{"path":"../28-roadmap-gantt.html","title":"Roadmap Gantt","category":"Exploration & Planning"},{"path":"../03-code-review-pr.html","title":"Annotated pull request","category":"Code Review & Understanding"},{"path":"../17-pr-writeup.html","title":"PR writeup for reviewers","category":"Code Review & Understanding"},{"path":"../04-code-understanding.html","title":"Module map","category":"Code Review & Understanding"},{"path":"../05-design-system.html","title":"Living design system","category":"Design"},{"path":"../06-component-variants.html","title":"Component variants","category":"Design"},{"path":"../07-prototype-animation.html","title":"Animation sandbox","category":"Prototyping"},{"path":"../08-prototype-interaction.html","title":"Clickable flow","category":"Prototyping"},{"path":"../10-svg-illustrations.html","title":"SVG figure sheet","category":"Illustrations & Diagrams"},{"path":"../13-flowchart-diagram.html","title":"Annotated flowchart","category":"Illustrations & Diagrams"},{"path":"../09-slide-deck.html","title":"Arrow-key slide deck","category":"Decks"},{"path":"../14-research-feature-explainer.html","title":"How a feature works","category":"Research & Learning"},{"path":"../15-research-concept-explainer.html","title":"Concept explainer","category":"Research & Learning"},{"path":"../11-status-report.html","title":"Weekly status","category":"Reports"},{"path":"../12-incident-report.html","title":"Incident timeline","category":"Reports"},{"path":"../27-postmortem-timeline.html","title":"Postmortem timeline","category":"Reports"},{"path":"../18-editor-triage-board.html","title":"Ticket triage board","category":"Custom Editing Interfaces"},{"path":"../19-editor-feature-flags.html","title":"Feature flag editor","category":"Custom Editing Interfaces"},{"path":"../20-editor-prompt-tuner.html","title":"Prompt tuner","category":"Custom Editing Interfaces"},{"path":"../29-kanban-board.html","title":"Week 28 kanban","category":"Custom Editing Interfaces"},{"path":"../30-tier-list.html","title":"Tooling tier list","category":"Custom Editing Interfaces"},{"path":"../31-todo-list.html","title":"Ship-week todo list","category":"Custom Editing Interfaces"},{"path":"../22-metrics-dashboard.html","title":"Metrics dashboard","category":"Data & Dashboards"},{"path":"../23-benchmark-comparison.html","title":"Benchmark comparison","category":"Data & Dashboards"},{"path":"../24-data-table-explorer.html","title":"Support queue table","category":"Data & Dashboards"},{"path":"../25-log-trace-explorer.html","title":"Trace waterfall","category":"Data & Dashboards"}];
+const PALETTES = ["claude", "newsprint", "paperback", "swiss", "terminal",
+"brutalist", "glass", "synthwave", "pastel", "notebook", "solarized"];
+const TYPES = {
+editorial:  ["Palatino · system", 'Palatino, "Palatino Linotype", P052, "URW Palladio L", Georgia, ui-serif, serif'],
+paperback:  ["Baskerville · Charter", 'Baskerville, "URW Bookman", "Noto Serif", serif'],
+grotesk:    ["Helvetica · tight", '"Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif'],
+geometric:  ["Futura · airy", 'Futura, Avenir, "Century Gothic", "URW Gothic", Ubuntu, sans-serif'],
+humanist:   ["Optima · Ubuntu", 'Optima, Candara, Seravek, Ubuntu, "Noto Sans", sans-serif'],
+slab:       ["Rockwell · system", 'Rockwell, "Roboto Slab", "DejaVu Serif", "Nimbus Roman", serif'],
+typewriter: ["Typewriter mono", '"American Typewriter", "Courier Prime", "Nimbus Mono PS", "Courier New", monospace'],
+terminal:   ["Coding mono", 'ui-monospace, "Cascadia Code", "DejaVu Sans Mono", "Liberation Mono", monospace'],
+casual:     ["Handwritten-ish", '"Segoe Print", "Bradley Hand", "Comic Sans MS", "Comic Neue", cursive'],
+};
+const FINISHES = ["soft", "sharp", "pill", "brutal", "hairline", "glow", "sketch"];
+const PRESETS = {
+studio:    { palette: "swiss",     type: "grotesk",    finish: "hairline" },
+claude:    { palette: "claude",    type: "editorial",  finish: "soft"     },
+newsprint: { palette: "newsprint", type: "paperback",  finish: "hairline" },
+paperback: { palette: "paperback", type: "paperback",  finish: "soft"     },
+swiss:     { palette: "swiss",     type: "grotesk",    finish: "sharp"    },
+terminal:  { palette: "terminal",  type: "terminal",   finish: "hairline" },
+brutalist: { palette: "brutalist", type: "grotesk",    finish: "brutal"   },
+glass:     { palette: "glass",     type: "humanist",   finish: "pill"     },
+synthwave: { palette: "synthwave", type: "typewriter", finish: "glow"     },
+pastel:    { palette: "pastel",    type: "casual",     finish: "pill"     },
+notebook:  { palette: "notebook",  type: "casual",     finish: "sketch"   },
+solarized: { palette: "solarized", type: "humanist",   finish: "soft"     },
+};
+const DEFAULTS = { v: 3, palette: "swiss", type: "grotesk", finish: "hairline",
+recipe: "studio", accent: null, mode: "light", density: "cozy", textSize: "m",
+nav: "dock", customPalette: null };
+const NAVS = ["none", "dock", "topbar", "sidebar", "tabs", "drawer", "dots"];
+const CP_TOKENS = ["bg", "surface", "surface-2", "ink", "ink-muted",
+"accent", "accent-contrast", "line"];
+const root = document.documentElement;
+const slug = root.dataset.artifact ||
+(location.pathname.split("/").pop() || "artifact").replace(/\.html?$/, "");
+const KEY = { settings: "html2:settings", recipes: "html2:recipes",
+hints: "html2:hints", edits: `html2:${slug}:edits`,
+state: `html2:${slug}:state`, blocks: `html2:${slug}:blocks`,
+backup: `html2:${slug}:backup` };
+const mem = new Map();
+const store = {
+read(k, fb) {
+try { const v = localStorage.getItem(k); if (v != null) return JSON.parse(v); } catch {}
+return mem.has(k) ? mem.get(k) : fb;
+},
+write(k, v) { mem.set(k, v); try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+remove(k) { mem.delete(k); try { localStorage.removeItem(k); } catch {} },
+};
+const noMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function migrateSettings(raw) {
+if (!raw || typeof raw !== "object") return null;
+if (raw.v === 3) return Object.assign({}, DEFAULTS, raw);
+if (raw.v === 2) {
+const s = Object.assign({}, DEFAULTS, raw, { v: 3, nav: "dock", customPalette: null });
+if (raw.palette === "swiss" && raw.type === "grotesk" && raw.finish === "sharp" &&
+!raw.accent && raw.recipe === "swiss") {
+s.finish = "hairline"; s.recipe = "studio";
+}
+return s;
+}
+if (raw.theme) {
+const mix = PRESETS[raw.theme] || PRESETS[DEFAULTS.recipe];
+return Object.assign({}, DEFAULTS, mix, {
+recipe: PRESETS[raw.theme] ? raw.theme : DEFAULTS.recipe,
+mode: raw.mode === "dark" || raw.mode === "light" ? raw.mode : DEFAULTS.mode,
+density: raw.density === "compact" ? "compact" : "cozy",
+});
+}
+return null;
+}
+let settings = migrateSettings(store.read(KEY.settings, null)) || Object.assign({}, DEFAULTS);
+let recipes = store.read(KEY.recipes, {});
+function setAttr(name, value) {
+if (value) root.setAttribute(name, value); else root.removeAttribute(name);
+}
+function applySettings(animate) {
+const run = () => {
+if (settings.customPalette && settings.customPalette.colors) {
+setAttr("data-palette", "custom");
+for (const t of CP_TOKENS)
+root.style.setProperty("--" + t, settings.customPalette.colors[t] || "");
+} else {
+for (const t of CP_TOKENS) root.style.removeProperty("--" + t);
+setAttr("data-palette", settings.palette !== "claude" && settings.palette);
+}
+setAttr("data-nav", settings.nav !== "dock" && settings.nav);
+setAttr("data-type", settings.type !== "editorial" && settings.type);
+setAttr("data-finish", settings.finish !== "soft" && settings.finish);
+setAttr("data-mode", settings.mode !== "system" && settings.mode);
+setAttr("data-density", settings.density === "compact" && "compact");
+setAttr("data-textsize", settings.textSize !== "m" && settings.textSize);
+root.removeAttribute("data-theme"); /* stale v1 attr */
+if (settings.accent) {
+root.style.setProperty("--user-accent", settings.accent);
+root.setAttribute("data-custom-accent", "");
+} else {
+root.style.removeProperty("--user-accent");
+root.removeAttribute("data-custom-accent");
+}
+};
+if (animate && document.startViewTransition && !noMotion()) {
+const vt = document.startViewTransition(run);
+vt.finished?.catch(() => {});   /* rapid switches skip transitions — not an error */
+vt.ready?.catch(() => {});
+} else run();
+}
+applySettings(false);
+function matchRecipe() {
+const cpSeed = settings.customPalette?.seed || null;
+const same = m => m.palette === settings.palette && m.type === settings.type &&
+m.finish === settings.finish && (m.accent || null) === (settings.accent || null) &&
+(m.customPalette?.seed || null) === cpSeed;
+for (const [n, m] of Object.entries(PRESETS))
+if (!settings.accent && !cpSeed && same(Object.assign({ accent: null }, m))) return n;
+for (const [n, m] of Object.entries(recipes)) if (same(m)) return n;
+return null;
+}
+function setSettings(patch, animate = true) {
+if ("palette" in patch && !("customPalette" in patch)) patch.customPalette = null;
+Object.assign(settings, patch);
+if (!("recipe" in patch) && ("palette" in patch || "type" in patch || "finish" in patch ||
+"accent" in patch || "customPalette" in patch))
+settings.recipe = matchRecipe();
+store.write(KEY.settings, settings);
+applySettings(animate);
+syncPanel();
+renderNav();
+}
+function applyRecipe(name) {
+const mix = PRESETS[name] || recipes[name];
+if (!mix) return;
+setSettings({ palette: mix.palette, type: mix.type, finish: mix.finish,
+accent: mix.accent || null, customPalette: mix.customPalette || null, recipe: name });
+}
+function saveRecipe(name) {
+recipes[name] = { palette: settings.palette, type: settings.type,
+finish: settings.finish, accent: settings.accent || null,
+customPalette: settings.customPalette || null };
+store.write(KEY.recipes, recipes);
+setSettings({ recipe: name });
+renderRecipes();
+toast(`Saved recipe “${name}”`);
+}
+function deleteRecipe(name) {
+const old = recipes[name];
+delete recipes[name];
+store.write(KEY.recipes, recipes);
+renderRecipes();
+toast(`Deleted “${name}”`, { label: "Undo", action() {
+recipes[name] = old; store.write(KEY.recipes, recipes); renderRecipes();
+} });
+}
+function resync() {
+const next = migrateSettings(store.read(KEY.settings, null));
+if (next && JSON.stringify(next) !== JSON.stringify(settings)) {
+settings = next; applySettings(false); syncPanel(); renderNav();
+}
+const r = store.read(KEY.recipes, {});
+if (JSON.stringify(r) !== JSON.stringify(recipes)) { recipes = r; renderRecipes(); }
+}
+addEventListener("storage", e => {
+if (!e.key || e.key === KEY.settings || e.key === KEY.recipes) resync();
+});
+addEventListener("focus", resync);
+addEventListener("pageshow", resync);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) resync(); });
+let toastEl, toastTimer, toastAction;
+function toast(msg, opts = {}) {
+if (!toastEl) return;
+toastEl.firstChild.textContent = msg;
+const btn = toastEl.querySelector("button");
+toastAction = opts.action || null;
+btn.hidden = !toastAction;
+btn.textContent = opts.label || "Undo";
+toastEl.hidden = false;
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => { toastEl.hidden = true; }, opts.sticky ? 8000 : 3500);
+}
+const originals = new Map();
+let edits = store.read(KEY.edits, {});
+function captureOriginals() {
+document.querySelectorAll("[data-edit]").forEach(el => {
+if (!originals.has(el.dataset.edit)) originals.set(el.dataset.edit, el.innerHTML);
+});
+}
+function applyEdits(map) {
+document.querySelectorAll("[data-edit]").forEach(el => {
+const v = map[el.dataset.edit];
+if (v != null) el.textContent = v;
+});
+}
+function persistEdit(el) {
+edits[el.dataset.edit] = el.textContent;
+store.write(KEY.edits, edits);
+}
+function setEditing(on) {
+root.toggleAttribute("data-editing", on);
+document.querySelectorAll("[data-edit]").forEach(el => {
+if (on) {
+el.setAttribute("contenteditable", "plaintext-only");
+if (el.contentEditable !== "plaintext-only") el.setAttribute("contenteditable", "true");
+} else el.removeAttribute("contenteditable");
+});
+if (pill) pill.hidden = !on;
+renderHandles(on);
+syncPanel();
+document.dispatchEvent(new CustomEvent("a2:editmode", { detail: { editing: on } }));
+}
+const isEditing = () => root.hasAttribute("data-editing");
+addEventListener("keydown", e => {
+if (e.key !== "e" && e.key !== "E") return;
+if (e.metaKey || e.ctrlKey || e.altKey) return;
+const t = e.target;
+if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+setEditing(!isEditing());
+});
+function initEditHint() {
+const hints = store.read(KEY.hints, {});
+if (hints.edit) return;
+const fn = e => {
+if (!e.target.closest || !e.target.closest("[data-edit]")) return;
+document.removeEventListener("mouseover", fn);
+hints.edit = true; store.write(KEY.hints, hints);
+toast("This text is editable — press E or use the gear");
+};
+document.addEventListener("mouseover", fn);
+}
+const restoreFns = [];
+const state = {
+get: () => store.read(KEY.state, null),
+set: v => store.write(KEY.state, v),
+clear: () => store.remove(KEY.state),
+onRestore: fn => { restoreFns.push(fn); const v = store.read(KEY.state, null); if (v != null) fn(v); },
+};
+function fireRestore() {
+const v = store.read(KEY.state, null);
+if (v != null) restoreFns.forEach(fn => fn(v));
+}
+let blockGroups = [];        // arrays of parents' block elements
+let originalOrder = [];
+const blockOrder = () => [...document.querySelectorAll("[data-block]")].map(el => el.dataset.block);
+function initBlocks() {
+const parents = new Set();
+document.querySelectorAll("[data-block]").forEach(el => parents.add(el.parentElement));
+blockGroups = [...parents]
+.map(p => [...p.children].filter(c => c.matches?.("[data-block]")))
+.filter(g => g.length > 1);
+originalOrder = blockOrder();
+applyBlockOrder(store.read(KEY.blocks, null));
+}
+function applyBlockOrder(order) {
+if (!Array.isArray(order) || !order.length) return;
+blockGroups.forEach(group => {
+const parent = group[0].parentElement;
+const anchor = group[group.length - 1].nextSibling;
+const sorted = [...group].sort((a, b) => {
+const ia = order.indexOf(a.dataset.block), ib = order.indexOf(b.dataset.block);
+return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib);
+});
+sorted.forEach(el => parent.insertBefore(el, anchor));
+group.length = 0; group.push(...sorted);
+});
+}
+function persistBlocks() {
+store.write(KEY.blocks, blockOrder());
+document.dispatchEvent(new CustomEvent("a2:blocks", { detail: { order: blockOrder() } }));
+}
+function moveBlock(el, dir) {
+const sib = dir < 0 ? el.previousElementSibling : el.nextElementSibling;
+if (!sib || !sib.matches("[data-block]")) return;
+flipBlocks(el.parentElement, () => {
+if (dir < 0) el.parentElement.insertBefore(el, sib);
+else el.parentElement.insertBefore(sib, el);
+});
+persistBlocks();
+}
+function flipBlocks(parent, mutate) {
+if (!window.Motion || noMotion()) { mutate(); return; }
+const els = [...parent.children].filter(c => c.matches?.("[data-block]"));
+const before = new Map(els.map(el => [el, el.getBoundingClientRect().top]));
+mutate();
+els.forEach(el => {
+const dy = before.get(el) - el.getBoundingClientRect().top;
+if (dy) window.Motion.animate(el,
+{ transform: [`translateY(${dy}px)`, "translateY(0px)"] },
+{ type: window.Motion.spring, bounce: 0.22, visualDuration: 0.55 });
+});
+}
+let dragBlock = null;
+function renderHandles(on) {
+document.querySelectorAll(".a2-handle").forEach(h => h.remove());
+document.querySelectorAll("[data-block].a2-blockhost").forEach(el => el.classList.remove("a2-blockhost"));
+if (!on) return;
+blockGroups.forEach(group => group.forEach(el => {
+el.classList.add("a2-blockhost");
+const h = document.createElement("button");
+h.className = "a2-handle";
+h.textContent = "⠿";
+h.draggable = true;
+h.setAttribute("aria-label", `Reorder section ${el.dataset.block} (arrow keys)`);
+h.addEventListener("keydown", e => {
+if (e.key === "ArrowUp") { e.preventDefault(); moveBlock(el, -1); h.focus(); }
+if (e.key === "ArrowDown") { e.preventDefault(); moveBlock(el, 1); h.focus(); }
+});
+h.addEventListener("dragstart", e => {
+dragBlock = el;
+e.dataTransfer.effectAllowed = "move";
+e.dataTransfer.setData("text/plain", el.dataset.block);
+});
+h.addEventListener("dragend", () => {
+dragBlock = null;
+document.querySelectorAll(".a2-dragover").forEach(x => x.classList.remove("a2-dragover"));
+});
+el.prepend(h);
+el.addEventListener("dragover", blockDragOver);
+el.addEventListener("dragleave", blockDragLeave);
+el.addEventListener("drop", blockDrop);
+}));
+}
+function blockDragOver(e) {
+if (!dragBlock || dragBlock === this || dragBlock.parentElement !== this.parentElement) return;
+e.preventDefault();
+e.dataTransfer.dropEffect = "move";
+this.classList.add("a2-dragover");
+}
+function blockDragLeave() { this.classList.remove("a2-dragover"); }
+function blockDrop(e) {
+this.classList.remove("a2-dragover");
+if (!dragBlock || dragBlock === this || dragBlock.parentElement !== this.parentElement) return;
+e.preventDefault();
+const target = this, src = dragBlock;
+flipBlocks(target.parentElement, () => {
+const after = [...target.parentElement.children].indexOf(src) <
+[...target.parentElement.children].indexOf(target);
+target.parentElement.insertBefore(src, after ? target.nextSibling : target);
+});
+persistBlocks();
+}
+function exportJSON() {
+const doc = { format: "html2-artifact", version: VERSION, artifact: slug,
+exportedAt: new Date().toISOString(), settings, recipes,
+edits, state: store.read(KEY.state, undefined), blocks: blockOrder() };
+if (doc.state === undefined) delete doc.state;
+if (!Object.keys(recipes).length) delete doc.recipes;
+const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });
+const a = Object.assign(document.createElement("a"),
+{ href: URL.createObjectURL(blob), download: `${slug}.edits.json` });
+a.click();
+URL.revokeObjectURL(a.href);
+toast("Exported " + a.download);
+}
+function importJSON(input) {
+const apply = doc => {
+if (!doc || doc.format !== "html2-artifact") return toast("Not an html2 edits file");
+if (doc.version > VERSION) return toast("Edits file is from a newer shell version");
+if (doc.artifact !== slug &&
+!confirm(`This file was exported from “${doc.artifact}”, not “${slug}”. Apply anyway?`)) return;
+store.write(KEY.backup, { edits, state: store.read(KEY.state, null), blocks: blockOrder() });
+edits = doc.edits || {};
+store.write(KEY.edits, edits);
+originals.forEach((html, k) => {
+if (!(k in edits)) {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+}
+});
+applyEdits(edits);
+if (doc.state != null) { store.write(KEY.state, doc.state); fireRestore(); }
+if (Array.isArray(doc.blocks)) { applyBlockOrder(doc.blocks); persistBlocks(); }
+if (doc.recipes) { Object.assign(recipes, doc.recipes); store.write(KEY.recipes, recipes); renderRecipes(); }
+if (doc.settings) {
+const m = migrateSettings(doc.settings);
+if (m) setSettings(m);
+}
+toast(doc.artifact !== slug ? `Imported (from ${doc.artifact})` : "Edits imported",
+{ label: "Undo", sticky: true, action: undoImport });
+};
+if (typeof input === "object" && !(input instanceof Blob)) return apply(input);
+input.text().then(t => { try { apply(JSON.parse(t)); } catch { toast("Could not parse JSON"); } });
+}
+function undoImport() {
+const b = store.read(KEY.backup, null);
+if (!b) return;
+edits = b.edits || {};
+store.write(KEY.edits, edits);
+originals.forEach((html, k) => {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+});
+applyEdits(edits);
+if (b.state != null) { store.write(KEY.state, b.state); fireRestore(); } else state.clear();
+if (Array.isArray(b.blocks)) { applyBlockOrder(b.blocks); persistBlocks(); }
+toast("Import undone");
+}
+function resetAll() {
+edits = {};
+store.remove(KEY.edits);
+state.clear();
+store.remove(KEY.blocks);
+originals.forEach((html, k) => {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+});
+applyBlockOrder(originalOrder);
+document.dispatchEvent(new CustomEvent("a2:reset"));
+toast("Edits, layout and state reset (recipe kept)");
+}
+/* ── flatten: bake the current look, edits, layout & state into a
+static, shell-free copy. The proof that the shell is deletable. ── */
+const FLAT_TOKENS = ["bg", "surface", "surface-2", "ink", "ink-muted", "ink-subtle",
+"accent", "accent-strong", "accent-contrast", "tint", "line", "line-strong", "focus",
+"positive", "warning", "negative", "shadow-color", "shadow-1", "shadow-2",
+"font-display", "font-body", "font-mono", "display-weight", "display-track", "lh-body",
+"radius-s", "radius-m", "radius-l", "radius-full", "border-w", "line-style", "space",
+"dur-1", "dur-2", "dur-3", "ease-out", "ease-spring"];
+function flatten() {
+const cs = getComputedStyle(root);
+const mode = cs.colorScheme.includes("dark") && !cs.colorScheme.includes("light")
+? "dark"
+: matchMedia("(prefers-color-scheme: dark)").matches && settings.mode === "system" ? "dark" : settings.mode === "dark" ? "dark" : "light";
+const vars = FLAT_TOKENS
+.map(t => [t, cs.getPropertyValue("--" + t).trim()])
+.filter(([, v]) => v)
+.map(([t, v]) => `  --${t}: ${v};`).join("\n");
+const staticCss = [
+'<style id="offprint-static">',
+`:root {\n  color-scheme: ${mode};\n${vars}\n}`,
+":where(body) { background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: var(--lh-body); }",
+":where(h1,h2,h3,h4) { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-track); }",
+":focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }",
+"@media print { * { box-shadow: none !important; } }",
+"@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }",
+"</style>",
+].join("\n");
+const st = store.read(KEY.state, null);
+const stub = `<script id="offprint-stub">
+const __S = ${JSON.stringify(st)};
+window.ArtifactShell = Object.freeze({ version: ${VERSION}, flat: true, slug: ${JSON.stringify(slug)},
+state: { get: () => __S, set: () => {}, clear: () => {}, onRestore: f => { if (__S != null) try { f(__S) } catch (e) {} } },
+toast: () => {}, isEditing: () => false, setEditing: () => {},
+applySettings: () => {}, applyTheme: () => {}, applyRecipe: () => {}, saveRecipe: () => {},
+setAccent: () => {}, randomPalette: () => null, generatePalette: () => null,
+exportJSON: () => {}, importJSON: () => {}, resetAll: () => {},
+readSettings: () => (${JSON.stringify(settings)}),
+recipes: { list: () => ({}), save: () => {}, remove: () => {} },
+blocks: { order: () => [], set: () => {}, reset: () => {} },
+get motion() { return window.Motion ?? null; } });
+<\/script>`;
+const doc = root.cloneNode(true);
+doc.querySelectorAll(".a2-gear,.a2-panel,.a2-toast,.a2-veil,.a2-editpill,.a2-handle," +
+".a3-nav,.a3-burger,#artifact-shell-css,#artifact-shell").forEach(el => el.remove());
+const walker = document.createTreeWalker(doc, NodeFilter.SHOW_COMMENT);
+const dead = [];
+while (walker.nextNode())
+if (/═══ \/?artifact-shell/.test(walker.currentNode.data)) dead.push(walker.currentNode);
+dead.forEach(n => n.remove());
+["data-palette", "data-type", "data-finish", "data-mode", "data-density", "data-textsize",
+"data-nav", "data-custom-accent", "data-editing", "style"].forEach(a => doc.removeAttribute(a));
+doc.querySelectorAll("[data-edit],[data-block],[data-reveal]").forEach(el => {
+el.removeAttribute("data-edit"); el.removeAttribute("data-block");
+el.removeAttribute("data-reveal"); el.removeAttribute("contenteditable");
+el.style?.removeProperty("--reveal-i");
+if (el.getAttribute("style") === "") el.removeAttribute("style");
+});
+doc.querySelector("body")?.classList.remove("a3-with-sidebar");
+doc.querySelector("head")?.insertAdjacentHTML("afterbegin",
+"\n" + staticCss + "\n" + stub + "\n");
+const html = "<!doctype html>\n" + doc.outerHTML;
+const blob = new Blob([html], { type: "text/html" });
+const a = Object.assign(document.createElement("a"),
+{ href: URL.createObjectURL(blob), download: `${slug}.flat.html` });
+a.click();
+URL.revokeObjectURL(a.href);
+toast(`Flattened → ${a.download} (static, shell-free)`);
+}
+function initReveal() {
+let i = 0;
+document.querySelectorAll("[data-reveal]").forEach(el => {
+el.style.setProperty("--reveal-i", Math.min(i++, 10));
+});
+}
+function oklchToLinearSrgb(L, C, H) {
+const hr = H * Math.PI / 180;
+const a = C * Math.cos(hr), b = C * Math.sin(hr);
+const l_ = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+const m_ = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+const s_ = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+return [
+4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
+-1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
+-0.0041960863 * l_ - 0.7034186147 * m_ + 1.7076147010 * s_,
+];
+}
+const inGamut = s => oklchToLinearSrgb(...s).every(c => c >= -0.0005 && c <= 1.0005);
+const relLum = s => {
+const [r, g, b] = oklchToLinearSrgb(...s).map(c => Math.min(1, Math.max(0, c)));
+return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const wcag = (a, b) => {
+const [hi, lo] = [relLum(a), relLum(b)].sort((x, y) => y - x);
+return (hi + 0.05) / (lo + 0.05);
+};
+function mulberry(seed) {
+return () => {
+seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+return ((t ^ t >>> 14) >>> 0) / 4294967296;
+};
+}
+function generatePalette(seedNum) {
+const rand = mulberry(seedNum);
+const H = rand() * 360;
+const w = rand();
+let N = H, Cn = 0;
+if (w < 0.30) Cn = 0;
+else if (w < 0.65) { N = H; Cn = 0.008 + rand() * 0.018; }
+else if (w < 0.80) { N = (H + 180) % 360; Cn = 0.006 + rand() * 0.012; }
+else { N = (H + (rand() < 0.5 ? -30 : 30) + 360) % 360; Cn = 0.008 + rand() * 0.018; }
+const bgL = 0.965 + rand() * 0.02, bgC = Cn * (0.5 + 0.5 * rand());
+const bgDL = 0.16 + rand() * 0.05;
+const t = {
+bg: [[bgL, bgC, N], [bgDL, bgC, N]],
+surface: [[Math.min(0.995, bgL + 0.005 + rand() * 0.015), bgC * 0.8, N], [bgDL + 0.035, bgC, N]],
+"surface-2": [[bgL - 0.035 - rand() * 0.01, Math.min(bgC * 1.3, 0.05), N], [bgDL + 0.075, bgC, N]],
+ink: [[0.15 + rand() * 0.09, Math.min(Cn * 1.5, 0.03), N], [0.92 + rand() * 0.03, Math.min(Cn, 0.02), N]],
+"ink-muted": [[0.46 + rand() * 0.08, Math.min(Cn * 2, 0.04), N], [0.62 + rand() * 0.06, Math.min(Cn * 2, 0.05), N]],
+line: [[0.84 + rand() * 0.05, Math.min(Cn, 0.03), N], [0.30 + rand() * 0.04, Math.min(Cn * 1.5, 0.04), N]],
+accent: [[0.48 + rand() * 0.14, 0.13 + rand() * 0.10, H],
+[Math.min(0.9, 0.62 + rand() * 0.14), 0.11 + rand() * 0.10, H]],
+};
+const clip = s => { while (s[1] > 0 && !inGamut(s)) s[1] = Math.max(0, s[1] - 0.01); return s; };
+Object.values(t).forEach(pair => pair.forEach(clip));
+for (const m of [0, 1]) {
+const dir = m ? +0.02 : -0.02;   /* dark mode pushes ink lighter, light darker */
+const sub = () => [t.ink[m][0] * 0.82 + t.bg[m][0] * 0.18, t.ink[m][1], N];
+let n = 0;
+while (n++ < 25) {
+let ok = true;
+const push = (tok, d) => {
+t[tok][m][0] = Math.min(0.98, Math.max(0.05, t[tok][m][0] + d));
+clip(t[tok][m]); ok = false;
+};
+if (wcag(t.ink[m], t.bg[m]) < 4.5 || wcag(t.ink[m], t.surface[m]) < 4.5) push("ink", dir);
+if (wcag(sub(), t.bg[m]) < 4.5) push("ink", dir);
+if (wcag(t["ink-muted"][m], t.surface[m]) < 3) push("ink-muted", dir);
+if (wcag(t.accent[m], t.bg[m]) < 3) push("accent", m ? +0.02 : -0.02);
+if (ok) break;
+}
+}
+t["accent-contrast"] = [
+t.accent[0][0] < 0.60 ? [...t.bg[0]] : [...t.ink[0]],
+t.accent[1][0] < 0.60 ? [...t.ink[1]] : [...t.bg[1]],
+];
+for (const m of [0, 1]) {
+let n = 0;
+while (wcag(t["accent-contrast"][m], t.accent[m]) < 3 && n++ < 25) {
+t.accent[m][0] += t["accent-contrast"][m][0] > t.accent[m][0] ? -0.02 : 0.02;
+clip(t.accent[m]);
+}
+}
+const fmt = s => `oklch(${(s[0] * 100).toFixed(1)}% ${s[1].toFixed(3)} ${s[2].toFixed(1)})`;
+const colors = {};
+for (const [k, [lt, dk]] of Object.entries(t)) colors[k] = `light-dark(${fmt(lt)}, ${fmt(dk)})`;
+const ADJ = ["quiet", "late", "paper", "raw", "cold", "warm", "soft", "wild", "dim", "clear", "dry", "deep"];
+const NOUN = ["copper", "harbor", "moss", "plum", "ash", "denim", "clay", "fern", "tide", "ochre", "slate", "rose"];
+const name = ADJ[Math.floor(rand() * ADJ.length)] + " " + NOUN[Math.floor(rand() * NOUN.length)];
+return { name, seed: (seedNum >>> 0).toString(36), colors };
+}
+function randomPalette(seed) {
+const seedNum = seed != null ? parseInt(String(seed), 36) : (Math.random() * 2 ** 31) | 0;
+const cp = generatePalette(seedNum);
+setSettings({ customPalette: cp });
+toast(`Palette “${cp.name}” (#${cp.seed}) — save the mix to keep it`);
+return cp;
+}
+let navRoot = null, spy = null, lastNav = null;
+function discoverSections() {
+let els = [...document.querySelectorAll("[data-block]")];
+if (!els.length)
+els = [...document.querySelectorAll("h2")].map(h => h.closest("section") || h)
+.filter((el, i, a) => a.indexOf(el) === i);
+return els.map((el, i) => {
+if (!el.id) el.id = "a3-s" + i;
+const h = el.matches("h1,h2,h3") ? el : el.querySelector("h1,h2,h3");
+let label = (h?.textContent || el.dataset.block || "Section " + (i + 1))
+.trim().replace(/\s+/g, " ");
+if (label.length > 40) label = label.slice(0, 37) + "…";
+return { id: el.id, label, el };
+});
+}
+const selfIndex = () => ARTIFACTS.findIndex(a =>
+a.path.split("/").pop() === slug + ".html");
+const homeHref = () => (location.pathname.includes("/unknowns/") ? "../" : "") + "index.html";
+const secLink = s => `<a href="#${s.id}" data-sec="${s.id}">${s.label}</a>`;
+function switcherHTML(cls) {
+const cats = [...new Set(ARTIFACTS.map(a => a.category))];
+const cur = selfIndex();
+return `<select class="${cls}" aria-label="Open another artifact">
+${cur < 0 ? `<option selected disabled>${document.title.split("—")[0].trim()}</option>` : ""}
+${cats.map(c => `<optgroup label="${c}">` +
+ARTIFACTS.filter(a => a.category === c).map(a =>
+`<option value="${a.path}"${ARTIFACTS.indexOf(a) === cur ? " selected" : ""}>${a.title}</option>`).join("") +
+`</optgroup>`).join("")}</select>`;
+}
+function setupSpy(map) {
+spy?.disconnect();
+spy = new IntersectionObserver(es => es.forEach(e => {
+if (!e.isIntersecting) return;
+navRoot?.querySelectorAll("[aria-current]").forEach(x => x.removeAttribute("aria-current"));
+map.get(e.target)?.setAttribute("aria-current", "true");
+}), { rootMargin: "-20% 0px -70%" });
+map.forEach((_, el) => spy.observe(el));
+}
+function renderNav(force) {
+if (!document.body || (!force && settings.nav === lastNav)) return;
+lastNav = settings.nav;
+spy?.disconnect(); spy = null;
+navRoot?.remove(); navRoot = null;
+document.querySelector(".a3-burger")?.remove();
+document.body.classList.remove("a3-with-sidebar");
+if (gear) { gear.classList.remove("a2-in-dock"); document.body.append(gear); }
+const kind = settings.nav || "dock";
+if (kind === "none") return;
+const sections = discoverSections();
+const idx = selfIndex();
+const prev = idx > 0 ? ARTIFACTS[idx - 1] : null;
+const next = idx >= 0 && idx < ARTIFACTS.length - 1 ? ARTIFACTS[idx + 1] : null;
+navRoot = document.createElement("nav");
+navRoot.id = "a3-nav";
+navRoot.className = "a3-nav a3-" + kind;
+navRoot.setAttribute("aria-label", "Page navigation");
+if (kind === "dock") {
+navRoot.innerHTML = `
+<a class="a3-ic" href="${homeHref()}" title="Gallery" aria-label="Gallery">⌂</a>
+${prev ? `<a class="a3-ic" href="${prev.path}" title="${prev.title}" aria-label="Previous: ${prev.title}">‹</a>`
+: `<span class="a3-ic" aria-hidden="true" data-dim>‹</span>`}
+${sections.length > 1 ? `<button class="a3-ic" data-pop aria-expanded="false" aria-label="Sections">¶</button>
+<div class="a3-pop">${sections.map(secLink).join("")}</div>` : ""}
+${next ? `<a class="a3-ic" href="${next.path}" title="${next.title}" aria-label="Next: ${next.title}">›</a>`
+: `<span class="a3-ic" aria-hidden="true" data-dim>›</span>`}`;
+document.body.append(navRoot);
+if (gear) { gear.classList.add("a2-in-dock"); navRoot.append(gear); }
+const pop = navRoot.querySelector(".a3-pop");
+const popBtn = navRoot.querySelector("[data-pop]");
+if (popBtn) {
+popBtn.addEventListener("click", () => {
+const on = !pop.classList.contains("is-open");
+pop.classList.toggle("is-open", on);
+popBtn.setAttribute("aria-expanded", on);
+});
+document.addEventListener("pointerdown", e => {
+if (!navRoot?.contains(e.target)) pop?.classList.remove("is-open");
+});
+pop.addEventListener("click", () => pop.classList.remove("is-open"));
+}
+} else if (kind === "topbar") {
+navRoot.innerHTML = `
+<a href="${homeHref()}">Gallery</a><span class="a3-sep">›</span>
+${switcherHTML("a3-switch")}
+<span class="a3-flex"></span>
+<span class="a3-seclinks">${sections.map(secLink).join("")}</span>`;
+document.body.prepend(navRoot);
+} else if (kind === "sidebar") {
+navRoot.innerHTML = `
+<a class="a3-side-home" href="${homeHref()}">⌂ Gallery</a>
+${switcherHTML("a3-switch")}
+<div class="a3-side-secs">${sections.map(secLink).join("")}</div>`;
+document.body.prepend(navRoot);
+document.body.classList.add("a3-with-sidebar");
+} else if (kind === "tabs") {
+navRoot.innerHTML = sections.map(secLink).join("");
+document.body.prepend(navRoot);
+} else if (kind === "drawer") {
+const burger = document.createElement("button");
+burger.className = "a3-burger";
+burger.setAttribute("aria-label", "Menu");
+burger.setAttribute("aria-expanded", "false");
+burger.innerHTML = "☰";
+navRoot.innerHTML = `
+<h3>On this page</h3>
+<div class="a3-drawer-secs">${sections.map(secLink).join("")}</div>
+<h3>All artifacts</h3>
+<div class="a3-drawer-arts">${[...new Set(ARTIFACTS.map(a => a.category))].map(c =>
+`<h4>${c}</h4>` + ARTIFACTS.filter(a => a.category === c).map(a =>
+`<a href="${a.path}"${ARTIFACTS.indexOf(a) === idx ? ' aria-current="true"' : ""}>${a.title}</a>`).join("")
+).join("")}`;
+document.body.append(burger, navRoot);
+const setOpen = on => {
+navRoot.classList.toggle("is-open", on);
+burger.setAttribute("aria-expanded", on);
+if (on) navRoot.querySelector("a")?.focus();
+};
+burger.addEventListener("click", () => setOpen(!navRoot.classList.contains("is-open")));
+addEventListener("keydown", e => {
+if (e.key === "Escape" && navRoot?.classList.contains("is-open")) { setOpen(false); burger.focus(); }
+});
+document.addEventListener("pointerdown", e => {
+if (navRoot?.classList.contains("is-open") &&
+!navRoot.contains(e.target) && !burger.contains(e.target)) setOpen(false);
+});
+navRoot.querySelectorAll(".a3-drawer-secs a").forEach(a =>
+a.addEventListener("click", () => setOpen(false)));
+} else if (kind === "dots") {
+navRoot.innerHTML = sections.map(s =>
+`<a href="#${s.id}" data-sec="${s.id}" aria-label="${s.label}"><i></i><b>${s.label}</b></a>`).join("");
+document.body.append(navRoot);
+if (sections.length < 3) navRoot.hidden = true;
+}
+navRoot.querySelectorAll(".a3-switch").forEach(sel =>
+sel.addEventListener("change", () => { if (sel.value) location.href = sel.value; }));
+if (["sidebar", "tabs", "dots"].includes(kind)) {
+const map = new Map(sections.map(s =>
+[s.el, navRoot.querySelector(`[data-sec="${s.id}"]`)]).filter(([, l]) => l));
+setupSpy(map);
+}
+}
+document.addEventListener("a2:blocks", () => renderNav(true));
+let panel, gear, pill, veil;
+const GEAR_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09c0 .68.4 1.3 1.03 1.56a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.63.88 1.03 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z"/></svg>`;
+const hasPopover = "popover" in HTMLElement.prototype;
+function setPanelOpen(on) {
+if (!panel) return;
+panel.classList.toggle("is-open", on);
+if (hasPopover) {
+try { on ? panel.showPopover() : panel.hidePopover(); } catch {}
+}
+}
+const panelOpen = () => panel && panel.classList.contains("is-open");
+function seg(name, values, current) {
+return `<div class="a2-seg" role="radiogroup" aria-label="${name}">` +
+values.map(v => `<label><input type="radio" name="a2-${name}" value="${v}"${v === current ? " checked" : ""}>${v[0].toUpperCase() + v.slice(1)}</label>`).join("") + `</div>`;
+}
+function buildPanel() {
+gear = document.createElement("button");
+gear.className = "a2-gear";
+gear.setAttribute("aria-label", "Style & settings");
+gear.setAttribute("aria-expanded", "false");
+gear.innerHTML = GEAR_SVG;
+panel = document.createElement("div");
+panel.className = "a2-panel";
+panel.id = "a2-panel";
+if (hasPopover) panel.setAttribute("popover", "manual");
+panel.innerHTML = `
+<div class="a2-seg a2-tabs" role="tablist" aria-label="Settings sections">
+${["recipes", "mix", "options"].map((t, i) =>
+`<label role="presentation"><input type="radio" name="a2-tab" value="${t}"${i === 0 ? " checked" : ""}>${t[0].toUpperCase() + t.slice(1)}</label>`).join("")}
+</div>
+<div class="a2-tabpanel" data-tab="recipes">
+<h3>Presets</h3>
+<div class="a2-tiles" data-tiles="presets" role="radiogroup" aria-label="Preset recipes"></div>
+<h3 data-saved-h hidden>Saved</h3>
+<div class="a2-tiles" data-tiles="saved" role="radiogroup" aria-label="Saved recipes"></div>
+<div class="a2-btnrow">
+<input class="a2-namefield" data-recipe-name placeholder="Name this mix…" hidden>
+<button class="a2-btn" data-act="save-recipe">＋ Save current mix</button>
+</div>
+</div>
+<div class="a2-tabpanel" data-tab="mix" hidden>
+<h3>Palette</h3>
+<div class="a2-swatches" role="radiogroup" aria-label="Color palette">
+${PALETTES.map(p => `<button class="a2-swatch" role="radio" data-palette="${p}" data-pick-palette="${p}" aria-checked="false" aria-label="${p}" title="${p}"></button>`).join("")}
+</div>
+<h3>Type</h3>
+<div class="a2-typerows" role="radiogroup" aria-label="Typography">
+${Object.entries(TYPES).map(([k, [sub, stack]]) =>
+`<button class="a2-typerow" role="radio" data-pick-type="${k}" aria-checked="false" style="font-family:${stack.replace(/"/g, "&quot;")}">${k[0].toUpperCase() + k.slice(1)}<small>${sub}</small></button>`).join("")}
+</div>
+<h3>Finish</h3>
+<div class="a2-finchips" role="radiogroup" aria-label="Finish">
+${FINISHES.map(f => `<button class="a2-finchip" role="radio" data-finish="${f}" data-pick-finish="${f}" aria-checked="false">${f}</button>`).join("")}
+</div>
+<div class="a2-btnrow">
+<button class="a2-btn" data-act="random-palette" title="Generate a random palette (always readable)">⚄ Random palette</button>
+</div>
+<h3>Accent</h3>
+<div class="a2-accentrow">
+<input type="color" data-accent aria-label="Custom accent color">
+<button class="a2-btn" data-act="accent-reset">↺ palette accent</button>
+</div>
+</div>
+<div class="a2-tabpanel" data-tab="options" hidden>
+<h3>Navigation</h3>
+<div class="a2-finchips" role="radiogroup" aria-label="Navigation">
+${NAVS.map(n => `<button class="a2-finchip" role="radio" data-pick-nav="${n}" aria-checked="false">${n}</button>`).join("")}
+</div>
+<h3>Mode</h3>
+${seg("mode", ["system", "light", "dark"], settings.mode)}
+<h3>Text size</h3>
+${seg("textsize", ["s", "m", "l", "xl"], settings.textSize)}
+<div class="a2-row">
+<label for="a2-density">Compact density</label>
+<input class="a2-switch" type="checkbox" id="a2-density" role="switch">
+</div>
+<div class="a2-row">
+<label for="a2-edit">Edit mode <small style="color:var(--ink-muted)">(E)</small></label>
+<input class="a2-switch" type="checkbox" id="a2-edit" role="switch">
+</div>
+<div class="a2-btnrow">
+<button class="a2-btn" data-act="export">Export JSON</button>
+<button class="a2-btn" data-act="import">Import</button>
+<button class="a2-btn" data-act="reset">Reset</button>
+<button class="a2-btn" data-act="flatten" title="Download a static copy with the current look, edits and layout baked in — no shell, no settings">⤓ Flatten</button>
+</div>
+<input type="file" accept=".json,application/json" hidden>
+</div>`;
+pill = document.createElement("div");
+pill.className = "a2-editpill";
+pill.hidden = true;
+pill.textContent = "editing";
+toastEl = document.createElement("div");
+toastEl.className = "a2-toast";
+toastEl.hidden = true;
+toastEl.setAttribute("role", "status");
+toastEl.setAttribute("aria-live", "polite");
+toastEl.append(document.createTextNode(""), Object.assign(document.createElement("button"), { hidden: true }));
+toastEl.querySelector("button").addEventListener("click", () => {
+toastEl.hidden = true;
+if (toastAction) toastAction();
+});
+veil = document.createElement("div");
+veil.className = "a2-veil";
+veil.hidden = true;
+veil.textContent = "Drop .edits.json to import";
+document.body.append(gear, panel, pill, toastEl, veil);
+gear.addEventListener("click", () => {
+const on = !panelOpen();
+setPanelOpen(on);
+gear.setAttribute("aria-expanded", on);
+});
+addEventListener("keydown", e => {
+if (e.key === "Escape" && panelOpen()) { setPanelOpen(false); gear.focus(); }
+});
+document.addEventListener("pointerdown", e => {
+if (panelOpen() && !panel.contains(e.target) && !gear.contains(e.target)) setPanelOpen(false);
+});
+panel.querySelectorAll("input[name=a2-tab]").forEach(r =>
+r.addEventListener("change", () => {
+panel.querySelectorAll(".a2-tabpanel").forEach(p =>
+p.hidden = p.dataset.tab !== r.value);
+}));
+panel.addEventListener("click", e => {
+const pal = e.target.closest("[data-pick-palette]");
+if (pal) return setSettings({ palette: pal.dataset.pickPalette });
+const typ = e.target.closest("[data-pick-type]");
+if (typ) return setSettings({ type: typ.dataset.pickType });
+const fin = e.target.closest("[data-pick-finish]");
+if (fin) return setSettings({ finish: fin.dataset.pickFinish });
+const nv = e.target.closest("[data-pick-nav]");
+if (nv) return setSettings({ nav: nv.dataset.pickNav }, false);
+const del = e.target.closest("[data-del-recipe]");
+if (del) { e.stopPropagation(); return deleteRecipe(del.dataset.delRecipe); }
+const tile = e.target.closest("[data-recipe]");
+if (tile) return applyRecipe(tile.dataset.recipe);
+const act = e.target.closest("[data-act]");
+if (!act) return;
+if (act.dataset.act === "export") exportJSON();
+if (act.dataset.act === "import") panel.querySelector("input[type=file]").click();
+if (act.dataset.act === "reset") resetAll();
+if (act.dataset.act === "accent-reset") setSettings({ accent: null });
+if (act.dataset.act === "random-palette") randomPalette();
+if (act.dataset.act === "flatten") flatten();
+if (act.dataset.act === "save-recipe") {
+const field = panel.querySelector("[data-recipe-name]");
+if (field.hidden) { field.hidden = false; field.focus(); return; }
+const name = field.value.trim();
+if (name) { saveRecipe(name); field.value = ""; field.hidden = true; }
+else field.focus();
+}
+});
+panel.querySelector("[data-recipe-name]").addEventListener("keydown", e => {
+if (e.key === "Enter") panel.querySelector("[data-act=save-recipe]").click();
+});
+panel.querySelector("input[type=file]").addEventListener("change", e => {
+if (e.target.files[0]) importJSON(e.target.files[0]);
+e.target.value = "";
+});
+panel.querySelectorAll("input[name=a2-mode]").forEach(r =>
+r.addEventListener("change", () => setSettings({ mode: r.value })));
+panel.querySelectorAll("input[name=a2-textsize]").forEach(r =>
+r.addEventListener("change", () => setSettings({ textSize: r.value }, false)));
+panel.querySelector("#a2-density").addEventListener("change", e =>
+setSettings({ density: e.target.checked ? "compact" : "cozy" }, false));
+panel.querySelector("#a2-edit").addEventListener("change", e => setEditing(e.target.checked));
+panel.querySelector("[data-accent]").addEventListener("input", e =>
+setSettings({ accent: e.target.value }, false));
+panel.querySelectorAll("[role=radiogroup]").forEach(group => {
+group.addEventListener("keydown", e => {
+const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+if (!dir) return;
+const items = [...group.querySelectorAll("[role=radio]")];
+if (!items.length) return;
+e.preventDefault();
+const cur = items.indexOf(document.activeElement);
+const next = items[(cur + dir + items.length) % items.length];
+items.forEach(s => s.tabIndex = -1);
+next.tabIndex = 0;
+next.focus();
+next.click();
+});
+});
+document.addEventListener("focusout", e => {
+if (isEditing() && e.target.matches?.("[data-edit]")) persistEdit(e.target);
+});
+let dragDepth = 0;
+addEventListener("dragenter", e => {
+if (dragBlock) return;   /* internal block drag, not a file */
+if (e.target.closest?.("[data-k-drop]")) return;   /* kit dropzones own their drags */
+if ([...e.dataTransfer?.items || []].some(i => i.kind === "file")) {
+dragDepth++;
+veil.hidden = false;
+}
+});
+addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; veil.hidden = true; } });
+addEventListener("dragover", e => { if (!dragBlock) e.preventDefault(); });
+addEventListener("drop", e => {
+dragDepth = 0;
+veil.hidden = true;
+if (dragBlock) return;
+const f = e.dataTransfer?.files?.[0];
+if (f && /\.json$/i.test(f.name)) { e.preventDefault(); importJSON(f); }
+});
+renderRecipes();
+syncPanel();
+}
+function tileHTML(name, mix, deletable) {
+const stack = (TYPES[mix.type] || TYPES.editorial)[1].replace(/"/g, "&quot;");
+return `<button class="a2-tile" role="radio" aria-checked="false"
+data-recipe="${name}" data-palette="${mix.palette}"
+${mix.accent ? `style="--accent:${mix.accent}"` : ""}>
+${deletable ? `<span class="a2-del" data-del-recipe="${name}" role="button" tabindex="0" aria-label="Delete ${name}">×</span>` : ""}
+<span class="a2-tile-name" style="font-family:${stack}">${name}</span>
+</button>`;
+}
+function renderRecipes() {
+if (!panel) return;
+panel.querySelector("[data-tiles=presets]").innerHTML =
+Object.entries(PRESETS).map(([n, m]) => tileHTML(n, m, false)).join("");
+const saved = Object.entries(recipes);
+panel.querySelector("[data-saved-h]").hidden = !saved.length;
+panel.querySelector("[data-tiles=saved]").innerHTML =
+saved.map(([n, m]) => tileHTML(n, m, true)).join("");
+syncPanel();
+}
+function syncPanel() {
+if (!panel) return;
+panel.querySelectorAll("[data-recipe]").forEach(t =>
+t.setAttribute("aria-checked", t.dataset.recipe === settings.recipe));
+panel.querySelectorAll("[data-pick-palette]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickPalette === settings.palette));
+panel.querySelectorAll("[data-pick-type]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickType === settings.type));
+panel.querySelectorAll("[data-pick-finish]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickFinish === settings.finish));
+panel.querySelectorAll("[data-pick-nav]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickNav === settings.nav));
+panel.querySelectorAll("input[name=a2-mode]").forEach(r => r.checked = r.value === settings.mode);
+panel.querySelectorAll("input[name=a2-textsize]").forEach(r => r.checked = r.value === settings.textSize);
+panel.querySelector("#a2-density").checked = settings.density === "compact";
+panel.querySelector("#a2-edit").checked = isEditing();
+if (settings.accent) panel.querySelector("[data-accent]").value = settings.accent;
+panel.querySelectorAll("[role=radiogroup]").forEach(group => {
+const items = [...group.querySelectorAll("[role=radio]")];
+if (!items.length) return;
+const active = items.find(i => i.getAttribute("aria-checked") === "true") || items[0];
+items.forEach(i => i.tabIndex = i === active ? 0 : -1);
+});
+}
+document.addEventListener("DOMContentLoaded", () => {
+captureOriginals();
+applyEdits(edits);
+initBlocks();
+initReveal();
+buildPanel();
+renderNav(true);
+initEditHint();
+});
+window.ArtifactShell = {
+version: VERSION, slug, state, toast,
+exportJSON, importJSON, resetAll, flatten,
+applyRecipe, saveRecipe,
+recipes: { list: () => Object.assign({}, recipes), save: saveRecipe, remove: deleteRecipe },
+blocks: { order: blockOrder, set: o => { applyBlockOrder(o); persistBlocks(); },
+reset: () => { applyBlockOrder(originalOrder); store.remove(KEY.blocks); } },
+setAccent: hex => setSettings({ accent: hex || null }),
+randomPalette, generatePalette,
+applySettings: setSettings,
+applyTheme: (patch, animate) => {
+if (patch && patch.theme) applyRecipe(patch.theme);
+const rest = Object.assign({}, patch);
+delete rest.theme;
+if (Object.keys(rest).length) setSettings(rest, animate);
+},
+readSettings: () => Object.assign({}, settings),
+setEditing, isEditing,
+get motion() { return window.Motion ?? null; },
+};
+})();
+</script>
+<!-- ═══ /artifact-shell ═══ -->
+<title>Implementation notes — Know your unknowns</title>
+<style>
+  /* colors come from the artifact shell's semantic tokens */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── header ── */
+  header.page { padding: 56px 0 8px; position: relative; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::before { content: ""; width: 24px; height: 1.5px; background: var(--accent); flex: none; }
+  a.back {
+    position: absolute;
+    top: 60px; right: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  a.back:hover { color: var(--accent-strong); }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(32px, 5vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 0 0 10px;
+  }
+  .lede { font-size: 16.5px; color: var(--ink-subtle); max-width: 640px; margin: 0 0 30px; }
+
+  /* ── prompt box ── */
+  .promptcard {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px 24px;
+    position: relative;
+  }
+  .promptcard .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .promptcard blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 17.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    max-width: 62ch;
+  }
+  button.copybtn {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-subtle);
+    background: var(--surface-2);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  button.copybtn:hover { border-color: var(--ink-muted); }
+  button.copybtn.done { color: var(--positive); border-color: var(--positive); background: var(--surface); }
+
+  /* ── divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0 30px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .divider::before, .divider::after { content: ""; height: 1.5px; background: var(--line); flex: 1; }
+
+  /* ── artifact: notes document ── */
+  .doc {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .doc-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    padding: 14px 22px;
+    border-bottom: 1.5px solid var(--line);
+    background: var(--surface-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-subtle);
+  }
+  .doc-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--positive); flex: none; }
+  .doc-head .path { overflow-wrap: anywhere; }
+  .doc-head .meta { margin-left: auto; color: var(--ink-muted); }
+
+  .doc-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 22px 22px 0;
+  }
+  .stat {
+    flex: 1 1 130px;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px 10px;
+  }
+  .stat .n { font-family: var(--font-display); font-weight: 500; font-size: 30px; line-height: 1.1; letter-spacing: -0.02em; }
+  .stat .t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-top: 3px; }
+  .stat.dev .n { color: var(--accent-strong); }
+  .stat.you .n { color: var(--ink); }
+  .stat.you { border-color: var(--tint); background: color-mix(in oklch, var(--accent) 8%, var(--surface)); }
+
+  /* filter chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 18px 22px 4px;
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-subtle);
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--ink-muted); }
+  .chip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .chip .ct { color: var(--ink-muted); }
+  .chip.on .ct { color: color-mix(in oklch, var(--bg) 72%, var(--ink)); }
+
+  /* timeline */
+  .timeline { padding: 16px 22px 26px; }
+  .entry {
+    display: grid;
+    grid-template-columns: 52px 14px 1fr;
+    gap: 0 14px;
+    position: relative;
+  }
+  .entry .ts {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-muted);
+    padding-top: 4px;
+    text-align: right;
+  }
+  .entry .rail { position: relative; }
+  .entry .rail::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 0; bottom: 0;
+    width: 1.5px;
+    background: var(--line);
+    transform: translateX(-50%);
+  }
+  .entry.rail-first .rail::before { top: 10px; }
+  .entry.rail-last .rail::before { bottom: auto; height: 10px; }
+  .entry.rail-first.rail-last .rail::before { display: none; }
+  .entry .node {
+    position: absolute;
+    left: 50%; top: 8px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: var(--line);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1.5px var(--line);
+  }
+  .entry.t-plan .node    { background: var(--positive); box-shadow: 0 0 0 1.5px var(--positive); }
+  .entry.t-dev .node     { background: var(--accent);  box-shadow: 0 0 0 1.5px var(--accent); }
+  .entry.t-disc .node    { background: var(--tint);   box-shadow: 0 0 0 1.5px var(--ink-muted); }
+  .entry.t-human .node   { background: var(--ink); box-shadow: 0 0 0 1.5px var(--ink); }
+  .entry .body { padding: 0 0 22px; min-width: 0; }
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2.5px 9px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+  .t-plan  .badge { color: var(--positive); background: color-mix(in oklch, var(--positive) 12%, var(--surface)); border: 1px solid color-mix(in oklch, var(--positive) 38%, var(--surface)); }
+  .t-dev   .badge { color: var(--accent-contrast); background: var(--accent); border: 1px solid var(--accent); }
+  .t-disc  .badge { color: var(--ink-subtle); background: var(--surface-2); border: 1px solid var(--line); }
+  .t-human .badge { color: var(--bg); background: var(--ink); border: 1px solid var(--ink); }
+  .entry h3 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 4px;
+    letter-spacing: -0.005em;
+  }
+  .entry p { margin: 0; font-size: 14px; color: var(--ink-subtle); max-width: 68ch; }
+  .entry code, .devgrid code, .n2 code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 1px 5px;
+    overflow-wrap: anywhere;
+  }
+  .ts-mobile { display: none; }
+
+  /* deviation sub-fields */
+  .devgrid {
+    margin-top: 10px;
+    border: 1.5px solid var(--tint);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    background: color-mix(in oklch, var(--accent) 6%, var(--surface));
+    overflow: hidden;
+  }
+  .devgrid .row {
+    display: grid;
+    grid-template-columns: 158px 1fr;
+    gap: 12px;
+    padding: 9px 14px;
+    font-size: 13.5px;
+    color: var(--ink-subtle);
+  }
+  .devgrid .row + .row { border-top: 1px solid color-mix(in oklch, var(--accent) 16%, var(--surface)); }
+  .devgrid .k {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding-top: 2px;
+  }
+  .devgrid .row.chosen .k { color: var(--positive); }
+  .devgrid .row.chosen .v { color: var(--ink); font-weight: 500; }
+  @media (max-width: 560px) {
+    .devgrid .row { grid-template-columns: 1fr; gap: 2px; }
+    .entry { grid-template-columns: 14px 1fr; }
+    .entry .ts { display: none; }
+    .ts-mobile { display: inline; font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); margin-left: 8px; }
+  }
+
+  /* attempt #2 block */
+  .next {
+    margin-top: 26px;
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 24px 26px 22px;
+    position: relative;
+  }
+  .next .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .next h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .next .sub { font-size: 14px; color: var(--ink-muted); margin: 0 0 14px; max-width: 60ch; }
+  .next ol { margin: 0; padding-left: 22px; }
+  .next li { font-size: 14.5px; color: var(--ink-subtle); margin-bottom: 10px; max-width: 70ch; }
+  .next li strong { color: var(--ink); font-weight: 600; }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 22px;
+    border-top: 1.5px solid var(--line);
+    font-size: 13.5px;
+    color: var(--ink-muted);
+  }
+  footer a { color: var(--accent-strong); text-decoration-color: var(--tint); text-underline-offset: 3px; }
+
+  .hidden { display: none; }
+
+  @media print {
+    .promptcard, .stat, .entry, .devgrid, .next, footer { break-inside: avoid; }
+    button.copybtn, .chips, a.back { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page" data-reveal>
+    <div class="eyebrow" data-edit="hd-eyebrow">Know your unknowns &middot; During implementation</div>
+    <a class="back" href="index.html">&larr; All examples</a>
+    <h1 data-edit="hd-title">Implementation notes</h1>
+    <p class="lede" data-edit="hd-lede">Instead of letting mid-build surprises vanish into the scrollback, ask the agent to log every deviation from the plan as it happens — so the surprises become inputs to your next attempt.</p>
+
+    <div class="promptcard" data-reveal>
+      <div class="label">The prompt</div>
+      <button class="copybtn" id="copyPrompt">copy prompt</button>
+      <blockquote id="promptText" data-edit="prompt-quote">&ldquo;Keep an implementation-notes file as you build the export feature. If you hit an edge case that forces you to deviate from the plan, pick the conservative option, log it under &lsquo;Deviations&rsquo;, and keep going.&rdquo;</blockquote>
+    </div>
+  </header>
+
+  <div class="divider">What Claude produced</div>
+
+  <div class="doc" data-reveal="scroll">
+    <div class="doc-head">
+      <span class="dot"></span>
+      <span class="path">docs/notes/export-feature-implementation.md</span>
+      <span class="meta">run started 14:02 &middot; last write 16:51 &middot; branch feat/review-export</span>
+    </div>
+
+    <div class="doc-summary" data-block="summary-stats">
+      <div class="stat"><div class="n" data-edit="stat1-n">11</div><div class="t" data-edit="stat1-t">entries</div></div>
+      <div class="stat dev"><div class="n" data-edit="stat2-n">4</div><div class="t" data-edit="stat2-t">deviations</div></div>
+      <div class="stat you"><div class="n" data-edit="stat3-n">2</div><div class="t" data-edit="stat3-t">need your judgment</div></div>
+    </div>
+
+    <div class="chips" role="tablist" aria-label="Filter entries" data-block="entry-filters">
+      <button class="chip on" data-f="all">All <span class="ct">11</span></button>
+      <button class="chip" data-f="dev">Deviations <span class="ct">4</span></button>
+      <button class="chip" data-f="human">For you <span class="ct">2</span></button>
+    </div>
+
+    <div class="timeline" id="timeline" data-block="dev-log-timeline">
+
+      <div class="entry t-plan" data-t="plan">
+        <div class="ts">14:02</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Plan-confirmed</span><span class="ts-mobile">14:02</span>
+          <h3 data-edit="en1-title">Step 1 — export job model and queue wiring, as planned</h3>
+          <p>Added <code>ExportJob</code> in <code>apps/api/src/exports/exportJob.ts</code>, enqueued on the existing BullMQ <code>media-tasks</code> queue with a dedicated <code>export</code> job name. Migration <code>0121_export_jobs</code> matches the plan's schema exactly (status enum, <code>requested_by</code>, <code>review_id</code>, <code>format</code>).</p>
+        </div>
+      </div>
+
+      <div class="entry t-plan" data-t="plan">
+        <div class="ts">14:18</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Plan-confirmed</span><span class="ts-mobile">14:18</span>
+          <h3 data-edit="en2-title">Step 2 — <code>POST /api/v1/reviews/:id/export</code> endpoint</h3>
+          <p>Request validation reuses the zod schemas in <code>apps/api/src/validation/</code> as the plan specified. <code>format</code> accepts <code>mp4-burnin | csv | bundle</code>. Returns <code>202</code> with a job id; polling endpoint deferred to step 6 per plan.</p>
+        </div>
+      </div>
+
+      <div class="entry t-disc" data-t="disc">
+        <div class="ts">14:29</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Discovery</span><span class="ts-mobile">14:29</span>
+          <h3 data-edit="en3-title"><code>Review.duration_ms</code> is denormalized and occasionally stale</h3>
+          <p>Three fixture reviews have <code>duration_ms</code> that disagrees with the source asset's probe data (looks like re-uploads never refresh it). Export reads duration from <code>MediaAsset.probe.duration</code> instead — same approach <code>playbackManifest.ts</code> already takes. No plan change, just noting the trap for anyone who touches this later.</p>
+        </div>
+      </div>
+
+      <div class="entry t-dev" data-t="dev">
+        <div class="ts">14:41</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Deviation 1 of 4</span><span class="ts-mobile">14:41</span>
+          <h3 data-edit="en4-title">Legacy annotations don't always have frame timestamps</h3>
+          <div class="devgrid">
+            <div class="row"><div class="k">What the plan said</div><div class="v">Every annotation has a <code>frame_ts</code>; burn-in renderer can sort and place them all on the timeline.</div></div>
+            <div class="row"><div class="k">What the code revealed</div><div class="v">~12% of rows in <code>annotations</code> predate migration <code>0087</code> and have <code>frame_ts = NULL</code> — they were general review comments before per-frame annotations existed.</div></div>
+            <div class="row chosen"><div class="k">Conservative choice</div><div class="v">Exclude null-timestamp annotations from the video burn-in; include them in the CSV sidecar with <code>frame_ts</code> left blank and a <code>legacy_comment</code> flag. Nothing is silently dropped from the export bundle.</div></div>
+            <div class="row"><div class="k">Revisit</div><div class="v">Could interpolate a timestamp from <code>created_at</code> offset against the review session — decide whether that's honest enough to show in the video.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="entry t-plan" data-t="plan">
+        <div class="ts">15:05</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Plan-confirmed</span><span class="ts-mobile">15:05</span>
+          <h3 data-edit="en5-title">Step 3 — annotation burn-in via ffmpeg <code>drawtext</code>/<code>drawbox</code>, as planned</h3>
+          <p>Filtergraph builder in <code>apps/worker/src/exports/burnin.ts</code>. The plan's per-annotation overlay windows (<code>enable='between(t,a,b)'</code>) work; verified against the 40-annotation stress fixture — render time 1.4x realtime on the worker instance class, inside the plan's 2x budget.</p>
+        </div>
+      </div>
+
+      <div class="entry t-dev" data-t="dev">
+        <div class="ts">15:22</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Deviation 2 of 4</span><span class="ts-mobile">15:22</span>
+          <h3 data-edit="en6-title">The queue round-trips <code>Date</code> objects as strings</h3>
+          <div class="devgrid">
+            <div class="row"><div class="k">What the plan said</div><div class="v"><code>ExportJobPayload.requestedAt: Date</code>, passed through to the worker and compared against the review's <code>updated_at</code> to detect stale exports.</div></div>
+            <div class="row"><div class="k">What the code revealed</div><div class="v">BullMQ JSON-serializes payloads into Redis, so the worker receives an ISO string, not a <code>Date</code>. The staleness comparison silently coerced and passed in unit tests, but failed on a redelivered job in the integration run.</div></div>
+            <div class="row chosen"><div class="k">Conservative choice</div><div class="v">Typed the payload as wire format (<code>requestedAt: string</code> ISO-8601), parse once at the worker boundary in <code>exportConsumer.ts</code>. No custom serializer.</div></div>
+            <div class="row"><div class="k">Revisit</div><div class="v">Other <code>media-tasks</code> payloads likely have the same latent bug — a shared zod codec for job payloads would fix the class of problem.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="entry t-dev" data-t="dev">
+        <div class="ts">15:48</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Deviation 3 of 4</span><span class="ts-mobile">15:48</span>
+          <h3 data-edit="en7-title">Zip streaming already exists — dropped the planned <code>archiver</code> dependency</h3>
+          <div class="devgrid">
+            <div class="row"><div class="k">What the plan said</div><div class="v">Add <code>archiver</code> to build the export bundle (video + CSV + thumbnails) as a zip stream to S3.</div></div>
+            <div class="row"><div class="k">What the code revealed</div><div class="v"><code>packages/media/src/zipStream.ts</code> already does streaming zip with backpressure handling — it powers the bulk asset download feature and has been in production since March.</div></div>
+            <div class="row chosen"><div class="k">Conservative choice</div><div class="v">Reused <code>zipStream.ts</code> as-is. One fewer dependency, and bundle exports inherit the same tested backpressure behavior as bulk downloads.</div></div>
+            <div class="row"><div class="k">Revisit</div><div class="v"><code>zipStream</code> lives in <code>packages/media</code> but is now used by two features — worth promoting to <code>packages/shared</code> in a cleanup pass.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="entry t-disc" data-t="disc">
+        <div class="ts">16:07</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Discovery</span><span class="ts-mobile">16:07</span>
+          <h3 data-edit="en8-title">A websocket progress channel convention already exists</h3>
+          <p>The transcode pipeline emits <code>media:progress:{assetId}</code> events. Followed the same convention — exports emit <code>export:progress:{jobId}</code> — so the frontend can reuse <code>useProgressChannel()</code> from <code>apps/web/src/hooks/</code> instead of the polling UI the plan sketched. Kept the polling endpoint too, as the fallback.</p>
+        </div>
+      </div>
+
+      <div class="entry t-dev" data-t="dev">
+        <div class="ts">16:20</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Deviation 4 of 4</span><span class="ts-mobile">16:20</span>
+          <h3 data-edit="en9-title">Guest reviewers can view reviews but can't download assets</h3>
+          <div class="devgrid">
+            <div class="row"><div class="k">What the plan said</div><div class="v">Export permission = review-level ACL: anyone who can open the review can export it.</div></div>
+            <div class="row"><div class="k">What the code revealed</div><div class="v">Workspace-level <code>guest_reviewer</code> role grants review access with <code>can_download_assets = false</code> — clients use it to let external stakeholders comment without taking the media offsite. A review-ACL-only check would let guests exfiltrate source video via export.</div></div>
+            <div class="row chosen"><div class="k">Conservative choice</div><div class="v">Export returns <code>403</code> for <code>guest_reviewer</code> across all formats, mirroring the existing asset-download check in <code>assetAccess.ts</code>. Strictest defensible reading.</div></div>
+            <div class="row"><div class="k">Revisit</div><div class="v">Arguably guests should still get the CSV (annotations only, no media). That's a product call, not mine — logged below.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="entry t-human" data-t="human">
+        <div class="ts">16:33</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Todo for human</span><span class="ts-mobile">16:33</span>
+          <h3 data-edit="en10-title">Decide the guest-reviewer export policy</h3>
+          <p>Current behavior (from Deviation 4): guests get <code>403</code> on every export format. If you want guests to export the annotation CSV without media, it's a ~10-line change in <code>exportPolicy.ts</code> plus one test — but it changes what &ldquo;can't download assets&rdquo; means to customers, so it should be your call. Blocking neither merge nor QA.</p>
+        </div>
+      </div>
+
+      <div class="entry t-human" data-t="human">
+        <div class="ts">16:51</div>
+        <div class="rail"><span class="node"></span></div>
+        <div class="body">
+          <span class="badge">Todo for human</span><span class="ts-mobile">16:51</span>
+          <h3 data-edit="en11-title">Confirm the retention window for export bundles</h3>
+          <p>The plan didn't specify a TTL for generated bundles. I put them under the <code>exports/</code> S3 prefix with a 7-day lifecycle rule, matching share-link expiry — conservative, and nothing customer-visible promises longer. But if contracts or the data-retention policy say otherwise, the lifecycle rule in <code>infra/s3.tf</code> is the one line to change.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="next" data-reveal="scroll">
+    <div class="label">Fold back into the plan</div>
+    <h2 data-edit="next-title">What this changes about attempt #2</h2>
+    <p class="sub" data-edit="next-sub">Three lines to paste into the next plan or prompt, so the next run doesn't rediscover today's surprises.</p>
+    <button class="copybtn" id="copyNext">copy bullets</button>
+    <ol id="nextList">
+      <li data-edit="next-li1"><strong>State the legacy-data caveat up front:</strong> ~12% of annotations (pre-migration-0087) have null <code>frame_ts</code>. Decide interpolate-vs-sidecar before implementation starts, not at 14:41 mid-build.</li>
+      <li data-edit="next-li2"><strong>Spec queue payloads as wire types:</strong> BullMQ round-trips through JSON, so payload interfaces should use ISO strings, never <code>Date</code> — and a shared zod codec for <code>media-tasks</code> payloads would retire the whole bug class.</li>
+      <li data-edit="next-li3"><strong>Inventory existing utilities before adding dependencies:</strong> <code>zipStream.ts</code> and <code>useProgressChannel()</code> both existed and both beat the plan's version. Add a &ldquo;search for prior art&rdquo; step to the plan template, and settle the guest-reviewer export policy before the next feature touches ACLs.</li>
+    </ol>
+  </div>
+
+  <footer data-reveal="scroll">
+    Part of <a href="index.html">Know your unknowns</a> — companion examples to the blog post.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  // ── copy buttons ──
+  function wireCopy(btnId, getText) {
+    var btn = document.getElementById(btnId);
+    var original = btn.textContent;
+    btn.addEventListener('click', function () {
+      var text = getText();
+      function done() {
+        btn.textContent = 'Copied';
+        btn.classList.add('done');
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.classList.remove('done');
+        }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
+      } else {
+        fallback(text); done();
+      }
+    });
+  }
+  function fallback(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  wireCopy('copyPrompt', function () {
+    return "Keep an implementation-notes file as you build the export feature. If you hit an edge case that forces you to deviate from the plan, pick the conservative option, log it under 'Deviations', and keep going.";
+  });
+
+  wireCopy('copyNext', function () {
+    var items = document.querySelectorAll('#nextList li');
+    var out = [];
+    items.forEach(function (li, i) { out.push((i + 1) + '. ' + li.textContent.replace(/\s+/g, ' ').trim()); });
+    return out.join('\n');
+  });
+
+  // ── filter chips ──
+  var chips = document.querySelectorAll('.chip');
+  var entries = document.querySelectorAll('.entry');
+  function markRailEnds() {
+    var visible = Array.prototype.filter.call(entries, function (e) {
+      return !e.classList.contains('hidden');
+    });
+    entries.forEach(function (e) {
+      e.classList.remove('rail-first', 'rail-last');
+    });
+    if (visible.length) {
+      visible[0].classList.add('rail-first');
+      visible[visible.length - 1].classList.add('rail-last');
+    }
+  }
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('on'); });
+      chip.classList.add('on');
+      var f = chip.getAttribute('data-f');
+      entries.forEach(function (e) {
+        var t = e.getAttribute('data-t');
+        var show = (f === 'all') || (f === 'dev' && t === 'dev') || (f === 'human' && t === 'human');
+        e.classList.toggle('hidden', !show);
+      });
+      markRailEnds();
+    });
+  });
+  markRailEnds();
+})();
+</script>
+</body>
+</html>

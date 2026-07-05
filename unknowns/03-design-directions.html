@@ -1,0 +1,2753 @@
+<!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
+<!doctype html>
+<html lang="en" data-artifact="03-design-directions">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ═══ artifact-shell v3 ═══ -->
+<style id="artifact-shell-css">
+/* artifact-shell v3 — stripped; source: shell/artifact-shell.css */
+@layer tokens, palette, type, finish, base, components, utilities;
+@layer tokens {
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #C05A34; }
+@property --bg     { syntax: "<color>"; inherits: true; initial-value: #FAF9F5; }
+@property --ink    { syntax: "<color>"; inherits: true; initial-value: #141413; }
+:root {
+color-scheme: light dark;
+--bg:              light-dark(oklch(98.1% .006 84),  oklch(21% .006 84));
+--surface:         light-dark(oklch(100% 0 0),       oklch(25.5% .007 84));
+--surface-2:       light-dark(oklch(94.7% .009 92),  oklch(29% .008 84));
+--ink:             light-dark(oklch(19.6% .004 106), oklch(94% .006 84));
+--ink-muted:       light-dark(oklch(60.5% .008 97),  oklch(66% .01 90));
+--accent:          light-dark(oklch(62% .125 42),    oklch(72% .12 42));
+--accent-contrast: light-dark(oklch(98.1% .006 84),  oklch(21% .006 84));
+--line:            light-dark(oklch(84.8% .008 96),  oklch(35% .008 84));
+--positive:        light-dark(oklch(60% .07 130),    oklch(68% .08 130));
+--warning:         light-dark(oklch(66% .12 75),     oklch(74% .12 80));
+--negative:        light-dark(oklch(52% .14 30),     oklch(66% .15 30));
+--focus: var(--accent);
+--ink-subtle:    color-mix(in oklch, var(--ink) 82%, var(--bg));
+--accent-strong: color-mix(in oklch, var(--accent), var(--ink) 22%);
+--tint:          color-mix(in oklch, var(--accent) 20%, var(--surface));
+--line-strong:   color-mix(in oklch, var(--line), var(--ink) 30%);
+--shadow-color:  color-mix(in oklch, var(--ink) 12%, transparent);
+--shadow-1: 0 1px 3px var(--shadow-color);
+--shadow-2: 0 12px 32px var(--shadow-color);
+--font-display: Palatino, "Palatino Linotype", P052, "URW Palladio L", Georgia, ui-serif, serif;
+--font-body: system-ui, "Segoe UI", Ubuntu, Roboto, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: ui-monospace, "SF Mono", "Cascadia Code", "DejaVu Sans Mono", "Liberation Mono", Consolas, monospace;
+--display-weight: 600;
+--display-track: 0em;
+--lh-body: 1.6;
+--radius-s: 4px; --radius-m: 8px; --radius-l: 12px; --radius-full: 999px;
+--border-w: 1.5px;
+--line-style: solid;
+--space: 1rem;
+--dur-1: 120ms; --dur-2: 240ms; --dur-3: 420ms;
+--ease-out: cubic-bezier(.2, .7, .2, 1);
+--ease-spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%,
+1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%,
+1.129 32.8%, 1.051 39.6%, 1.017 43.1%, .991, .977 51%, .974 53.8%,
+.975 57.1%, .997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+}
+:root[data-mode="light"] { color-scheme: light; }
+:root[data-mode="dark"]  { color-scheme: dark; }
+:root[data-density="compact"] { --space: .8rem; --radius-m: 6px; --radius-l: 9px; }
+:root[data-textsize="s"]  { zoom: .9; }
+:root[data-textsize="l"]  { zoom: 1.1; }
+:root[data-textsize="xl"] { zoom: 1.25; }
+:root {
+--ivory: var(--bg); --paper: var(--surface); --white: var(--surface);
+--slate: var(--ink); --clay: var(--accent); --clay-d: var(--accent-strong);
+--oat: var(--tint); --olive: var(--positive); --rust: var(--negative);
+--g100: var(--surface-2); --gray-50: var(--surface-2);
+--gray-100: var(--surface-2); --gray-150: var(--surface-2);
+--g200: var(--line); --g300: var(--line);
+--gray-200: var(--line); --gray-300: var(--line);
+--g500: var(--ink-muted); --gray-500: var(--ink-muted);
+--g700: var(--ink-subtle); --gray-700: var(--ink-subtle); --gray-800: var(--ink-subtle);
+--serif: var(--font-display); --sans: var(--font-body); --mono: var(--font-mono);
+}
+}
+@layer palette {
+[data-palette="newsprint"] {
+--bg:        light-dark(oklch(96.5% .002 90), oklch(18% 0 0));
+--surface:   light-dark(oklch(99% .001 90),   oklch(22% 0 0));
+--surface-2: light-dark(oklch(93% .002 90),   oklch(26% 0 0));
+--ink:       light-dark(oklch(15% 0 0),       oklch(93% .002 90));
+--ink-muted: light-dark(oklch(48% .002 90),   oklch(65% .002 90));
+--accent:    light-dark(oklch(50% .19 27),    oklch(64% .17 27));
+--accent-contrast: oklch(98% .002 90);
+--line:      light-dark(oklch(80% .002 90),   oklch(34% 0 0));
+}
+[data-palette="paperback"] {
+--bg:        light-dark(oklch(95.5% .022 85), oklch(23% .02 60));
+--surface:   light-dark(oklch(97.8% .018 85), oklch(27% .022 60));
+--surface-2: light-dark(oklch(92.5% .025 85), oklch(31% .022 60));
+--ink:       light-dark(oklch(28% .03 60),    oklch(91% .02 80));
+--ink-muted: light-dark(oklch(52% .035 65),   oklch(68% .03 75));
+--accent:    light-dark(oklch(56% .11 55),    oklch(72% .11 65));
+--accent-contrast: light-dark(oklch(97.8% .018 85), oklch(23% .02 60));
+--line:      light-dark(oklch(84% .03 80),    oklch(37% .025 60));
+}
+[data-palette="swiss"] {
+--bg:        light-dark(oklch(100% 0 0),      oklch(17% 0 0));
+--surface:   light-dark(oklch(100% 0 0),      oklch(21% 0 0));
+--surface-2: light-dark(oklch(95% 0 0),       oklch(25% 0 0));
+--ink:       light-dark(oklch(13% 0 0),       oklch(95% 0 0));
+--ink-muted: light-dark(oklch(50% 0 0),       oklch(66% 0 0));
+--accent:    light-dark(oklch(58% .22 29),    oklch(66% .2 29));
+--accent-contrast: oklch(100% 0 0);
+--line:      light-dark(oklch(88% 0 0),       oklch(32% 0 0));
+}
+[data-palette="terminal"] {
+--bg:        light-dark(oklch(95% .015 150),  oklch(16% .02 150));
+--surface:   light-dark(oklch(97.5% .01 150), oklch(19.5% .025 150));
+--surface-2: light-dark(oklch(91% .02 150),   oklch(23% .03 150));
+--ink:       light-dark(oklch(23% .03 150),   oklch(88% .09 150));
+--ink-muted: light-dark(oklch(48% .04 150),   oklch(64% .06 150));
+--accent:    light-dark(oklch(48% .13 150),   oklch(78% .18 150));
+--accent-contrast: light-dark(oklch(97.5% .01 150), oklch(16% .02 150));
+--line:      light-dark(oklch(80% .04 150),   oklch(32% .05 150));
+}
+[data-palette="brutalist"] {
+--bg:        light-dark(oklch(98% 0 0),       oklch(15% 0 0));
+--surface:   light-dark(oklch(100% 0 0),      oklch(20% 0 0));
+--surface-2: light-dark(oklch(93% .02 95),    oklch(25% .01 95));
+--ink:       light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+--ink-muted: light-dark(oklch(38% 0 0),       oklch(72% 0 0));
+--accent:    light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+--accent-contrast: light-dark(oklch(97% 0 0), oklch(10% 0 0));
+--tint:      light-dark(oklch(86% .17 95),    oklch(78% .15 95));
+--line:      light-dark(oklch(10% 0 0),       oklch(97% 0 0));
+}
+[data-palette="glass"] {
+--bg:        light-dark(oklch(96% .012 290),  oklch(18% .03 290));
+--surface:   light-dark(oklch(100% 0 0 / .62), oklch(26% .03 290 / .55));
+--surface-2: light-dark(oklch(97% .01 290 / .7), oklch(31% .035 290 / .6));
+--ink:       light-dark(oklch(22% .03 290),   oklch(94% .01 290));
+--ink-muted: light-dark(oklch(50% .04 290),   oklch(70% .03 290));
+--accent:    light-dark(oklch(54% .19 290),   oklch(74% .15 290));
+--accent-contrast: light-dark(oklch(98% .005 290), oklch(18% .03 290));
+--line:      light-dark(oklch(85% .025 290 / .8), oklch(40% .04 290 / .7));
+--shadow-color: color-mix(in oklch, oklch(30% .1 290) 18%, transparent);
+}
+[data-palette="synthwave"] {
+--bg:        light-dark(oklch(95% .02 300),   oklch(17% .05 290));
+--surface:   light-dark(oklch(98% .012 300),  oklch(22% .06 290));
+--surface-2: light-dark(oklch(91.5% .03 300), oklch(26.5% .07 290));
+--ink:       light-dark(oklch(24% .06 300),   oklch(93% .03 320));
+--ink-muted: light-dark(oklch(50% .08 310),   oklch(70% .08 320));
+--accent:    light-dark(oklch(56% .23 340),   oklch(72% .22 340));
+--accent-contrast: light-dark(oklch(98% .01 340), oklch(17% .05 290));
+--line:      light-dark(oklch(83% .05 310),   oklch(37% .09 300));
+}
+[data-palette="pastel"] {
+--bg:        light-dark(oklch(97.5% .015 330), oklch(24% .025 320));
+--surface:   light-dark(oklch(99.4% .006 330), oklch(28% .028 320));
+--surface-2: light-dark(oklch(94.5% .022 300), oklch(32% .03 315));
+--ink:       light-dark(oklch(30% .04 320),    oklch(93% .015 330));
+--ink-muted: light-dark(oklch(56% .05 325),    oklch(70% .04 325));
+--accent:    light-dark(oklch(63% .14 350),    oklch(76% .13 350));
+--accent-contrast: light-dark(oklch(99.4% .006 330), oklch(24% .025 320));
+--line:      light-dark(oklch(88% .03 320),    oklch(38% .04 320));
+}
+[data-palette="notebook"] {
+--bg:        light-dark(oklch(98% .008 100),  oklch(22% .01 100));
+--surface:   light-dark(oklch(99.5% .004 100), oklch(26% .012 100));
+--surface-2: light-dark(oklch(94.5% .012 100), oklch(30% .012 100));
+--ink:       light-dark(oklch(25% .015 262),  oklch(92% .008 100));
+--ink-muted: light-dark(oklch(52% .02 262),   oklch(67% .015 100));
+--accent:    light-dark(oklch(46% .17 262),   oklch(72% .13 262));
+--accent-contrast: light-dark(oklch(99.5% .004 100), oklch(22% .01 100));
+--line:      light-dark(oklch(84% .015 100),  oklch(36% .015 100));
+}
+[data-palette="solarized"] {
+--bg:        light-dark(oklch(96.5% .025 90), oklch(27% .035 235));
+--surface:   light-dark(oklch(99% .016 95),   oklch(30.5% .04 235));
+--surface-2: light-dark(oklch(92.5% .03 90),  oklch(34% .04 235));
+--ink:       light-dark(oklch(42% .025 220),  oklch(88% .02 90));
+--ink-muted: light-dark(oklch(58% .02 220),   oklch(68% .025 200));
+--accent:    light-dark(oklch(56% .12 240),   oklch(68% .11 240));
+--accent-contrast: light-dark(oklch(98% .016 95), oklch(27% .035 235));
+--line:      light-dark(oklch(87% .028 90),   oklch(38% .04 235));
+}
+:root[data-custom-accent] {
+--accent: var(--user-accent);
+--accent-contrast: oklch(from var(--user-accent)
+clamp(.13, (.66 - l) * infinity, .985) .01 h);
+--focus: var(--user-accent);
+}
+}
+@layer type {
+[data-type="paperback"] {
+--font-display: Baskerville, "Baskerville Old Face", "Libre Baskerville", "URW Bookman", "Bookman Old Style", "Noto Serif", serif;
+--font-body: Charter, "Bitstream Charter", "Iowan Old Style", "Noto Serif", "Liberation Serif", Georgia, serif;
+--font-mono: "Nimbus Mono PS", "Courier Prime", "Courier New", monospace;
+--lh-body: 1.68;
+}
+[data-type="grotesk"] {
+--font-display: "Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+--font-body: "Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
+--display-weight: 700; --display-track: -.02em;
+}
+[data-type="geometric"] {
+--font-display: Futura, "Futura PT", Avenir, "Century Gothic", "URW Gothic", "Avant Garde", Ubuntu, sans-serif;
+--font-body: Avenir, "Avenir Next", "Century Gothic", "URW Gothic", Ubuntu, "Noto Sans", sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", monospace;
+--display-weight: 500; --display-track: .03em;
+}
+[data-type="humanist"] {
+--font-display: Optima, Candara, Seravek, Ubuntu, "Noto Sans", sans-serif;
+--font-body: Seravek, Candara, Ubuntu, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: "Ubuntu Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+--lh-body: 1.62;
+}
+[data-type="slab"] {
+--font-display: Rockwell, "Rockwell Nova", "Roboto Slab", "DejaVu Serif", "Nimbus Roman", serif;
+--font-body: system-ui, Ubuntu, "Noto Sans", "Liberation Sans", sans-serif;
+--font-mono: ui-monospace, "DejaVu Sans Mono", monospace;
+--display-weight: 700;
+}
+[data-type="typewriter"] {
+--font-display: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--font-body: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--font-mono: "American Typewriter", "Courier Prime", "Nimbus Mono PS", "Liberation Mono", "Courier New", monospace;
+--display-weight: 700; --lh-body: 1.7;
+}
+[data-type="terminal"] {
+--font-display: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--font-body: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace;
+--lh-body: 1.55; --display-track: .01em;
+}
+[data-type="casual"] {
+--font-display: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Comic Neue", cursive;
+--font-body: "Comic Neue", "Segoe UI", Ubuntu, "Noto Sans", sans-serif;
+--font-mono: "Ubuntu Mono", ui-monospace, monospace;
+--lh-body: 1.65;
+}
+}
+@layer finish {
+[data-finish="sharp"] {
+--radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --radius-full: 0px;
+--border-w: 2px;
+--shadow-1: none; --shadow-2: none;
+--display-track: -.01em;
+}
+[data-finish="pill"] {
+--radius-s: 10px; --radius-m: 18px; --radius-l: 26px;
+--shadow-1: 0 2px 8px var(--shadow-color);
+--shadow-2: 0 20px 48px var(--shadow-color);
+--space: 1.1rem;
+}
+[data-finish="brutal"] {
+--radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --radius-full: 0px;
+--border-w: 2.5px;
+--shadow-1: 3px 3px 0 var(--ink);
+--shadow-2: 6px 6px 0 var(--ink);
+--line-strong: var(--ink);
+}
+[data-finish="hairline"] {
+--radius-s: 2px; --radius-m: 3px; --radius-l: 4px;
+--border-w: 1px;
+--shadow-1: none; --shadow-2: none;
+--display-track: .01em;
+}
+[data-finish="glow"] {
+--radius-s: 3px; --radius-m: 6px; --radius-l: 10px;
+--border-w: 1px;
+--shadow-1: 0 0 10px color-mix(in oklch, var(--accent) 45%, transparent);
+--shadow-2: 0 0 26px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+[data-finish="sketch"] {
+--radius-s: 6px; --radius-m: 9px; --radius-l: 12px;
+--line-style: dashed;
+--shadow-1: none; --shadow-2: none;
+}
+}
+@layer base {
+:where(body) { font-family: var(--font-body); line-height: var(--lh-body, 1.6); }
+:where(h1, h2, h3, h4) {
+font-family: var(--font-display);
+font-weight: var(--display-weight, 600);
+letter-spacing: var(--display-track, 0em);
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+:where(a) {
+transition: text-underline-offset var(--dur-1) var(--ease-out),
+text-decoration-thickness var(--dur-1) var(--ease-out), color var(--dur-1);
+}
+:where(a:hover) { text-underline-offset: 4px; }
+:where(button, [role="button"], summary):where(:not([disabled])) {
+transition: translate var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+:where(button, [role="button"], summary):where(:not([disabled])):hover { translate: 0 -1px; }
+:where(button, [role="button"], summary):where(:not([disabled])):active {
+translate: 0 0; transition-duration: 60ms;
+}
+:where(summary) { cursor: pointer; }
+:root:not([data-editing]) [data-edit] {
+text-decoration-line: underline;
+text-decoration-style: dashed;
+text-decoration-color: transparent;
+text-decoration-thickness: 1px;
+text-underline-offset: 3px;
+transition: text-decoration-color var(--dur-2) var(--ease-out) 300ms;
+}
+:root:not([data-editing]) [data-edit]:hover {
+text-decoration-color: color-mix(in oklch, var(--accent) 45%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+*, *::before, *::after {
+animation-duration: .01ms !important;
+animation-iteration-count: 1 !important;
+transition-duration: .01ms !important;
+scroll-behavior: auto !important;
+}
+::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+animation-duration: .01ms !important;
+}
+}
+@media print {
+:root { zoom: 1 !important; }
+:root, [data-palette], [data-theme] {
+color-scheme: light;
+--bg: #fff; --surface: #fff; --surface-2: #F0EEE6;
+--ink: #141413; --ink-muted: #57564F; --accent: #B85C3E;
+--accent-contrast: #fff; --line: #C9C7BD;
+--positive: #5C6F44; --warning: #8A6320; --negative: #A04024;
+--shadow-1: none; --shadow-2: none;
+}
+.a2-gear, .a2-toast, .a2-veil, .a2-panel, .a2-editpill, .a2-handle,
+.a3-nav, .a3-burger { display: none !important; }
+body.a3-with-sidebar { margin-inline-start: 0 !important; }
+[data-edit] { outline: none !important; text-decoration: none !important; }
+details { &::details-content { content-visibility: visible; display: block; } }
+details > summary { list-style: none; }
+* { box-shadow: none !important; text-shadow: none !important; }
+}
+}
+@layer components {
+.a2-gear {
+position: fixed; inset-block-end: 18px; inset-inline-end: 18px; z-index: 999;
+inline-size: 44px; block-size: 44px; border-radius: 50%;
+border: var(--border-w) solid var(--line);
+background: var(--surface); color: var(--ink);
+display: grid; place-items: center; cursor: pointer;
+box-shadow: var(--shadow-1);
+transition: rotate var(--dur-2) var(--ease-spring), box-shadow var(--dur-1) var(--ease-out);
+&:hover { rotate: 30deg; box-shadow: var(--shadow-2); }
+& svg { inline-size: 20px; block-size: 20px; }
+}
+.a2-panel {
+position: fixed; inset: auto 16px 72px auto; z-index: 1000;
+margin: 0; padding: 12px; inline-size: 316px;
+max-block-size: min(70vh, 560px); overflow: auto; overscroll-behavior: contain;
+border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-l);
+background: var(--surface); color: var(--ink);
+box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13px; line-height: 1.45;
+display: none; opacity: 0; translate: 0 8px; scale: .98;
+transition: opacity var(--dur-2) var(--ease-out),
+translate var(--dur-2) var(--ease-spring), scale var(--dur-2) var(--ease-spring),
+display var(--dur-2) allow-discrete;
+&.is-open {
+display: block; opacity: 1; translate: 0 0; scale: 1;
+@starting-style { opacity: 0; translate: 0 8px; scale: .98; }
+}
+}
+.a2-panel h3 {
+margin: 12px 0 7px; font: 600 10.5px/1 var(--font-mono);
+letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted);
+&:first-child { margin-block-start: 2px; }
+}
+.a2-seg {
+display: grid; grid-auto-flow: column; gap: 2px; padding: 2px;
+background: var(--surface-2); border-radius: var(--radius-m);
+& label {
+position: relative; text-align: center; padding: 5px 4px;
+border-radius: calc(var(--radius-m) - 2px); cursor: pointer; color: var(--ink-muted);
+&:has(input:checked) { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
+& input { position: absolute; opacity: 0; pointer-events: none; }
+}
+}
+.a2-tabs { position: sticky; inset-block-start: 0; background: var(--surface); z-index: 1; padding-block-end: 6px; }
+.a2-tabpanel[hidden] { display: none; }
+.a2-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.a2-tile {
+position: relative; padding: 8px 6px 7px; cursor: pointer; text-align: center;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: linear-gradient(160deg, var(--bg) 0 55%, var(--accent) 55% 80%, var(--ink) 80%);
+color: var(--ink); font-size: 11.5px; line-height: 1.15;
+transition: scale var(--dur-1) var(--ease-spring), border-color var(--dur-1);
+& .a2-tile-name {
+display: block; margin-block-start: 22px; padding: 2px 3px;
+background: color-mix(in oklch, var(--surface) 82%, transparent);
+border-radius: var(--radius-s);
+}
+&:hover { scale: 1.05; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 1px; }
+& .a2-del {
+position: absolute; inset-block-start: 2px; inset-inline-end: 2px;
+border: 0; background: none; color: var(--ink-muted); cursor: pointer;
+font-size: 12px; line-height: 1; padding: 2px 4px; border-radius: var(--radius-s);
+&:hover { color: var(--negative); }
+}
+}
+.a2-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.a2-swatch {
+aspect-ratio: 1; border-radius: var(--radius-s); cursor: pointer; padding: 0;
+border: var(--border-w) solid var(--line);
+background: linear-gradient(135deg, var(--bg) 0 45%, var(--accent) 45% 75%, var(--ink) 75%);
+transition: scale var(--dur-1) var(--ease-spring), border-color var(--dur-1);
+&:hover { scale: 1.12; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 2px solid var(--focus); outline-offset: 1px; }
+}
+.a2-typerows { display: flex; flex-direction: column; gap: 3px; }
+.a2-typerow {
+display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+padding: 6px 9px; cursor: pointer; text-align: start;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); font-size: 14.5px;
+transition: border-color var(--dur-1), background var(--dur-1);
+& small { font: 10.5px var(--font-mono); color: var(--ink-muted); white-space: nowrap; }
+&:hover { border-color: var(--line-strong); background: var(--surface-2); }
+&[aria-checked="true"] { border-color: var(--focus); outline: 1.5px solid var(--focus); outline-offset: 0; }
+}
+.a2-finchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.a2-finchip {
+padding: 6px 12px; cursor: pointer; font-size: 12.5px;
+border: var(--border-w) var(--line-style) var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1);
+transition: scale var(--dur-1) var(--ease-spring);
+&:hover { scale: 1.06; }
+&[aria-checked="true"] { border-color: var(--focus); outline: 1.5px solid var(--focus); }
+}
+.a2-row {
+display: flex; align-items: center; justify-content: space-between;
+gap: 8px; margin-block-start: 10px;
+}
+.a2-accentrow {
+display: flex; align-items: center; gap: 8px;
+& input[type="color"] {
+inline-size: 42px; block-size: 30px; padding: 2px; cursor: pointer;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-s);
+background: var(--surface);
+}
+}
+.a2-switch {
+appearance: none; margin: 0; cursor: pointer; flex: none;
+inline-size: 36px; block-size: 21px; border-radius: var(--radius-full);
+background: var(--surface-2); border: var(--border-w) solid var(--line);
+transition: background var(--dur-2) var(--ease-out);
+&::before {
+content: ""; display: block; inline-size: 15px; block-size: 15px;
+border-radius: 50%; margin: 1.5px; background: var(--ink-muted);
+transition: translate var(--dur-2) var(--ease-spring), background var(--dur-2);
+}
+&:checked { background: var(--accent); border-color: var(--accent);
+&::before { translate: 14px 0; background: var(--accent-contrast); } }
+}
+.a2-btn {
+font: inherit; padding: 6px 10px; cursor: pointer;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink);
+transition: border-color var(--dur-1), background var(--dur-1), scale var(--dur-1) var(--ease-spring);
+&:hover { border-color: var(--line-strong); background: var(--surface-2); }
+&:active { scale: .96; }
+}
+.a2-btnrow { display: flex; gap: 6px; flex-wrap: wrap; margin-block-start: 10px; }
+.a2-namefield {
+font: inherit; flex: 1; min-inline-size: 0; padding: 6px 9px;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink);
+}
+.a2-toast {
+position: fixed; inset-block-end: 76px; inset-inline-start: 50%;
+translate: -50% 0; z-index: 1001;
+max-inline-size: min(90vw, 440px);
+padding: 10px 14px; border-radius: var(--radius-m);
+border: var(--border-w) solid var(--line);
+background: var(--surface); color: var(--ink); box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13.5px;
+display: flex; align-items: center; gap: 12px;
+transition: opacity var(--dur-2), translate var(--dur-2) var(--ease-spring),
+display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; translate: -50% 12px; }
+&[hidden] { opacity: 0; translate: -50% 12px; display: none; }
+& button { font: inherit; font-weight: 600; border: 0; background: none;
+color: var(--accent); cursor: pointer; padding: 0; }
+}
+:root[data-editing] [data-edit] {
+outline: 1.5px dashed color-mix(in oklch, var(--accent) 55%, transparent);
+outline-offset: 3px; border-radius: 2px;
+transition: outline-color var(--dur-1), background var(--dur-1);
+&:hover { outline-color: var(--accent); }
+&:focus { outline: 2px solid var(--accent); background: color-mix(in oklch, var(--accent) 7%, transparent); }
+}
+.a2-editpill {
+position: fixed; inset-block-start: 14px; inset-inline-end: 14px; z-index: 999;
+font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase;
+padding: 7px 12px; border-radius: var(--radius-full);
+background: var(--accent); color: var(--accent-contrast); box-shadow: var(--shadow-1);
+transition: opacity var(--dur-2), display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; }
+&[hidden] { opacity: 0; display: none; }
+}
+.a2-blockhost { position: relative; }
+.a2-handle {
+position: absolute; inset-block-start: 4px; inset-inline-start: -34px; z-index: 5;
+inline-size: 26px; block-size: 26px; cursor: grab;
+display: grid; place-items: center;
+border: var(--border-w) solid var(--line); border-radius: var(--radius-s);
+background: var(--surface); color: var(--ink-muted);
+font-size: 13px; line-height: 1; user-select: none;
+box-shadow: var(--shadow-1);
+&:hover { color: var(--ink); border-color: var(--line-strong); }
+&:active { cursor: grabbing; }
+@media (max-width: 900px) { inset-inline-start: 2px; }
+}
+[data-block].a2-dragover { outline: 2px dashed var(--accent); outline-offset: 4px; }
+.a2-veil {
+position: fixed; inset: 0; z-index: 1002;
+display: grid; place-items: center;
+background: color-mix(in oklch, var(--bg) 72%, transparent);
+backdrop-filter: blur(3px);
+border: 3px dashed var(--accent); border-radius: var(--radius-l);
+font: 600 15px var(--font-body); color: var(--ink);
+transition: opacity var(--dur-2), display var(--dur-2) allow-discrete;
+@starting-style { opacity: 0; }
+&[hidden] { opacity: 0; display: none; }
+}
+.a3-nav a { color: inherit; text-decoration: none; }
+.a3-nav a[aria-current] { color: var(--accent); }
+.a3-dock {
+position: fixed; inset-block-end: 14px; inset-inline: 0; z-index: 998;
+margin-inline: auto; inline-size: max-content;
+display: flex; align-items: center; gap: 4px; padding: 6px;
+border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-full);
+background: var(--surface); box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 15px;
+}
+.a3-ic {
+display: grid; place-items: center; inline-size: 34px; block-size: 34px;
+border: 0; border-radius: var(--radius-full); cursor: pointer;
+background: none; color: var(--ink); font-size: 16px; line-height: 1;
+transition: background var(--dur-1);
+&:hover { background: var(--surface-2); }
+&[data-dim] { opacity: .3; cursor: default; }
+}
+.a2-gear.a2-in-dock {
+position: static; inline-size: 34px; block-size: 34px;
+border: 0; box-shadow: none; background: none;
+& svg { inline-size: 17px; block-size: 17px; }
+}
+.a3-pop {
+position: absolute; inset-block-end: calc(100% + 10px); inset-inline-start: 50%;
+translate: -50% 0;
+min-inline-size: 200px; max-block-size: 50vh; overflow: auto;
+padding: 8px; border: var(--border-w) var(--line-style) var(--line);
+border-radius: var(--radius-l); background: var(--surface);
+box-shadow: var(--shadow-2); font-size: 13.5px;
+display: none; opacity: 0;
+transition: opacity var(--dur-2) var(--ease-out), display var(--dur-2) allow-discrete;
+&.is-open { display: block; opacity: 1; @starting-style { opacity: 0; } }
+& a { display: block; padding: 6px 10px; border-radius: var(--radius-s);
+&:hover { background: var(--surface-2); } }
+}
+.a3-topbar {
+position: sticky; inset-block-start: 0; z-index: 998;
+display: flex; align-items: center; gap: 10px;
+padding: 8px 18px;
+background: color-mix(in oklch, var(--bg) 85%, transparent);
+backdrop-filter: blur(8px);
+border-block-end: 1px var(--line-style) var(--line);
+font-family: var(--font-body); font-size: 13px;
+& > a:hover { color: var(--accent); }
+& .a3-sep { color: var(--ink-muted); }
+& .a3-flex { flex: 1; }
+& .a3-seclinks { display: flex; gap: 14px; overflow-x: auto;
+& a { color: var(--ink-muted); white-space: nowrap;
+&:hover { color: var(--ink); } } }
+@media (max-width: 720px) { & .a3-seclinks { display: none; } }
+}
+.a3-switch {
+font: inherit; max-inline-size: 260px; padding: 4px 6px;
+border: 1px var(--line-style) var(--line); border-radius: var(--radius-s);
+background: var(--surface); color: var(--ink);
+}
+.a3-sidebar {
+display: none;
+@media (min-width: 1200px) {
+display: flex; flex-direction: column; gap: 10px;
+position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 998;
+inline-size: 220px; padding: 20px 14px;
+background: var(--surface);
+border-inline-end: 1px var(--line-style) var(--line);
+overflow-y: auto; font-family: var(--font-body); font-size: 13px;
+& .a3-side-home { color: var(--ink-muted); &:hover { color: var(--ink); } }
+& .a3-side-secs { display: flex; flex-direction: column; gap: 2px; margin-block-start: 8px;
+& a { padding: 5px 8px; border-radius: var(--radius-s); color: var(--ink-muted);
+border-inline-start: 2px solid transparent;
+&:hover { background: var(--surface-2); color: var(--ink); }
+&[aria-current] { color: var(--accent); border-inline-start-color: var(--accent); } } }
+}
+}
+@media (min-width: 1200px) {
+body.a3-with-sidebar { margin-inline-start: 220px; }
+}
+.a3-tabs {
+position: sticky; inset-block-start: 0; z-index: 998;
+display: flex; gap: 4px; padding: 0 14px;
+background: color-mix(in oklch, var(--bg) 88%, transparent);
+backdrop-filter: blur(8px);
+border-block-end: 1px var(--line-style) var(--line);
+overflow-x: auto; scroll-snap-type: x proximity;
+font-family: var(--font-body); font-size: 13px;
+& a { padding: 11px 12px 9px; white-space: nowrap; scroll-snap-align: start;
+color: var(--ink-muted); border-block-end: 2px solid transparent;
+&:hover { color: var(--ink); }
+&[aria-current] { color: var(--ink); border-block-end-color: var(--accent); } }
+}
+.a3-burger {
+position: fixed; inset-block-start: 14px; inset-inline-start: 14px; z-index: 999;
+inline-size: 40px; block-size: 40px; cursor: pointer;
+border: var(--border-w) var(--line-style) var(--line); border-radius: var(--radius-m);
+background: var(--surface); color: var(--ink); font-size: 16px;
+box-shadow: var(--shadow-1);
+}
+.a3-drawer {
+position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 1001;
+inline-size: min(300px, 85vw); padding: 18px 16px; overflow-y: auto;
+background: var(--surface);
+border-inline-end: var(--border-w) var(--line-style) var(--line);
+box-shadow: var(--shadow-2);
+font-family: var(--font-body); font-size: 13.5px;
+translate: -105% 0;
+transition: translate var(--dur-2) var(--ease-out);
+&.is-open { translate: 0 0; }
+& h3 { margin: 14px 0 6px; font: 600 10.5px/1 var(--font-mono);
+letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted);
+&:first-child { margin-block-start: 0; } }
+& h4 { margin: 10px 0 3px; font: 600 11.5px var(--font-body); color: var(--ink-subtle); }
+& a { display: block; padding: 5px 8px; border-radius: var(--radius-s); color: var(--ink-muted);
+&:hover { background: var(--surface-2); color: var(--ink); }
+&[aria-current] { color: var(--accent); } }
+}
+.a3-dots {
+position: fixed; inset-block-start: 50%; inset-inline-end: 12px; z-index: 998;
+translate: 0 -50%;
+display: none; flex-direction: column; gap: 10px;
+@media (min-width: 900px) { display: flex; }
+& a { position: relative; display: grid; place-items: center; padding: 3px;
+& i { display: block; inline-size: 9px; block-size: 9px; border-radius: 50%;
+border: 1.5px solid var(--ink-muted); background: transparent;
+transition: background var(--dur-1), border-color var(--dur-1), scale var(--dur-1) var(--ease-spring); }
+& b {
+position: absolute; inset-inline-end: calc(100% + 8px); inset-block-start: 50%;
+translate: 0 -50%; white-space: nowrap;
+font: 500 12px var(--font-body); color: var(--ink);
+background: var(--surface); border: 1px var(--line-style) var(--line);
+border-radius: var(--radius-s); padding: 3px 8px; box-shadow: var(--shadow-1);
+opacity: 0; pointer-events: none; transition: opacity var(--dur-1);
+}
+&:hover, &:focus-visible { & i { scale: 1.25; border-color: var(--ink); } & b { opacity: 1; } }
+&[aria-current] i { background: var(--accent); border-color: var(--accent); }
+}
+}
+}
+@layer utilities {
+[data-reveal] {
+opacity: 1; translate: 0 0;
+transition: opacity var(--dur-3) var(--ease-out) calc(var(--reveal-i, 0) * 40ms),
+translate var(--dur-3) var(--ease-spring) calc(var(--reveal-i, 0) * 40ms);
+@starting-style { opacity: 0; translate: 0 10px; }
+}
+@supports (animation-timeline: view()) {
+@media (prefers-reduced-motion: no-preference) {
+[data-reveal="scroll"] {
+transition: none;
+animation: a2-rise both;
+animation-timeline: view();
+animation-range: entry 0% entry 60%;
+}
+}
+}
+@keyframes a2-rise { from { opacity: 0; translate: 0 14px; } }
+::view-transition-old(root), ::view-transition-new(root) {
+animation-duration: var(--dur-2);
+}
+}
+</style>
+<script id="artifact-shell">
+/* artifact-shell v3 — stripped; source: shell/artifact-shell.js */
+(() => {
+"use strict";
+const VERSION = 3;
+const ARTIFACTS = [{"path":"../21-theme-lab.html","title":"The Theme Lab","category":"Reference"},{"path":"../32-kit-gallery.html","title":"The Kit","category":"Reference"},{"path":"../01-exploration-code-approaches.html","title":"Three code approaches","category":"Exploration & Planning"},{"path":"../02-exploration-visual-designs.html","title":"Visual design directions","category":"Exploration & Planning"},{"path":"../16-implementation-plan.html","title":"Implementation plan","category":"Exploration & Planning"},{"path":"../26-decision-matrix.html","title":"Decision matrix","category":"Exploration & Planning"},{"path":"../28-roadmap-gantt.html","title":"Roadmap Gantt","category":"Exploration & Planning"},{"path":"../03-code-review-pr.html","title":"Annotated pull request","category":"Code Review & Understanding"},{"path":"../17-pr-writeup.html","title":"PR writeup for reviewers","category":"Code Review & Understanding"},{"path":"../04-code-understanding.html","title":"Module map","category":"Code Review & Understanding"},{"path":"../05-design-system.html","title":"Living design system","category":"Design"},{"path":"../06-component-variants.html","title":"Component variants","category":"Design"},{"path":"../07-prototype-animation.html","title":"Animation sandbox","category":"Prototyping"},{"path":"../08-prototype-interaction.html","title":"Clickable flow","category":"Prototyping"},{"path":"../10-svg-illustrations.html","title":"SVG figure sheet","category":"Illustrations & Diagrams"},{"path":"../13-flowchart-diagram.html","title":"Annotated flowchart","category":"Illustrations & Diagrams"},{"path":"../09-slide-deck.html","title":"Arrow-key slide deck","category":"Decks"},{"path":"../14-research-feature-explainer.html","title":"How a feature works","category":"Research & Learning"},{"path":"../15-research-concept-explainer.html","title":"Concept explainer","category":"Research & Learning"},{"path":"../11-status-report.html","title":"Weekly status","category":"Reports"},{"path":"../12-incident-report.html","title":"Incident timeline","category":"Reports"},{"path":"../27-postmortem-timeline.html","title":"Postmortem timeline","category":"Reports"},{"path":"../18-editor-triage-board.html","title":"Ticket triage board","category":"Custom Editing Interfaces"},{"path":"../19-editor-feature-flags.html","title":"Feature flag editor","category":"Custom Editing Interfaces"},{"path":"../20-editor-prompt-tuner.html","title":"Prompt tuner","category":"Custom Editing Interfaces"},{"path":"../29-kanban-board.html","title":"Week 28 kanban","category":"Custom Editing Interfaces"},{"path":"../30-tier-list.html","title":"Tooling tier list","category":"Custom Editing Interfaces"},{"path":"../31-todo-list.html","title":"Ship-week todo list","category":"Custom Editing Interfaces"},{"path":"../22-metrics-dashboard.html","title":"Metrics dashboard","category":"Data & Dashboards"},{"path":"../23-benchmark-comparison.html","title":"Benchmark comparison","category":"Data & Dashboards"},{"path":"../24-data-table-explorer.html","title":"Support queue table","category":"Data & Dashboards"},{"path":"../25-log-trace-explorer.html","title":"Trace waterfall","category":"Data & Dashboards"}];
+const PALETTES = ["claude", "newsprint", "paperback", "swiss", "terminal",
+"brutalist", "glass", "synthwave", "pastel", "notebook", "solarized"];
+const TYPES = {
+editorial:  ["Palatino · system", 'Palatino, "Palatino Linotype", P052, "URW Palladio L", Georgia, ui-serif, serif'],
+paperback:  ["Baskerville · Charter", 'Baskerville, "URW Bookman", "Noto Serif", serif'],
+grotesk:    ["Helvetica · tight", '"Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif'],
+geometric:  ["Futura · airy", 'Futura, Avenir, "Century Gothic", "URW Gothic", Ubuntu, sans-serif'],
+humanist:   ["Optima · Ubuntu", 'Optima, Candara, Seravek, Ubuntu, "Noto Sans", sans-serif'],
+slab:       ["Rockwell · system", 'Rockwell, "Roboto Slab", "DejaVu Serif", "Nimbus Roman", serif'],
+typewriter: ["Typewriter mono", '"American Typewriter", "Courier Prime", "Nimbus Mono PS", "Courier New", monospace'],
+terminal:   ["Coding mono", 'ui-monospace, "Cascadia Code", "DejaVu Sans Mono", "Liberation Mono", monospace'],
+casual:     ["Handwritten-ish", '"Segoe Print", "Bradley Hand", "Comic Sans MS", "Comic Neue", cursive'],
+};
+const FINISHES = ["soft", "sharp", "pill", "brutal", "hairline", "glow", "sketch"];
+const PRESETS = {
+studio:    { palette: "swiss",     type: "grotesk",    finish: "hairline" },
+claude:    { palette: "claude",    type: "editorial",  finish: "soft"     },
+newsprint: { palette: "newsprint", type: "paperback",  finish: "hairline" },
+paperback: { palette: "paperback", type: "paperback",  finish: "soft"     },
+swiss:     { palette: "swiss",     type: "grotesk",    finish: "sharp"    },
+terminal:  { palette: "terminal",  type: "terminal",   finish: "hairline" },
+brutalist: { palette: "brutalist", type: "grotesk",    finish: "brutal"   },
+glass:     { palette: "glass",     type: "humanist",   finish: "pill"     },
+synthwave: { palette: "synthwave", type: "typewriter", finish: "glow"     },
+pastel:    { palette: "pastel",    type: "casual",     finish: "pill"     },
+notebook:  { palette: "notebook",  type: "casual",     finish: "sketch"   },
+solarized: { palette: "solarized", type: "humanist",   finish: "soft"     },
+};
+const DEFAULTS = { v: 3, palette: "swiss", type: "grotesk", finish: "hairline",
+recipe: "studio", accent: null, mode: "light", density: "cozy", textSize: "m",
+nav: "dock", customPalette: null };
+const NAVS = ["none", "dock", "topbar", "sidebar", "tabs", "drawer", "dots"];
+const CP_TOKENS = ["bg", "surface", "surface-2", "ink", "ink-muted",
+"accent", "accent-contrast", "line"];
+const root = document.documentElement;
+const slug = root.dataset.artifact ||
+(location.pathname.split("/").pop() || "artifact").replace(/\.html?$/, "");
+const KEY = { settings: "html2:settings", recipes: "html2:recipes",
+hints: "html2:hints", edits: `html2:${slug}:edits`,
+state: `html2:${slug}:state`, blocks: `html2:${slug}:blocks`,
+backup: `html2:${slug}:backup` };
+const mem = new Map();
+const store = {
+read(k, fb) {
+try { const v = localStorage.getItem(k); if (v != null) return JSON.parse(v); } catch {}
+return mem.has(k) ? mem.get(k) : fb;
+},
+write(k, v) { mem.set(k, v); try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+remove(k) { mem.delete(k); try { localStorage.removeItem(k); } catch {} },
+};
+const noMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function migrateSettings(raw) {
+if (!raw || typeof raw !== "object") return null;
+if (raw.v === 3) return Object.assign({}, DEFAULTS, raw);
+if (raw.v === 2) {
+const s = Object.assign({}, DEFAULTS, raw, { v: 3, nav: "dock", customPalette: null });
+if (raw.palette === "swiss" && raw.type === "grotesk" && raw.finish === "sharp" &&
+!raw.accent && raw.recipe === "swiss") {
+s.finish = "hairline"; s.recipe = "studio";
+}
+return s;
+}
+if (raw.theme) {
+const mix = PRESETS[raw.theme] || PRESETS[DEFAULTS.recipe];
+return Object.assign({}, DEFAULTS, mix, {
+recipe: PRESETS[raw.theme] ? raw.theme : DEFAULTS.recipe,
+mode: raw.mode === "dark" || raw.mode === "light" ? raw.mode : DEFAULTS.mode,
+density: raw.density === "compact" ? "compact" : "cozy",
+});
+}
+return null;
+}
+let settings = migrateSettings(store.read(KEY.settings, null)) || Object.assign({}, DEFAULTS);
+let recipes = store.read(KEY.recipes, {});
+function setAttr(name, value) {
+if (value) root.setAttribute(name, value); else root.removeAttribute(name);
+}
+function applySettings(animate) {
+const run = () => {
+if (settings.customPalette && settings.customPalette.colors) {
+setAttr("data-palette", "custom");
+for (const t of CP_TOKENS)
+root.style.setProperty("--" + t, settings.customPalette.colors[t] || "");
+} else {
+for (const t of CP_TOKENS) root.style.removeProperty("--" + t);
+setAttr("data-palette", settings.palette !== "claude" && settings.palette);
+}
+setAttr("data-nav", settings.nav !== "dock" && settings.nav);
+setAttr("data-type", settings.type !== "editorial" && settings.type);
+setAttr("data-finish", settings.finish !== "soft" && settings.finish);
+setAttr("data-mode", settings.mode !== "system" && settings.mode);
+setAttr("data-density", settings.density === "compact" && "compact");
+setAttr("data-textsize", settings.textSize !== "m" && settings.textSize);
+root.removeAttribute("data-theme"); /* stale v1 attr */
+if (settings.accent) {
+root.style.setProperty("--user-accent", settings.accent);
+root.setAttribute("data-custom-accent", "");
+} else {
+root.style.removeProperty("--user-accent");
+root.removeAttribute("data-custom-accent");
+}
+};
+if (animate && document.startViewTransition && !noMotion()) {
+const vt = document.startViewTransition(run);
+vt.finished?.catch(() => {});   /* rapid switches skip transitions — not an error */
+vt.ready?.catch(() => {});
+} else run();
+}
+applySettings(false);
+function matchRecipe() {
+const cpSeed = settings.customPalette?.seed || null;
+const same = m => m.palette === settings.palette && m.type === settings.type &&
+m.finish === settings.finish && (m.accent || null) === (settings.accent || null) &&
+(m.customPalette?.seed || null) === cpSeed;
+for (const [n, m] of Object.entries(PRESETS))
+if (!settings.accent && !cpSeed && same(Object.assign({ accent: null }, m))) return n;
+for (const [n, m] of Object.entries(recipes)) if (same(m)) return n;
+return null;
+}
+function setSettings(patch, animate = true) {
+if ("palette" in patch && !("customPalette" in patch)) patch.customPalette = null;
+Object.assign(settings, patch);
+if (!("recipe" in patch) && ("palette" in patch || "type" in patch || "finish" in patch ||
+"accent" in patch || "customPalette" in patch))
+settings.recipe = matchRecipe();
+store.write(KEY.settings, settings);
+applySettings(animate);
+syncPanel();
+renderNav();
+}
+function applyRecipe(name) {
+const mix = PRESETS[name] || recipes[name];
+if (!mix) return;
+setSettings({ palette: mix.palette, type: mix.type, finish: mix.finish,
+accent: mix.accent || null, customPalette: mix.customPalette || null, recipe: name });
+}
+function saveRecipe(name) {
+recipes[name] = { palette: settings.palette, type: settings.type,
+finish: settings.finish, accent: settings.accent || null,
+customPalette: settings.customPalette || null };
+store.write(KEY.recipes, recipes);
+setSettings({ recipe: name });
+renderRecipes();
+toast(`Saved recipe “${name}”`);
+}
+function deleteRecipe(name) {
+const old = recipes[name];
+delete recipes[name];
+store.write(KEY.recipes, recipes);
+renderRecipes();
+toast(`Deleted “${name}”`, { label: "Undo", action() {
+recipes[name] = old; store.write(KEY.recipes, recipes); renderRecipes();
+} });
+}
+function resync() {
+const next = migrateSettings(store.read(KEY.settings, null));
+if (next && JSON.stringify(next) !== JSON.stringify(settings)) {
+settings = next; applySettings(false); syncPanel(); renderNav();
+}
+const r = store.read(KEY.recipes, {});
+if (JSON.stringify(r) !== JSON.stringify(recipes)) { recipes = r; renderRecipes(); }
+}
+addEventListener("storage", e => {
+if (!e.key || e.key === KEY.settings || e.key === KEY.recipes) resync();
+});
+addEventListener("focus", resync);
+addEventListener("pageshow", resync);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) resync(); });
+let toastEl, toastTimer, toastAction;
+function toast(msg, opts = {}) {
+if (!toastEl) return;
+toastEl.firstChild.textContent = msg;
+const btn = toastEl.querySelector("button");
+toastAction = opts.action || null;
+btn.hidden = !toastAction;
+btn.textContent = opts.label || "Undo";
+toastEl.hidden = false;
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => { toastEl.hidden = true; }, opts.sticky ? 8000 : 3500);
+}
+const originals = new Map();
+let edits = store.read(KEY.edits, {});
+function captureOriginals() {
+document.querySelectorAll("[data-edit]").forEach(el => {
+if (!originals.has(el.dataset.edit)) originals.set(el.dataset.edit, el.innerHTML);
+});
+}
+function applyEdits(map) {
+document.querySelectorAll("[data-edit]").forEach(el => {
+const v = map[el.dataset.edit];
+if (v != null) el.textContent = v;
+});
+}
+function persistEdit(el) {
+edits[el.dataset.edit] = el.textContent;
+store.write(KEY.edits, edits);
+}
+function setEditing(on) {
+root.toggleAttribute("data-editing", on);
+document.querySelectorAll("[data-edit]").forEach(el => {
+if (on) {
+el.setAttribute("contenteditable", "plaintext-only");
+if (el.contentEditable !== "plaintext-only") el.setAttribute("contenteditable", "true");
+} else el.removeAttribute("contenteditable");
+});
+if (pill) pill.hidden = !on;
+renderHandles(on);
+syncPanel();
+document.dispatchEvent(new CustomEvent("a2:editmode", { detail: { editing: on } }));
+}
+const isEditing = () => root.hasAttribute("data-editing");
+addEventListener("keydown", e => {
+if (e.key !== "e" && e.key !== "E") return;
+if (e.metaKey || e.ctrlKey || e.altKey) return;
+const t = e.target;
+if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+setEditing(!isEditing());
+});
+function initEditHint() {
+const hints = store.read(KEY.hints, {});
+if (hints.edit) return;
+const fn = e => {
+if (!e.target.closest || !e.target.closest("[data-edit]")) return;
+document.removeEventListener("mouseover", fn);
+hints.edit = true; store.write(KEY.hints, hints);
+toast("This text is editable — press E or use the gear");
+};
+document.addEventListener("mouseover", fn);
+}
+const restoreFns = [];
+const state = {
+get: () => store.read(KEY.state, null),
+set: v => store.write(KEY.state, v),
+clear: () => store.remove(KEY.state),
+onRestore: fn => { restoreFns.push(fn); const v = store.read(KEY.state, null); if (v != null) fn(v); },
+};
+function fireRestore() {
+const v = store.read(KEY.state, null);
+if (v != null) restoreFns.forEach(fn => fn(v));
+}
+let blockGroups = [];        // arrays of parents' block elements
+let originalOrder = [];
+const blockOrder = () => [...document.querySelectorAll("[data-block]")].map(el => el.dataset.block);
+function initBlocks() {
+const parents = new Set();
+document.querySelectorAll("[data-block]").forEach(el => parents.add(el.parentElement));
+blockGroups = [...parents]
+.map(p => [...p.children].filter(c => c.matches?.("[data-block]")))
+.filter(g => g.length > 1);
+originalOrder = blockOrder();
+applyBlockOrder(store.read(KEY.blocks, null));
+}
+function applyBlockOrder(order) {
+if (!Array.isArray(order) || !order.length) return;
+blockGroups.forEach(group => {
+const parent = group[0].parentElement;
+const anchor = group[group.length - 1].nextSibling;
+const sorted = [...group].sort((a, b) => {
+const ia = order.indexOf(a.dataset.block), ib = order.indexOf(b.dataset.block);
+return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib);
+});
+sorted.forEach(el => parent.insertBefore(el, anchor));
+group.length = 0; group.push(...sorted);
+});
+}
+function persistBlocks() {
+store.write(KEY.blocks, blockOrder());
+document.dispatchEvent(new CustomEvent("a2:blocks", { detail: { order: blockOrder() } }));
+}
+function moveBlock(el, dir) {
+const sib = dir < 0 ? el.previousElementSibling : el.nextElementSibling;
+if (!sib || !sib.matches("[data-block]")) return;
+flipBlocks(el.parentElement, () => {
+if (dir < 0) el.parentElement.insertBefore(el, sib);
+else el.parentElement.insertBefore(sib, el);
+});
+persistBlocks();
+}
+function flipBlocks(parent, mutate) {
+if (!window.Motion || noMotion()) { mutate(); return; }
+const els = [...parent.children].filter(c => c.matches?.("[data-block]"));
+const before = new Map(els.map(el => [el, el.getBoundingClientRect().top]));
+mutate();
+els.forEach(el => {
+const dy = before.get(el) - el.getBoundingClientRect().top;
+if (dy) window.Motion.animate(el,
+{ transform: [`translateY(${dy}px)`, "translateY(0px)"] },
+{ type: window.Motion.spring, bounce: 0.22, visualDuration: 0.55 });
+});
+}
+let dragBlock = null;
+function renderHandles(on) {
+document.querySelectorAll(".a2-handle").forEach(h => h.remove());
+document.querySelectorAll("[data-block].a2-blockhost").forEach(el => el.classList.remove("a2-blockhost"));
+if (!on) return;
+blockGroups.forEach(group => group.forEach(el => {
+el.classList.add("a2-blockhost");
+const h = document.createElement("button");
+h.className = "a2-handle";
+h.textContent = "⠿";
+h.draggable = true;
+h.setAttribute("aria-label", `Reorder section ${el.dataset.block} (arrow keys)`);
+h.addEventListener("keydown", e => {
+if (e.key === "ArrowUp") { e.preventDefault(); moveBlock(el, -1); h.focus(); }
+if (e.key === "ArrowDown") { e.preventDefault(); moveBlock(el, 1); h.focus(); }
+});
+h.addEventListener("dragstart", e => {
+dragBlock = el;
+e.dataTransfer.effectAllowed = "move";
+e.dataTransfer.setData("text/plain", el.dataset.block);
+});
+h.addEventListener("dragend", () => {
+dragBlock = null;
+document.querySelectorAll(".a2-dragover").forEach(x => x.classList.remove("a2-dragover"));
+});
+el.prepend(h);
+el.addEventListener("dragover", blockDragOver);
+el.addEventListener("dragleave", blockDragLeave);
+el.addEventListener("drop", blockDrop);
+}));
+}
+function blockDragOver(e) {
+if (!dragBlock || dragBlock === this || dragBlock.parentElement !== this.parentElement) return;
+e.preventDefault();
+e.dataTransfer.dropEffect = "move";
+this.classList.add("a2-dragover");
+}
+function blockDragLeave() { this.classList.remove("a2-dragover"); }
+function blockDrop(e) {
+this.classList.remove("a2-dragover");
+if (!dragBlock || dragBlock === this || dragBlock.parentElement !== this.parentElement) return;
+e.preventDefault();
+const target = this, src = dragBlock;
+flipBlocks(target.parentElement, () => {
+const after = [...target.parentElement.children].indexOf(src) <
+[...target.parentElement.children].indexOf(target);
+target.parentElement.insertBefore(src, after ? target.nextSibling : target);
+});
+persistBlocks();
+}
+function exportJSON() {
+const doc = { format: "html2-artifact", version: VERSION, artifact: slug,
+exportedAt: new Date().toISOString(), settings, recipes,
+edits, state: store.read(KEY.state, undefined), blocks: blockOrder() };
+if (doc.state === undefined) delete doc.state;
+if (!Object.keys(recipes).length) delete doc.recipes;
+const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });
+const a = Object.assign(document.createElement("a"),
+{ href: URL.createObjectURL(blob), download: `${slug}.edits.json` });
+a.click();
+URL.revokeObjectURL(a.href);
+toast("Exported " + a.download);
+}
+function importJSON(input) {
+const apply = doc => {
+if (!doc || doc.format !== "html2-artifact") return toast("Not an html2 edits file");
+if (doc.version > VERSION) return toast("Edits file is from a newer shell version");
+if (doc.artifact !== slug &&
+!confirm(`This file was exported from “${doc.artifact}”, not “${slug}”. Apply anyway?`)) return;
+store.write(KEY.backup, { edits, state: store.read(KEY.state, null), blocks: blockOrder() });
+edits = doc.edits || {};
+store.write(KEY.edits, edits);
+originals.forEach((html, k) => {
+if (!(k in edits)) {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+}
+});
+applyEdits(edits);
+if (doc.state != null) { store.write(KEY.state, doc.state); fireRestore(); }
+if (Array.isArray(doc.blocks)) { applyBlockOrder(doc.blocks); persistBlocks(); }
+if (doc.recipes) { Object.assign(recipes, doc.recipes); store.write(KEY.recipes, recipes); renderRecipes(); }
+if (doc.settings) {
+const m = migrateSettings(doc.settings);
+if (m) setSettings(m);
+}
+toast(doc.artifact !== slug ? `Imported (from ${doc.artifact})` : "Edits imported",
+{ label: "Undo", sticky: true, action: undoImport });
+};
+if (typeof input === "object" && !(input instanceof Blob)) return apply(input);
+input.text().then(t => { try { apply(JSON.parse(t)); } catch { toast("Could not parse JSON"); } });
+}
+function undoImport() {
+const b = store.read(KEY.backup, null);
+if (!b) return;
+edits = b.edits || {};
+store.write(KEY.edits, edits);
+originals.forEach((html, k) => {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+});
+applyEdits(edits);
+if (b.state != null) { store.write(KEY.state, b.state); fireRestore(); } else state.clear();
+if (Array.isArray(b.blocks)) { applyBlockOrder(b.blocks); persistBlocks(); }
+toast("Import undone");
+}
+function resetAll() {
+edits = {};
+store.remove(KEY.edits);
+state.clear();
+store.remove(KEY.blocks);
+originals.forEach((html, k) => {
+const el = document.querySelector(`[data-edit="${CSS.escape(k)}"]`);
+if (el) el.innerHTML = html;
+});
+applyBlockOrder(originalOrder);
+document.dispatchEvent(new CustomEvent("a2:reset"));
+toast("Edits, layout and state reset (recipe kept)");
+}
+/* ── flatten: bake the current look, edits, layout & state into a
+static, shell-free copy. The proof that the shell is deletable. ── */
+const FLAT_TOKENS = ["bg", "surface", "surface-2", "ink", "ink-muted", "ink-subtle",
+"accent", "accent-strong", "accent-contrast", "tint", "line", "line-strong", "focus",
+"positive", "warning", "negative", "shadow-color", "shadow-1", "shadow-2",
+"font-display", "font-body", "font-mono", "display-weight", "display-track", "lh-body",
+"radius-s", "radius-m", "radius-l", "radius-full", "border-w", "line-style", "space",
+"dur-1", "dur-2", "dur-3", "ease-out", "ease-spring"];
+function flatten() {
+const cs = getComputedStyle(root);
+const mode = cs.colorScheme.includes("dark") && !cs.colorScheme.includes("light")
+? "dark"
+: matchMedia("(prefers-color-scheme: dark)").matches && settings.mode === "system" ? "dark" : settings.mode === "dark" ? "dark" : "light";
+const vars = FLAT_TOKENS
+.map(t => [t, cs.getPropertyValue("--" + t).trim()])
+.filter(([, v]) => v)
+.map(([t, v]) => `  --${t}: ${v};`).join("\n");
+const staticCss = [
+'<style id="offprint-static">',
+`:root {\n  color-scheme: ${mode};\n${vars}\n}`,
+":where(body) { background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: var(--lh-body); }",
+":where(h1,h2,h3,h4) { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-track); }",
+":focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }",
+"@media print { * { box-shadow: none !important; } }",
+"@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }",
+"</style>",
+].join("\n");
+const st = store.read(KEY.state, null);
+const stub = `<script id="offprint-stub">
+const __S = ${JSON.stringify(st)};
+window.ArtifactShell = Object.freeze({ version: ${VERSION}, flat: true, slug: ${JSON.stringify(slug)},
+state: { get: () => __S, set: () => {}, clear: () => {}, onRestore: f => { if (__S != null) try { f(__S) } catch (e) {} } },
+toast: () => {}, isEditing: () => false, setEditing: () => {},
+applySettings: () => {}, applyTheme: () => {}, applyRecipe: () => {}, saveRecipe: () => {},
+setAccent: () => {}, randomPalette: () => null, generatePalette: () => null,
+exportJSON: () => {}, importJSON: () => {}, resetAll: () => {},
+readSettings: () => (${JSON.stringify(settings)}),
+recipes: { list: () => ({}), save: () => {}, remove: () => {} },
+blocks: { order: () => [], set: () => {}, reset: () => {} },
+get motion() { return window.Motion ?? null; } });
+<\/script>`;
+const doc = root.cloneNode(true);
+doc.querySelectorAll(".a2-gear,.a2-panel,.a2-toast,.a2-veil,.a2-editpill,.a2-handle," +
+".a3-nav,.a3-burger,#artifact-shell-css,#artifact-shell").forEach(el => el.remove());
+const walker = document.createTreeWalker(doc, NodeFilter.SHOW_COMMENT);
+const dead = [];
+while (walker.nextNode())
+if (/═══ \/?artifact-shell/.test(walker.currentNode.data)) dead.push(walker.currentNode);
+dead.forEach(n => n.remove());
+["data-palette", "data-type", "data-finish", "data-mode", "data-density", "data-textsize",
+"data-nav", "data-custom-accent", "data-editing", "style"].forEach(a => doc.removeAttribute(a));
+doc.querySelectorAll("[data-edit],[data-block],[data-reveal]").forEach(el => {
+el.removeAttribute("data-edit"); el.removeAttribute("data-block");
+el.removeAttribute("data-reveal"); el.removeAttribute("contenteditable");
+el.style?.removeProperty("--reveal-i");
+if (el.getAttribute("style") === "") el.removeAttribute("style");
+});
+doc.querySelector("body")?.classList.remove("a3-with-sidebar");
+doc.querySelector("head")?.insertAdjacentHTML("afterbegin",
+"\n" + staticCss + "\n" + stub + "\n");
+const html = "<!doctype html>\n" + doc.outerHTML;
+const blob = new Blob([html], { type: "text/html" });
+const a = Object.assign(document.createElement("a"),
+{ href: URL.createObjectURL(blob), download: `${slug}.flat.html` });
+a.click();
+URL.revokeObjectURL(a.href);
+toast(`Flattened → ${a.download} (static, shell-free)`);
+}
+function initReveal() {
+let i = 0;
+document.querySelectorAll("[data-reveal]").forEach(el => {
+el.style.setProperty("--reveal-i", Math.min(i++, 10));
+});
+}
+function oklchToLinearSrgb(L, C, H) {
+const hr = H * Math.PI / 180;
+const a = C * Math.cos(hr), b = C * Math.sin(hr);
+const l_ = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+const m_ = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+const s_ = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+return [
+4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
+-1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
+-0.0041960863 * l_ - 0.7034186147 * m_ + 1.7076147010 * s_,
+];
+}
+const inGamut = s => oklchToLinearSrgb(...s).every(c => c >= -0.0005 && c <= 1.0005);
+const relLum = s => {
+const [r, g, b] = oklchToLinearSrgb(...s).map(c => Math.min(1, Math.max(0, c)));
+return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const wcag = (a, b) => {
+const [hi, lo] = [relLum(a), relLum(b)].sort((x, y) => y - x);
+return (hi + 0.05) / (lo + 0.05);
+};
+function mulberry(seed) {
+return () => {
+seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+return ((t ^ t >>> 14) >>> 0) / 4294967296;
+};
+}
+function generatePalette(seedNum) {
+const rand = mulberry(seedNum);
+const H = rand() * 360;
+const w = rand();
+let N = H, Cn = 0;
+if (w < 0.30) Cn = 0;
+else if (w < 0.65) { N = H; Cn = 0.008 + rand() * 0.018; }
+else if (w < 0.80) { N = (H + 180) % 360; Cn = 0.006 + rand() * 0.012; }
+else { N = (H + (rand() < 0.5 ? -30 : 30) + 360) % 360; Cn = 0.008 + rand() * 0.018; }
+const bgL = 0.965 + rand() * 0.02, bgC = Cn * (0.5 + 0.5 * rand());
+const bgDL = 0.16 + rand() * 0.05;
+const t = {
+bg: [[bgL, bgC, N], [bgDL, bgC, N]],
+surface: [[Math.min(0.995, bgL + 0.005 + rand() * 0.015), bgC * 0.8, N], [bgDL + 0.035, bgC, N]],
+"surface-2": [[bgL - 0.035 - rand() * 0.01, Math.min(bgC * 1.3, 0.05), N], [bgDL + 0.075, bgC, N]],
+ink: [[0.15 + rand() * 0.09, Math.min(Cn * 1.5, 0.03), N], [0.92 + rand() * 0.03, Math.min(Cn, 0.02), N]],
+"ink-muted": [[0.46 + rand() * 0.08, Math.min(Cn * 2, 0.04), N], [0.62 + rand() * 0.06, Math.min(Cn * 2, 0.05), N]],
+line: [[0.84 + rand() * 0.05, Math.min(Cn, 0.03), N], [0.30 + rand() * 0.04, Math.min(Cn * 1.5, 0.04), N]],
+accent: [[0.48 + rand() * 0.14, 0.13 + rand() * 0.10, H],
+[Math.min(0.9, 0.62 + rand() * 0.14), 0.11 + rand() * 0.10, H]],
+};
+const clip = s => { while (s[1] > 0 && !inGamut(s)) s[1] = Math.max(0, s[1] - 0.01); return s; };
+Object.values(t).forEach(pair => pair.forEach(clip));
+for (const m of [0, 1]) {
+const dir = m ? +0.02 : -0.02;   /* dark mode pushes ink lighter, light darker */
+const sub = () => [t.ink[m][0] * 0.82 + t.bg[m][0] * 0.18, t.ink[m][1], N];
+let n = 0;
+while (n++ < 25) {
+let ok = true;
+const push = (tok, d) => {
+t[tok][m][0] = Math.min(0.98, Math.max(0.05, t[tok][m][0] + d));
+clip(t[tok][m]); ok = false;
+};
+if (wcag(t.ink[m], t.bg[m]) < 4.5 || wcag(t.ink[m], t.surface[m]) < 4.5) push("ink", dir);
+if (wcag(sub(), t.bg[m]) < 4.5) push("ink", dir);
+if (wcag(t["ink-muted"][m], t.surface[m]) < 3) push("ink-muted", dir);
+if (wcag(t.accent[m], t.bg[m]) < 3) push("accent", m ? +0.02 : -0.02);
+if (ok) break;
+}
+}
+t["accent-contrast"] = [
+t.accent[0][0] < 0.60 ? [...t.bg[0]] : [...t.ink[0]],
+t.accent[1][0] < 0.60 ? [...t.ink[1]] : [...t.bg[1]],
+];
+for (const m of [0, 1]) {
+let n = 0;
+while (wcag(t["accent-contrast"][m], t.accent[m]) < 3 && n++ < 25) {
+t.accent[m][0] += t["accent-contrast"][m][0] > t.accent[m][0] ? -0.02 : 0.02;
+clip(t.accent[m]);
+}
+}
+const fmt = s => `oklch(${(s[0] * 100).toFixed(1)}% ${s[1].toFixed(3)} ${s[2].toFixed(1)})`;
+const colors = {};
+for (const [k, [lt, dk]] of Object.entries(t)) colors[k] = `light-dark(${fmt(lt)}, ${fmt(dk)})`;
+const ADJ = ["quiet", "late", "paper", "raw", "cold", "warm", "soft", "wild", "dim", "clear", "dry", "deep"];
+const NOUN = ["copper", "harbor", "moss", "plum", "ash", "denim", "clay", "fern", "tide", "ochre", "slate", "rose"];
+const name = ADJ[Math.floor(rand() * ADJ.length)] + " " + NOUN[Math.floor(rand() * NOUN.length)];
+return { name, seed: (seedNum >>> 0).toString(36), colors };
+}
+function randomPalette(seed) {
+const seedNum = seed != null ? parseInt(String(seed), 36) : (Math.random() * 2 ** 31) | 0;
+const cp = generatePalette(seedNum);
+setSettings({ customPalette: cp });
+toast(`Palette “${cp.name}” (#${cp.seed}) — save the mix to keep it`);
+return cp;
+}
+let navRoot = null, spy = null, lastNav = null;
+function discoverSections() {
+let els = [...document.querySelectorAll("[data-block]")];
+if (!els.length)
+els = [...document.querySelectorAll("h2")].map(h => h.closest("section") || h)
+.filter((el, i, a) => a.indexOf(el) === i);
+return els.map((el, i) => {
+if (!el.id) el.id = "a3-s" + i;
+const h = el.matches("h1,h2,h3") ? el : el.querySelector("h1,h2,h3");
+let label = (h?.textContent || el.dataset.block || "Section " + (i + 1))
+.trim().replace(/\s+/g, " ");
+if (label.length > 40) label = label.slice(0, 37) + "…";
+return { id: el.id, label, el };
+});
+}
+const selfIndex = () => ARTIFACTS.findIndex(a =>
+a.path.split("/").pop() === slug + ".html");
+const homeHref = () => (location.pathname.includes("/unknowns/") ? "../" : "") + "index.html";
+const secLink = s => `<a href="#${s.id}" data-sec="${s.id}">${s.label}</a>`;
+function switcherHTML(cls) {
+const cats = [...new Set(ARTIFACTS.map(a => a.category))];
+const cur = selfIndex();
+return `<select class="${cls}" aria-label="Open another artifact">
+${cur < 0 ? `<option selected disabled>${document.title.split("—")[0].trim()}</option>` : ""}
+${cats.map(c => `<optgroup label="${c}">` +
+ARTIFACTS.filter(a => a.category === c).map(a =>
+`<option value="${a.path}"${ARTIFACTS.indexOf(a) === cur ? " selected" : ""}>${a.title}</option>`).join("") +
+`</optgroup>`).join("")}</select>`;
+}
+function setupSpy(map) {
+spy?.disconnect();
+spy = new IntersectionObserver(es => es.forEach(e => {
+if (!e.isIntersecting) return;
+navRoot?.querySelectorAll("[aria-current]").forEach(x => x.removeAttribute("aria-current"));
+map.get(e.target)?.setAttribute("aria-current", "true");
+}), { rootMargin: "-20% 0px -70%" });
+map.forEach((_, el) => spy.observe(el));
+}
+function renderNav(force) {
+if (!document.body || (!force && settings.nav === lastNav)) return;
+lastNav = settings.nav;
+spy?.disconnect(); spy = null;
+navRoot?.remove(); navRoot = null;
+document.querySelector(".a3-burger")?.remove();
+document.body.classList.remove("a3-with-sidebar");
+if (gear) { gear.classList.remove("a2-in-dock"); document.body.append(gear); }
+const kind = settings.nav || "dock";
+if (kind === "none") return;
+const sections = discoverSections();
+const idx = selfIndex();
+const prev = idx > 0 ? ARTIFACTS[idx - 1] : null;
+const next = idx >= 0 && idx < ARTIFACTS.length - 1 ? ARTIFACTS[idx + 1] : null;
+navRoot = document.createElement("nav");
+navRoot.id = "a3-nav";
+navRoot.className = "a3-nav a3-" + kind;
+navRoot.setAttribute("aria-label", "Page navigation");
+if (kind === "dock") {
+navRoot.innerHTML = `
+<a class="a3-ic" href="${homeHref()}" title="Gallery" aria-label="Gallery">⌂</a>
+${prev ? `<a class="a3-ic" href="${prev.path}" title="${prev.title}" aria-label="Previous: ${prev.title}">‹</a>`
+: `<span class="a3-ic" aria-hidden="true" data-dim>‹</span>`}
+${sections.length > 1 ? `<button class="a3-ic" data-pop aria-expanded="false" aria-label="Sections">¶</button>
+<div class="a3-pop">${sections.map(secLink).join("")}</div>` : ""}
+${next ? `<a class="a3-ic" href="${next.path}" title="${next.title}" aria-label="Next: ${next.title}">›</a>`
+: `<span class="a3-ic" aria-hidden="true" data-dim>›</span>`}`;
+document.body.append(navRoot);
+if (gear) { gear.classList.add("a2-in-dock"); navRoot.append(gear); }
+const pop = navRoot.querySelector(".a3-pop");
+const popBtn = navRoot.querySelector("[data-pop]");
+if (popBtn) {
+popBtn.addEventListener("click", () => {
+const on = !pop.classList.contains("is-open");
+pop.classList.toggle("is-open", on);
+popBtn.setAttribute("aria-expanded", on);
+});
+document.addEventListener("pointerdown", e => {
+if (!navRoot?.contains(e.target)) pop?.classList.remove("is-open");
+});
+pop.addEventListener("click", () => pop.classList.remove("is-open"));
+}
+} else if (kind === "topbar") {
+navRoot.innerHTML = `
+<a href="${homeHref()}">Gallery</a><span class="a3-sep">›</span>
+${switcherHTML("a3-switch")}
+<span class="a3-flex"></span>
+<span class="a3-seclinks">${sections.map(secLink).join("")}</span>`;
+document.body.prepend(navRoot);
+} else if (kind === "sidebar") {
+navRoot.innerHTML = `
+<a class="a3-side-home" href="${homeHref()}">⌂ Gallery</a>
+${switcherHTML("a3-switch")}
+<div class="a3-side-secs">${sections.map(secLink).join("")}</div>`;
+document.body.prepend(navRoot);
+document.body.classList.add("a3-with-sidebar");
+} else if (kind === "tabs") {
+navRoot.innerHTML = sections.map(secLink).join("");
+document.body.prepend(navRoot);
+} else if (kind === "drawer") {
+const burger = document.createElement("button");
+burger.className = "a3-burger";
+burger.setAttribute("aria-label", "Menu");
+burger.setAttribute("aria-expanded", "false");
+burger.innerHTML = "☰";
+navRoot.innerHTML = `
+<h3>On this page</h3>
+<div class="a3-drawer-secs">${sections.map(secLink).join("")}</div>
+<h3>All artifacts</h3>
+<div class="a3-drawer-arts">${[...new Set(ARTIFACTS.map(a => a.category))].map(c =>
+`<h4>${c}</h4>` + ARTIFACTS.filter(a => a.category === c).map(a =>
+`<a href="${a.path}"${ARTIFACTS.indexOf(a) === idx ? ' aria-current="true"' : ""}>${a.title}</a>`).join("")
+).join("")}`;
+document.body.append(burger, navRoot);
+const setOpen = on => {
+navRoot.classList.toggle("is-open", on);
+burger.setAttribute("aria-expanded", on);
+if (on) navRoot.querySelector("a")?.focus();
+};
+burger.addEventListener("click", () => setOpen(!navRoot.classList.contains("is-open")));
+addEventListener("keydown", e => {
+if (e.key === "Escape" && navRoot?.classList.contains("is-open")) { setOpen(false); burger.focus(); }
+});
+document.addEventListener("pointerdown", e => {
+if (navRoot?.classList.contains("is-open") &&
+!navRoot.contains(e.target) && !burger.contains(e.target)) setOpen(false);
+});
+navRoot.querySelectorAll(".a3-drawer-secs a").forEach(a =>
+a.addEventListener("click", () => setOpen(false)));
+} else if (kind === "dots") {
+navRoot.innerHTML = sections.map(s =>
+`<a href="#${s.id}" data-sec="${s.id}" aria-label="${s.label}"><i></i><b>${s.label}</b></a>`).join("");
+document.body.append(navRoot);
+if (sections.length < 3) navRoot.hidden = true;
+}
+navRoot.querySelectorAll(".a3-switch").forEach(sel =>
+sel.addEventListener("change", () => { if (sel.value) location.href = sel.value; }));
+if (["sidebar", "tabs", "dots"].includes(kind)) {
+const map = new Map(sections.map(s =>
+[s.el, navRoot.querySelector(`[data-sec="${s.id}"]`)]).filter(([, l]) => l));
+setupSpy(map);
+}
+}
+document.addEventListener("a2:blocks", () => renderNav(true));
+let panel, gear, pill, veil;
+const GEAR_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09c0 .68.4 1.3 1.03 1.56a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.63.88 1.03 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z"/></svg>`;
+const hasPopover = "popover" in HTMLElement.prototype;
+function setPanelOpen(on) {
+if (!panel) return;
+panel.classList.toggle("is-open", on);
+if (hasPopover) {
+try { on ? panel.showPopover() : panel.hidePopover(); } catch {}
+}
+}
+const panelOpen = () => panel && panel.classList.contains("is-open");
+function seg(name, values, current) {
+return `<div class="a2-seg" role="radiogroup" aria-label="${name}">` +
+values.map(v => `<label><input type="radio" name="a2-${name}" value="${v}"${v === current ? " checked" : ""}>${v[0].toUpperCase() + v.slice(1)}</label>`).join("") + `</div>`;
+}
+function buildPanel() {
+gear = document.createElement("button");
+gear.className = "a2-gear";
+gear.setAttribute("aria-label", "Style & settings");
+gear.setAttribute("aria-expanded", "false");
+gear.innerHTML = GEAR_SVG;
+panel = document.createElement("div");
+panel.className = "a2-panel";
+panel.id = "a2-panel";
+if (hasPopover) panel.setAttribute("popover", "manual");
+panel.innerHTML = `
+<div class="a2-seg a2-tabs" role="tablist" aria-label="Settings sections">
+${["recipes", "mix", "options"].map((t, i) =>
+`<label role="presentation"><input type="radio" name="a2-tab" value="${t}"${i === 0 ? " checked" : ""}>${t[0].toUpperCase() + t.slice(1)}</label>`).join("")}
+</div>
+<div class="a2-tabpanel" data-tab="recipes">
+<h3>Presets</h3>
+<div class="a2-tiles" data-tiles="presets" role="radiogroup" aria-label="Preset recipes"></div>
+<h3 data-saved-h hidden>Saved</h3>
+<div class="a2-tiles" data-tiles="saved" role="radiogroup" aria-label="Saved recipes"></div>
+<div class="a2-btnrow">
+<input class="a2-namefield" data-recipe-name placeholder="Name this mix…" hidden>
+<button class="a2-btn" data-act="save-recipe">＋ Save current mix</button>
+</div>
+</div>
+<div class="a2-tabpanel" data-tab="mix" hidden>
+<h3>Palette</h3>
+<div class="a2-swatches" role="radiogroup" aria-label="Color palette">
+${PALETTES.map(p => `<button class="a2-swatch" role="radio" data-palette="${p}" data-pick-palette="${p}" aria-checked="false" aria-label="${p}" title="${p}"></button>`).join("")}
+</div>
+<h3>Type</h3>
+<div class="a2-typerows" role="radiogroup" aria-label="Typography">
+${Object.entries(TYPES).map(([k, [sub, stack]]) =>
+`<button class="a2-typerow" role="radio" data-pick-type="${k}" aria-checked="false" style="font-family:${stack.replace(/"/g, "&quot;")}">${k[0].toUpperCase() + k.slice(1)}<small>${sub}</small></button>`).join("")}
+</div>
+<h3>Finish</h3>
+<div class="a2-finchips" role="radiogroup" aria-label="Finish">
+${FINISHES.map(f => `<button class="a2-finchip" role="radio" data-finish="${f}" data-pick-finish="${f}" aria-checked="false">${f}</button>`).join("")}
+</div>
+<div class="a2-btnrow">
+<button class="a2-btn" data-act="random-palette" title="Generate a random palette (always readable)">⚄ Random palette</button>
+</div>
+<h3>Accent</h3>
+<div class="a2-accentrow">
+<input type="color" data-accent aria-label="Custom accent color">
+<button class="a2-btn" data-act="accent-reset">↺ palette accent</button>
+</div>
+</div>
+<div class="a2-tabpanel" data-tab="options" hidden>
+<h3>Navigation</h3>
+<div class="a2-finchips" role="radiogroup" aria-label="Navigation">
+${NAVS.map(n => `<button class="a2-finchip" role="radio" data-pick-nav="${n}" aria-checked="false">${n}</button>`).join("")}
+</div>
+<h3>Mode</h3>
+${seg("mode", ["system", "light", "dark"], settings.mode)}
+<h3>Text size</h3>
+${seg("textsize", ["s", "m", "l", "xl"], settings.textSize)}
+<div class="a2-row">
+<label for="a2-density">Compact density</label>
+<input class="a2-switch" type="checkbox" id="a2-density" role="switch">
+</div>
+<div class="a2-row">
+<label for="a2-edit">Edit mode <small style="color:var(--ink-muted)">(E)</small></label>
+<input class="a2-switch" type="checkbox" id="a2-edit" role="switch">
+</div>
+<div class="a2-btnrow">
+<button class="a2-btn" data-act="export">Export JSON</button>
+<button class="a2-btn" data-act="import">Import</button>
+<button class="a2-btn" data-act="reset">Reset</button>
+<button class="a2-btn" data-act="flatten" title="Download a static copy with the current look, edits and layout baked in — no shell, no settings">⤓ Flatten</button>
+</div>
+<input type="file" accept=".json,application/json" hidden>
+</div>`;
+pill = document.createElement("div");
+pill.className = "a2-editpill";
+pill.hidden = true;
+pill.textContent = "editing";
+toastEl = document.createElement("div");
+toastEl.className = "a2-toast";
+toastEl.hidden = true;
+toastEl.setAttribute("role", "status");
+toastEl.setAttribute("aria-live", "polite");
+toastEl.append(document.createTextNode(""), Object.assign(document.createElement("button"), { hidden: true }));
+toastEl.querySelector("button").addEventListener("click", () => {
+toastEl.hidden = true;
+if (toastAction) toastAction();
+});
+veil = document.createElement("div");
+veil.className = "a2-veil";
+veil.hidden = true;
+veil.textContent = "Drop .edits.json to import";
+document.body.append(gear, panel, pill, toastEl, veil);
+gear.addEventListener("click", () => {
+const on = !panelOpen();
+setPanelOpen(on);
+gear.setAttribute("aria-expanded", on);
+});
+addEventListener("keydown", e => {
+if (e.key === "Escape" && panelOpen()) { setPanelOpen(false); gear.focus(); }
+});
+document.addEventListener("pointerdown", e => {
+if (panelOpen() && !panel.contains(e.target) && !gear.contains(e.target)) setPanelOpen(false);
+});
+panel.querySelectorAll("input[name=a2-tab]").forEach(r =>
+r.addEventListener("change", () => {
+panel.querySelectorAll(".a2-tabpanel").forEach(p =>
+p.hidden = p.dataset.tab !== r.value);
+}));
+panel.addEventListener("click", e => {
+const pal = e.target.closest("[data-pick-palette]");
+if (pal) return setSettings({ palette: pal.dataset.pickPalette });
+const typ = e.target.closest("[data-pick-type]");
+if (typ) return setSettings({ type: typ.dataset.pickType });
+const fin = e.target.closest("[data-pick-finish]");
+if (fin) return setSettings({ finish: fin.dataset.pickFinish });
+const nv = e.target.closest("[data-pick-nav]");
+if (nv) return setSettings({ nav: nv.dataset.pickNav }, false);
+const del = e.target.closest("[data-del-recipe]");
+if (del) { e.stopPropagation(); return deleteRecipe(del.dataset.delRecipe); }
+const tile = e.target.closest("[data-recipe]");
+if (tile) return applyRecipe(tile.dataset.recipe);
+const act = e.target.closest("[data-act]");
+if (!act) return;
+if (act.dataset.act === "export") exportJSON();
+if (act.dataset.act === "import") panel.querySelector("input[type=file]").click();
+if (act.dataset.act === "reset") resetAll();
+if (act.dataset.act === "accent-reset") setSettings({ accent: null });
+if (act.dataset.act === "random-palette") randomPalette();
+if (act.dataset.act === "flatten") flatten();
+if (act.dataset.act === "save-recipe") {
+const field = panel.querySelector("[data-recipe-name]");
+if (field.hidden) { field.hidden = false; field.focus(); return; }
+const name = field.value.trim();
+if (name) { saveRecipe(name); field.value = ""; field.hidden = true; }
+else field.focus();
+}
+});
+panel.querySelector("[data-recipe-name]").addEventListener("keydown", e => {
+if (e.key === "Enter") panel.querySelector("[data-act=save-recipe]").click();
+});
+panel.querySelector("input[type=file]").addEventListener("change", e => {
+if (e.target.files[0]) importJSON(e.target.files[0]);
+e.target.value = "";
+});
+panel.querySelectorAll("input[name=a2-mode]").forEach(r =>
+r.addEventListener("change", () => setSettings({ mode: r.value })));
+panel.querySelectorAll("input[name=a2-textsize]").forEach(r =>
+r.addEventListener("change", () => setSettings({ textSize: r.value }, false)));
+panel.querySelector("#a2-density").addEventListener("change", e =>
+setSettings({ density: e.target.checked ? "compact" : "cozy" }, false));
+panel.querySelector("#a2-edit").addEventListener("change", e => setEditing(e.target.checked));
+panel.querySelector("[data-accent]").addEventListener("input", e =>
+setSettings({ accent: e.target.value }, false));
+panel.querySelectorAll("[role=radiogroup]").forEach(group => {
+group.addEventListener("keydown", e => {
+const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+if (!dir) return;
+const items = [...group.querySelectorAll("[role=radio]")];
+if (!items.length) return;
+e.preventDefault();
+const cur = items.indexOf(document.activeElement);
+const next = items[(cur + dir + items.length) % items.length];
+items.forEach(s => s.tabIndex = -1);
+next.tabIndex = 0;
+next.focus();
+next.click();
+});
+});
+document.addEventListener("focusout", e => {
+if (isEditing() && e.target.matches?.("[data-edit]")) persistEdit(e.target);
+});
+let dragDepth = 0;
+addEventListener("dragenter", e => {
+if (dragBlock) return;   /* internal block drag, not a file */
+if (e.target.closest?.("[data-k-drop]")) return;   /* kit dropzones own their drags */
+if ([...e.dataTransfer?.items || []].some(i => i.kind === "file")) {
+dragDepth++;
+veil.hidden = false;
+}
+});
+addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; veil.hidden = true; } });
+addEventListener("dragover", e => { if (!dragBlock) e.preventDefault(); });
+addEventListener("drop", e => {
+dragDepth = 0;
+veil.hidden = true;
+if (dragBlock) return;
+const f = e.dataTransfer?.files?.[0];
+if (f && /\.json$/i.test(f.name)) { e.preventDefault(); importJSON(f); }
+});
+renderRecipes();
+syncPanel();
+}
+function tileHTML(name, mix, deletable) {
+const stack = (TYPES[mix.type] || TYPES.editorial)[1].replace(/"/g, "&quot;");
+return `<button class="a2-tile" role="radio" aria-checked="false"
+data-recipe="${name}" data-palette="${mix.palette}"
+${mix.accent ? `style="--accent:${mix.accent}"` : ""}>
+${deletable ? `<span class="a2-del" data-del-recipe="${name}" role="button" tabindex="0" aria-label="Delete ${name}">×</span>` : ""}
+<span class="a2-tile-name" style="font-family:${stack}">${name}</span>
+</button>`;
+}
+function renderRecipes() {
+if (!panel) return;
+panel.querySelector("[data-tiles=presets]").innerHTML =
+Object.entries(PRESETS).map(([n, m]) => tileHTML(n, m, false)).join("");
+const saved = Object.entries(recipes);
+panel.querySelector("[data-saved-h]").hidden = !saved.length;
+panel.querySelector("[data-tiles=saved]").innerHTML =
+saved.map(([n, m]) => tileHTML(n, m, true)).join("");
+syncPanel();
+}
+function syncPanel() {
+if (!panel) return;
+panel.querySelectorAll("[data-recipe]").forEach(t =>
+t.setAttribute("aria-checked", t.dataset.recipe === settings.recipe));
+panel.querySelectorAll("[data-pick-palette]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickPalette === settings.palette));
+panel.querySelectorAll("[data-pick-type]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickType === settings.type));
+panel.querySelectorAll("[data-pick-finish]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickFinish === settings.finish));
+panel.querySelectorAll("[data-pick-nav]").forEach(s =>
+s.setAttribute("aria-checked", s.dataset.pickNav === settings.nav));
+panel.querySelectorAll("input[name=a2-mode]").forEach(r => r.checked = r.value === settings.mode);
+panel.querySelectorAll("input[name=a2-textsize]").forEach(r => r.checked = r.value === settings.textSize);
+panel.querySelector("#a2-density").checked = settings.density === "compact";
+panel.querySelector("#a2-edit").checked = isEditing();
+if (settings.accent) panel.querySelector("[data-accent]").value = settings.accent;
+panel.querySelectorAll("[role=radiogroup]").forEach(group => {
+const items = [...group.querySelectorAll("[role=radio]")];
+if (!items.length) return;
+const active = items.find(i => i.getAttribute("aria-checked") === "true") || items[0];
+items.forEach(i => i.tabIndex = i === active ? 0 : -1);
+});
+}
+document.addEventListener("DOMContentLoaded", () => {
+captureOriginals();
+applyEdits(edits);
+initBlocks();
+initReveal();
+buildPanel();
+renderNav(true);
+initEditHint();
+});
+window.ArtifactShell = {
+version: VERSION, slug, state, toast,
+exportJSON, importJSON, resetAll, flatten,
+applyRecipe, saveRecipe,
+recipes: { list: () => Object.assign({}, recipes), save: saveRecipe, remove: deleteRecipe },
+blocks: { order: blockOrder, set: o => { applyBlockOrder(o); persistBlocks(); },
+reset: () => { applyBlockOrder(originalOrder); store.remove(KEY.blocks); } },
+setAccent: hex => setSettings({ accent: hex || null }),
+randomPalette, generatePalette,
+applySettings: setSettings,
+applyTheme: (patch, animate) => {
+if (patch && patch.theme) applyRecipe(patch.theme);
+const rest = Object.assign({}, patch);
+delete rest.theme;
+if (Object.keys(rest).length) setSettings(rest, animate);
+},
+readSettings: () => Object.assign({}, settings),
+setEditing, isEditing,
+get motion() { return window.Motion ?? null; },
+};
+})();
+</script>
+<!-- ═══ /artifact-shell ═══ -->
+<title>Four design directions — Know your unknowns</title>
+<style>
+  /* Page chrome uses the shell's semantic tokens only.
+     The four direction mockups (.d1–.d4) display their own sub-palettes AS
+     CONTENT, so those colors are deliberately literal, namespaced --demo-*. */
+  .d1, .d2, .d3, .d4 {
+    --demo-ivory:  #FAF9F5;
+    --demo-paper:  #FFFFFF;
+    --demo-slate:  #141413;
+    --demo-clay:   #D97757;
+    --demo-clay-d: #B85C3E;
+    --demo-oat:    #E3DACC;
+    --demo-olive:  #788C5D;
+    --demo-g100:   #F0EEE6;
+    --demo-g200:   #E6E3DA;
+    --demo-g300:   #D1CFC5;
+    --demo-g500:   #87867F;
+    --demo-g700:   #3D3D3A;
+    --demo-serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+    --demo-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --demo-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px 110px; }
+  @media (max-width: 480px) { .wrap { padding: 0 16px 90px; } }
+
+  /* ── header ─────────────────────────────── */
+  header.page {
+    padding: 56px 0 8px;
+    position: relative;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 24px; height: 1.5px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .backlink {
+    position: absolute;
+    top: 60px; right: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .backlink:hover { color: var(--accent); }
+  @media (max-width: 640px) {
+    .backlink { position: static; display: inline-block; margin-bottom: 14px; }
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -0.018em;
+    margin: 0 0 12px;
+  }
+  .lede {
+    font-size: 16px;
+    color: var(--ink-subtle);
+    max-width: 640px;
+    margin: 0 0 34px;
+  }
+
+  /* ── prompt box ─────────────────────────── */
+  .prompt-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px 20px;
+    position: relative;
+  }
+  .prompt-card .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .prompt-card blockquote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 17.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    max-width: 62ch;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--ink-subtle);
+    cursor: pointer;
+    transition: border-color 120ms, color 120ms;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--positive); color: var(--positive); }
+  @media (max-width: 520px) {
+    .copy-btn { position: static; margin-top: 14px; display: inline-block; }
+  }
+
+  /* ── divider ────────────────────────────── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 52px 0 40px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ── artifact intro ─────────────────────── */
+  .art-intro {
+    font-size: 15px;
+    color: var(--ink-subtle);
+    max-width: 660px;
+    margin: 0 0 14px;
+  }
+  .art-intro strong { color: var(--ink); }
+  .same-data {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0 0 46px;
+    line-height: 1.7;
+  }
+  .same-data b { color: var(--ink-subtle); font-weight: 600; }
+
+  /* ── direction block chrome ─────────────── */
+  .direction { margin: 0 0 64px; }
+  .dir-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .dir-head .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .dir-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 24px;
+    letter-spacing: -0.012em;
+    margin: 0;
+  }
+  .dir-says {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-subtle);
+    margin: 0 0 16px;
+  }
+  .dir-says::before { content: "This direction says: "; font-style: normal; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin-right: 6px; }
+
+  .frame {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .frame-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border-bottom: 1.5px solid var(--line);
+    background: var(--surface-2);
+  }
+  .frame-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+  .frame-bar .url {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-muted);
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .frame-body { overflow-x: auto; }
+
+  /* reaction chips under each frame */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    cursor: pointer;
+    color: var(--ink-subtle);
+    transition: border-color 120ms, background 120ms, color 120ms;
+    text-align: left;
+  }
+  .chip .k { font-weight: 600; letter-spacing: 0.05em; }
+  .chip.steal .k { color: var(--positive); }
+  .chip.skip .k { color: var(--accent-strong); }
+  .chip:hover { border-color: var(--line-strong); }
+  .chip.steal.on { border-color: var(--positive); background: color-mix(in oklch, var(--positive) 12%, var(--surface)); color: var(--ink); }
+  .chip.skip.on  { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 12%, var(--surface)); color: var(--ink); }
+  .chip.on .k::after { content: " ✓"; }
+  .chip-hint {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 8px;
+  }
+
+  /* ══════════════ DIRECTION 1 — ops console ══════════════ */
+  .d1 {
+    color-scheme: dark;
+    background: #1B1B19;
+    color: #D8D6CE;
+    font-family: var(--demo-mono);
+    font-size: 12px;
+    padding: 18px 20px 20px;
+    min-width: 620px;
+  }
+  .d1 .topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+  .d1 .prod { color: #F5F4EF; font-weight: 600; letter-spacing: 0.06em; }
+  .d1 .prod span { color: var(--demo-clay); }
+  .d1 .env { font-size: 10px; color: #6E6D66; letter-spacing: 0.1em; }
+  .d1 .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #33322F;
+    border: 1px solid #33322F;
+    margin-bottom: 16px;
+  }
+  .d1 .metric { background: #232320; padding: 10px 12px; }
+  .d1 .metric .mk { font-size: 9.5px; letter-spacing: 0.12em; color: #6E6D66; text-transform: uppercase; }
+  .d1 .metric .mv { font-size: 19px; color: #F5F4EF; line-height: 1.3; }
+  .d1 .metric .mv em { font-style: normal; font-size: 10px; color: var(--demo-olive); }
+  .d1 .metric .mv em.bad { color: var(--demo-clay); }
+  .d1 table { border-collapse: collapse; width: 100%; }
+  .d1 th {
+    text-align: left;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6E6D66;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-bottom: 1px solid #33322F;
+  }
+  .d1 td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #262624;
+    white-space: nowrap;
+  }
+  .d1 tr:hover td { background: #232320; }
+  .d1 .id { color: #6E6D66; }
+  .d1 .t { color: #F5F4EF; }
+  .d1 .rv { color: #A8A69E; }
+  .d1 .sdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+  .d1 .s-rev  .sdot { background: var(--demo-oat); }
+  .d1 .s-chg  .sdot { background: var(--demo-clay); }
+  .d1 .s-wait .sdot { background: #6E6D66; }
+  .d1 .s-ok   .sdot { background: var(--demo-olive); }
+  .d1 .s-chg { color: var(--demo-clay); }
+  .d1 .s-ok { color: var(--demo-olive); }
+  .d1 .num-r { text-align: right; }
+  .d1 .age-hot { color: var(--demo-clay); }
+
+  /* ══════════════ DIRECTION 2 — editorial ══════════════ */
+  .d2 {
+    background: var(--demo-ivory);
+    padding: 40px 44px 44px;
+    font-family: var(--demo-sans);
+    min-width: 300px;
+  }
+  @media (max-width: 560px) { .d2 { padding: 28px 20px 32px; } }
+  .d2 .masth {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    border-bottom: 1.5px solid var(--demo-g300);
+    padding-bottom: 26px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .d2 .bignum {
+    font-family: var(--demo-serif);
+    font-weight: 500;
+    font-size: clamp(72px, 14vw, 118px);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+    color: var(--demo-slate);
+  }
+  .d2 .bignum-wrap { display: flex; align-items: baseline; gap: 18px; }
+  .d2 .bignum-cap {
+    font-family: var(--demo-serif);
+    font-style: italic;
+    font-size: 19px;
+    color: var(--demo-g700);
+    max-width: 12ch;
+    line-height: 1.3;
+  }
+  .d2 .weekly {
+    font-family: var(--demo-serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--demo-g500);
+    text-align: right;
+  }
+  .d2 .weekly b { color: var(--demo-olive); font-weight: 600; font-style: normal; font-size: 22px; font-family: var(--demo-serif); }
+  .d2 .row {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--demo-g200);
+  }
+  .d2 .row:last-child { border-bottom: none; }
+  .d2 .av {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--demo-mono);
+    font-size: 11px;
+    font-weight: 600;
+    align-self: center;
+  }
+  .d2 .av.a1 { background: var(--demo-oat); color: var(--demo-g700); }
+  .d2 .av.a2 { background: var(--demo-olive); color: var(--demo-ivory); }
+  .d2 .av.a3 { background: var(--demo-clay); color: var(--demo-ivory); }
+  .d2 .av.a4 { background: var(--demo-slate); color: var(--demo-ivory); }
+  .d2 .info { flex: 1; min-width: 0; }
+  .d2 .vt {
+    font-family: var(--demo-serif);
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: -0.008em;
+    line-height: 1.25;
+  }
+  .d2 .meta {
+    font-size: 12px;
+    color: var(--demo-g500);
+    letter-spacing: 0.02em;
+    margin-top: 3px;
+  }
+  .d2 .phrase {
+    font-family: var(--demo-serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--demo-g700);
+    text-align: right;
+    white-space: nowrap;
+    align-self: center;
+  }
+  .d2 .phrase.hot { color: var(--demo-clay-d); }
+  .d2 .phrase.ok { color: var(--demo-olive); }
+  @media (max-width: 560px) {
+    .d2 .row { flex-wrap: wrap; }
+    .d2 .phrase { text-align: left; width: 100%; padding-left: 52px; }
+  }
+
+  /* ══════════════ DIRECTION 3 — kanban/timeline ══════════════ */
+  .d3 {
+    background: var(--demo-paper);
+    padding: 22px;
+    min-width: 640px;
+  }
+  .d3 .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .d3 .head .hl { font-weight: 600; font-size: 14px; letter-spacing: -0.01em; }
+  .d3 .head .hr { font-size: 12px; color: var(--demo-g500); }
+  .d3 .head .hr b { color: var(--demo-olive); font-weight: 600; }
+  .d3 .cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .d3 .col { background: var(--demo-g100); border-radius: 10px; padding: 10px; }
+  .d3 .col-h {
+    font-family: var(--demo-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--demo-g500);
+    padding: 2px 4px 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .d3 .col-h .cnt { color: var(--demo-g700); }
+  .d3 .col.chg .col-h { color: var(--demo-clay-d); }
+  .d3 .col.ok  .col-h { color: var(--demo-olive); }
+  .d3 .kcard {
+    background: var(--demo-paper);
+    border: 1px solid var(--demo-g200);
+    border-radius: 8px;
+    padding: 10px 11px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+  }
+  .d3 .kcard:last-child { margin-bottom: 0; }
+  .d3 .kcard .kt { font-weight: 600; line-height: 1.35; }
+  .d3 .kcard .km {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 7px;
+    font-size: 11px;
+    color: var(--demo-g500);
+  }
+  .d3 .mini-av {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--demo-mono);
+    font-size: 8.5px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .d3 .mini-av.a1 { background: var(--demo-oat); color: var(--demo-g700); }
+  .d3 .mini-av.a2 { background: var(--demo-olive); color: var(--demo-ivory); }
+  .d3 .mini-av.a3 { background: var(--demo-clay); color: var(--demo-ivory); }
+  .d3 .mini-av.a4 { background: var(--demo-slate); color: var(--demo-ivory); }
+  .d3 .kcard .cmt { margin-left: auto; font-family: var(--demo-mono); }
+  .d3 .kcard.stale { border-left: 3px solid var(--demo-clay); }
+  .d3 .tl-label {
+    font-family: var(--demo-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--demo-g500);
+    margin-bottom: 8px;
+  }
+  .d3 .tl {
+    position: relative;
+    height: 58px;
+    border-top: 1.5px solid var(--demo-g300);
+  }
+  .d3 .tick {
+    position: absolute;
+    top: -4px;
+    width: 1.5px; height: 8px;
+    background: var(--demo-g300);
+  }
+  .d3 .tick-lab {
+    position: absolute;
+    top: 8px;
+    font-family: var(--demo-mono);
+    font-size: 9px;
+    color: var(--demo-g500);
+    transform: translateX(-50%);
+  }
+  .d3 .tdot {
+    position: absolute;
+    top: 24px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .d3 .tdot .d { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--demo-paper); box-shadow: 0 0 0 1px var(--demo-g300); }
+  .d3 .tdot .d.rev { background: var(--demo-oat); }
+  .d3 .tdot .d.chg { background: var(--demo-clay); }
+  .d3 .tdot .d.ok  { background: var(--demo-olive); }
+  .d3 .tdot .d.wait{ background: var(--demo-g300); }
+  .d3 .tdot .tn { font-family: var(--demo-mono); font-size: 8.5px; color: var(--demo-g500); white-space: nowrap; }
+
+  /* ══════════════ DIRECTION 4 — brutalist terminal ══════════════ */
+  .d4 {
+    color-scheme: dark;
+    background: var(--demo-slate);
+    color: var(--demo-ivory);
+    font-family: var(--demo-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    padding: 22px 24px 26px;
+    min-width: 620px;
+  }
+  .d4 .hdr { color: var(--demo-g500); }
+  .d4 .hdr b { color: var(--demo-ivory); font-weight: 600; }
+  .d4 .rule { color: #4A4945; user-select: none; overflow: hidden; white-space: nowrap; }
+  .d4 .kv { display: flex; gap: 28px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .d4 .kv span { color: var(--demo-g500); }
+  .d4 .kv b { color: var(--demo-oat); font-weight: 600; }
+  .d4 .kv b.ok { color: #A3B58A; }
+  .d4 .kv b.hot { color: var(--demo-clay); }
+  .d4 table { border-collapse: collapse; width: 100%; }
+  .d4 th {
+    text-align: left;
+    color: var(--demo-g500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 10.5px;
+    padding: 4px 12px 4px 0;
+    border-bottom: 1px dashed #4A4945;
+  }
+  .d4 td { padding: 6px 12px 6px 0; border-bottom: 1px dashed #33322F; white-space: nowrap; vertical-align: top; }
+  .d4 .st { font-weight: 600; }
+  .d4 .st.rev  { color: var(--demo-oat); }
+  .d4 .st.chg  { color: var(--demo-clay); }
+  .d4 .st.wait { color: var(--demo-g500); }
+  .d4 .st.ok   { color: #A3B58A; }
+  .d4 .idx { color: var(--demo-g500); }
+  .d4 .cmd { margin-top: 16px; color: var(--demo-g500); }
+  .d4 .cmd b { color: var(--demo-ivory); font-weight: 500; }
+  .d4 .cursor {
+    display: inline-block;
+    width: 8px; height: 15px;
+    background: var(--demo-clay);
+    vertical-align: -2px;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── how to react card ──────────────────── */
+  .react-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 26px 28px 26px;
+    margin-top: 8px;
+  }
+  @media (max-width: 480px) { .react-card { padding: 20px 16px; } }
+  .react-card .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .react-card h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 23px;
+    letter-spacing: -0.012em;
+    margin: 0 0 8px;
+  }
+  .react-card p { font-size: 14.5px; color: var(--ink-subtle); max-width: 640px; margin: 0 0 18px; }
+  .pick-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .pick {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--ink-subtle);
+    cursor: pointer;
+    transition: border-color 120ms, background 120ms, color 120ms;
+  }
+  .pick:hover { border-color: var(--line-strong); }
+  .pick.on { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+  .reply-wrap { position: relative; }
+  .reply {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    color: var(--ink-subtle);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 96px;
+    margin: 0;
+  }
+  .copy-reply {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 11px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-subtle);
+    cursor: pointer;
+    transition: border-color 120ms, color 120ms;
+  }
+  .copy-reply:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-reply.copied { border-color: var(--positive); color: var(--positive); }
+  .react-foot {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    margin-top: 14px;
+  }
+
+  /* ── footer ─────────────────────────────── */
+  footer {
+    margin-top: 90px;
+    border-top: 1.5px solid var(--line);
+    padding-top: 28px;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  footer a { color: var(--accent); text-decoration-color: var(--tint); text-underline-offset: 3px; }
+  footer a:hover { text-decoration-color: var(--accent); }
+
+  /* ── print ──────────────────────────────── */
+  @media print {
+    .direction, .frame, .prompt-card, .react-card, .same-data { break-inside: avoid; }
+    .copy-btn, .copy-reply, .chips, .chip-hint, .pick-row { display: none; }
+    .d4 .cursor { animation: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .d4 .cursor { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page" data-reveal>
+    <a class="backlink" href="index.html">&larr; All examples</a>
+    <div class="eyebrow" data-edit="hero-eyebrow">Know your unknowns &middot; Pre-implementation</div>
+    <h1 data-edit="hero-title">Four design directions</h1>
+    <p class="lede" data-edit="hero-lede">
+      When you can't describe the design you want, don't describe one &mdash; ask for four incompatible ones
+      rendered live, and let your gut do the specifying. Reacting is easier than imagining.
+    </p>
+    <div class="prompt-card">
+      <div class="label">The prompt</div>
+      <blockquote id="prompt-text">&ldquo;I want a review-queue dashboard for Acme but I have no visual taste and don't know what's possible. Make me one HTML page with 4 wildly different design directions so I can react to them.&rdquo;</blockquote>
+      <button class="copy-btn" id="copy-prompt" type="button">Copy prompt</button>
+    </div>
+  </header>
+
+  <div class="divider">What Claude produced</div>
+
+  <p class="art-intro" data-edit="intro-lead">
+    Same data, four philosophies. Every frame below renders the <strong>identical review queue</strong> &mdash;
+    five videos awaiting review in Acme &mdash; so the only variable is the design. Under each frame,
+    tap the chips for anything you'd <strong>steal</strong> or <strong>skip</strong>; your picks assemble a
+    reply at the bottom of the page.
+  </p>
+  <div class="same-data">
+    <b>The shared dataset:</b> 5 pending reviews &middot; 4 reviewers (MK, DR, LT, JB) &middot; statuses:
+    in&nbsp;review / needs&nbsp;changes / waiting&nbsp;on&nbsp;reviewer / approved&nbsp;w/&nbsp;notes &middot;
+    23 open comments &middot; 14 reviews cleared this week &middot; avg turnaround 6.2h
+  </div>
+
+  <!-- ═══════════════ DIRECTION 1 ═══════════════ -->
+  <div class="direction" data-block="direction-ops-console" data-reveal>
+    <div class="dir-head"><span class="num">DIRECTION 1 / 4</span><h2 data-edit="dir1-title">Dense ops console</h2></div>
+    <p class="dir-says" data-edit="dir1-says">&ldquo;Your review queue is an operational system. Show everything, waste nothing, let the anomalies pop.&rdquo;</p>
+    <div class="frame">
+      <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">acme.app/ops/review-queue</span></div>
+      <div class="frame-body">
+        <div class="d1">
+          <div class="topline">
+            <span class="prod">ACME<span>/</span>REVIEW-OPS</span>
+            <span class="env">TEAM: LAUNCH-CONTENT &middot; UPDATED 14:32</span>
+          </div>
+          <div class="metrics">
+            <div class="metric"><div class="mk">Pending</div><div class="mv">5 <em class="bad">+2 today</em></div></div>
+            <div class="metric"><div class="mk">Avg turnaround</div><div class="mv">6.2h <em>&minus;0.8h</em></div></div>
+            <div class="metric"><div class="mk">Cleared / 7d</div><div class="mv">14 <em>on pace</em></div></div>
+            <div class="metric"><div class="mk">Oldest waiting</div><div class="mv">2d 4h <em class="bad">SLA 48h</em></div></div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Video</th><th class="num-r">Len</th><th>Reviewer</th><th class="num-r">Cmts</th><th>Status</th><th class="num-r">Age</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="id">VR-2214</td><td class="t">Q3 launch teaser &mdash; v4</td><td class="num-r">0:47</td><td class="rv">MK &middot; Kowalski</td><td class="num-r">12</td><td class="s-chg"><span class="sdot"></span>NEEDS CHANGES</td><td class="num-r">2h</td></tr>
+              <tr><td class="id">VR-2213</td><td class="t">Onboarding walkthrough &mdash; final</td><td class="num-r">3:12</td><td class="rv">DR &middot; Raman</td><td class="num-r">3</td><td class="s-rev"><span class="sdot"></span>IN REVIEW</td><td class="num-r">5h</td></tr>
+              <tr><td class="id">VR-2209</td><td class="t">Customer story: Halvorsen Co.</td><td class="num-r">2:05</td><td class="rv">LT &middot; Torres</td><td class="num-r">0</td><td class="s-wait"><span class="sdot"></span>WAITING</td><td class="num-r age-hot">1d 6h</td></tr>
+              <tr><td class="id">VR-2206</td><td class="t">Homepage hero loop &mdash; v9</td><td class="num-r">0:15</td><td class="rv">MK &middot; Kowalski</td><td class="num-r">7</td><td class="s-ok"><span class="sdot"></span>APPROVED*</td><td class="num-r">1d 8h</td></tr>
+              <tr><td class="id">VR-2201</td><td class="t">Podcast clip &mdash; ep. 32</td><td class="num-r">1:28</td><td class="rv">JB &middot; Beck</td><td class="num-r">1</td><td class="s-rev"><span class="sdot"></span>IN REVIEW</td><td class="num-r age-hot">2d 4h</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="chips" data-dir="1">
+      <button class="chip steal" type="button" data-label="the 4-stat metric strip (D1)"><span class="k">steal</span> &middot; the 4-stat metric strip</button>
+      <button class="chip steal" type="button" data-label="status dots + inline comment counts (D1)"><span class="k">steal</span> &middot; status dots + comment counts</button>
+      <button class="chip skip" type="button" data-label="the full dark chrome (D1)"><span class="k">skip</span> &middot; full dark chrome</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DIRECTION 2 ═══════════════ -->
+  <div class="direction" data-block="direction-editorial-cards" data-reveal="scroll">
+    <div class="dir-head"><span class="num">DIRECTION 2 / 4</span><h2 data-edit="dir2-title">Airy editorial cards</h2></div>
+    <p class="dir-says" data-edit="dir2-says">&ldquo;Reviewing creative work should feel calm. One number that matters, then the queue as a reading list.&rdquo;</p>
+    <div class="frame">
+      <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">acme.app/studio/queue</span></div>
+      <div class="frame-body">
+        <div class="d2">
+          <div class="masth">
+            <div class="bignum-wrap">
+              <div class="bignum">5</div>
+              <div class="bignum-cap">videos waiting on a decision</div>
+            </div>
+            <div class="weekly"><b>14</b> cleared this week &mdash;<br>your fastest week since May.</div>
+          </div>
+          <div class="row">
+            <span class="av a1">MK</span>
+            <div class="info">
+              <div class="vt">Q3 launch teaser &mdash; v4</div>
+              <div class="meta">0:47 &middot; Maya Kowalski &middot; 12 comments &middot; uploaded 2h ago</div>
+            </div>
+            <div class="phrase hot">needs changes</div>
+          </div>
+          <div class="row">
+            <span class="av a2">DR</span>
+            <div class="info">
+              <div class="vt">Onboarding walkthrough &mdash; final</div>
+              <div class="meta">3:12 &middot; Dev Raman &middot; 3 comments &middot; uploaded 5h ago</div>
+            </div>
+            <div class="phrase">being reviewed now</div>
+          </div>
+          <div class="row">
+            <span class="av a3">LT</span>
+            <div class="info">
+              <div class="vt">Customer story: Halvorsen Co.</div>
+              <div class="meta">2:05 &middot; Lena Torres &middot; no comments yet &middot; uploaded yesterday</div>
+            </div>
+            <div class="phrase">waiting on Lena</div>
+          </div>
+          <div class="row">
+            <span class="av a1">MK</span>
+            <div class="info">
+              <div class="vt">Homepage hero loop &mdash; v9</div>
+              <div class="meta">0:15 &middot; Maya Kowalski &middot; 7 comments &middot; uploaded yesterday</div>
+            </div>
+            <div class="phrase ok">approved, with notes</div>
+          </div>
+          <div class="row">
+            <span class="av a4">JB</span>
+            <div class="info">
+              <div class="vt">Podcast clip &mdash; ep. 32</div>
+              <div class="meta">1:28 &middot; Jonah Beck &middot; 1 comment &middot; uploaded two days ago</div>
+            </div>
+            <div class="phrase">being reviewed now</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chips" data-dir="2">
+      <button class="chip steal" type="button" data-label="the big serif numeral headline (D2)"><span class="k">steal</span> &middot; the big serif numeral</button>
+      <button class="chip steal" type="button" data-label="human status phrases like &quot;waiting on Lena&quot; (D2)"><span class="k">steal</span> &middot; human status phrases</button>
+      <button class="chip skip" type="button" data-label="the low density &mdash; won't survive 30 items (D2)"><span class="k">skip</span> &middot; low density (dies at 30 items)</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DIRECTION 3 ═══════════════ -->
+  <div class="direction" data-block="direction-kanban-timeline" data-reveal="scroll">
+    <div class="dir-head"><span class="num">DIRECTION 3 / 4</span><h2 data-edit="dir3-title">Kanban / timeline hybrid</h2></div>
+    <p class="dir-says" data-edit="dir3-says">&ldquo;A review is a thing that moves. Show where each video sits in the pipeline, and how long it's been sitting.&rdquo;</p>
+    <div class="frame">
+      <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">acme.app/board/review-queue</span></div>
+      <div class="frame-body">
+        <div class="d3">
+          <div class="head">
+            <span class="hl">Review pipeline &mdash; Launch content</span>
+            <span class="hr"><b>14</b> cleared this week &middot; avg 6.2h to decision</span>
+          </div>
+          <div class="cols">
+            <div class="col wait">
+              <div class="col-h"><span>Waiting / in review</span><span class="cnt">3</span></div>
+              <div class="kcard">
+                <div class="kt">Onboarding walkthrough &mdash; final</div>
+                <div class="km"><span class="mini-av a2">DR</span> 3:12 &middot; 5h in <span class="cmt">3&#9998;</span></div>
+              </div>
+              <div class="kcard stale">
+                <div class="kt">Customer story: Halvorsen Co.</div>
+                <div class="km"><span class="mini-av a3">LT</span> 2:05 &middot; 1d 6h in <span class="cmt">0&#9998;</span></div>
+              </div>
+              <div class="kcard stale">
+                <div class="kt">Podcast clip &mdash; ep. 32</div>
+                <div class="km"><span class="mini-av a4">JB</span> 1:28 &middot; 2d 4h in <span class="cmt">1&#9998;</span></div>
+              </div>
+            </div>
+            <div class="col chg">
+              <div class="col-h"><span>Needs changes</span><span class="cnt">1</span></div>
+              <div class="kcard">
+                <div class="kt">Q3 launch teaser &mdash; v4</div>
+                <div class="km"><span class="mini-av a1">MK</span> 0:47 &middot; 2h in <span class="cmt">12&#9998;</span></div>
+              </div>
+            </div>
+            <div class="col ok">
+              <div class="col-h"><span>Approved w/ notes</span><span class="cnt">1</span></div>
+              <div class="kcard">
+                <div class="kt">Homepage hero loop &mdash; v9</div>
+                <div class="km"><span class="mini-av a1">MK</span> 0:15 &middot; 1d 8h in <span class="cmt">7&#9998;</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tl-label">Time in queue &mdash; red-flagged past 24h</div>
+          <div class="tl">
+            <span class="tick" style="left:0%"></span><span class="tick-lab" style="left:0%">now</span>
+            <span class="tick" style="left:25%"></span><span class="tick-lab" style="left:25%">12h</span>
+            <span class="tick" style="left:50%"></span><span class="tick-lab" style="left:50%">24h</span>
+            <span class="tick" style="left:75%"></span><span class="tick-lab" style="left:75%">36h</span>
+            <span class="tick" style="left:99%"></span><span class="tick-lab" style="left:98%">48h+</span>
+            <span class="tdot" style="left:4%"><span class="d chg"></span><span class="tn">teaser v4</span></span>
+            <span class="tdot" style="left:11%"><span class="d rev"></span><span class="tn">onboarding</span></span>
+            <span class="tdot" style="left:62%"><span class="d wait"></span><span class="tn">Halvorsen</span></span>
+            <span class="tdot" style="left:67%"><span class="d ok"></span><span class="tn">hero v9</span></span>
+            <span class="tdot" style="left:96%"><span class="d rev"></span><span class="tn">ep. 32</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chips" data-dir="3">
+      <button class="chip steal" type="button" data-label="the age-in-queue timeline strip (D3)"><span class="k">steal</span> &middot; the age timeline strip</button>
+      <button class="chip steal" type="button" data-label="red left-edge on stale cards (D3)"><span class="k">steal</span> &middot; red edge on stale cards</button>
+      <button class="chip skip" type="button" data-label="three columns &mdash; wasteful with only 5 items (D3)"><span class="k">skip</span> &middot; columns feel empty at n=5</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DIRECTION 4 ═══════════════ -->
+  <div class="direction" data-block="direction-brutalist-terminal" data-reveal="scroll">
+    <div class="dir-head"><span class="num">DIRECTION 4 / 4</span><h2 data-edit="dir4-title">Brutalist mono terminal</h2></div>
+    <p class="dir-says" data-edit="dir4-says">&ldquo;No decoration, no chrome. A queue is a list; read it top to bottom and get out.&rdquo;</p>
+    <div class="frame">
+      <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">acme.app/q &mdash; keyboard-first</span></div>
+      <div class="frame-body">
+        <div class="d4">
+          <div class="hdr"><b>acme</b> :: review-queue :: launch-content</div>
+          <div class="rule">════════════════════════════════════════════════════════════════════</div>
+          <div class="kv">
+            <span>PENDING=<b>5</b></span>
+            <span>CLEARED_7D=<b class="ok">14</b></span>
+            <span>AVG_TURNAROUND=<b>6.2h</b></span>
+            <span>OLDEST=<b class="hot">2d4h&nbsp;!SLA</b></span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>#</th><th>title</th><th>len</th><th>rev</th><th>cmt</th><th>status</th><th>age</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="idx">1</td><td>q3-launch-teaser.v4</td><td>0:47</td><td>MK</td><td>12</td><td class="st chg">[NEEDS-CHANGES]</td><td>2h</td></tr>
+              <tr><td class="idx">2</td><td>onboarding-walkthrough.final</td><td>3:12</td><td>DR</td><td>3</td><td class="st rev">[IN-REVIEW]</td><td>5h</td></tr>
+              <tr><td class="idx">3</td><td>customer-story.halvorsen</td><td>2:05</td><td>LT</td><td>0</td><td class="st wait">[WAITING]</td><td>1d6h</td></tr>
+              <tr><td class="idx">4</td><td>homepage-hero-loop.v9</td><td>0:15</td><td>MK</td><td>7</td><td class="st ok">[APPROVED+NOTES]</td><td>1d8h</td></tr>
+              <tr><td class="idx">5</td><td>podcast-clip.ep32</td><td>1:28</td><td>JB</td><td>1</td><td class="st rev">[IN-REVIEW]</td><td>2d4h</td></tr>
+            </tbody>
+          </table>
+          <div class="cmd">&gt; <b>open 3</b> &mdash; j/k move &middot; o open &middot; a approve &middot; c comment <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="chips" data-dir="4">
+      <button class="chip steal" type="button" data-label="keyboard-first shortcuts on every row (D4)"><span class="k">steal</span> &middot; keyboard shortcuts everywhere</button>
+      <button class="chip skip" type="button" data-label="the all-caps bracket statuses (D4)"><span class="k">skip</span> &middot; [ALL-CAPS-BRACKETS]</button>
+      <button class="chip skip" type="button" data-label="the terminal cosplay &mdash; novelty wears off (D4)"><span class="k">skip</span> &middot; the novelty wears off</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ HOW TO REACT ═══════════════ -->
+  <div class="react-card" data-reveal="scroll" data-block="how-to-react">
+    <div class="label">How to react</div>
+    <h3 data-edit="react-title">Reply with a direction and your steals</h3>
+    <p data-edit="react-desc">
+      You don't have to write a design brief &mdash; that's the whole point. Pick the direction whose
+      <em>attitude</em> is right, then name the two or three details worth carrying over from the others.
+      Tap a direction and the chips above; the reply writes itself.
+    </p>
+    <div class="pick-row" id="pick-row">
+      <button class="pick" type="button" data-dir="1" data-name="Direction 1 (ops console)">D1 &middot; ops console</button>
+      <button class="pick on" type="button" data-dir="2" data-name="Direction 2 (editorial cards)">D2 &middot; editorial</button>
+      <button class="pick" type="button" data-dir="3" data-name="Direction 3 (kanban/timeline)">D3 &middot; kanban/timeline</button>
+      <button class="pick" type="button" data-dir="4" data-name="Direction 4 (terminal)">D4 &middot; terminal</button>
+    </div>
+    <div class="reply-wrap">
+      <pre class="reply" id="reply"></pre>
+      <button class="copy-reply" id="copy-reply" type="button">Copy reply</button>
+    </div>
+    <p class="react-foot" data-edit="react-foot">
+      Paste that back into the chat as-is. Claude will fold the steals into the winning direction and
+      come back with one refined design &mdash; which is a far shorter conversation than trying to
+      describe taste you didn't know you had.
+    </p>
+  </div>
+
+  <footer>
+    Part of <a href="index.html">Know your unknowns</a> &mdash; companion examples to the blog post.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  // ---- copy helper -------------------------------------------------------
+  function copyText(text, btn, idleLabel) {
+    function done() {
+      btn.classList.add('copied');
+      var prev = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(function () {
+        btn.classList.remove('copied');
+        btn.textContent = idleLabel || prev;
+      }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    } else {
+      fallback();
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  // ---- copy prompt -------------------------------------------------------
+  var promptBtn = document.getElementById('copy-prompt');
+  var promptText = document.getElementById('prompt-text').textContent
+    .trim().replace(/^[“"]/, '').replace(/[”"]$/, '');
+  promptBtn.addEventListener('click', function () {
+    copyText(promptText, promptBtn, 'Copy prompt');
+  });
+
+  // ---- reaction builder --------------------------------------------------
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.pick'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var replyEl = document.getElementById('reply');
+
+  function decode(s) {
+    // chip labels contain entities via data attributes already decoded by the parser
+    return s;
+  }
+
+  function currentDirection() {
+    var on = picks.filter(function (p) { return p.classList.contains('on'); })[0];
+    return on ? on.getAttribute('data-name') : null;
+  }
+
+  function buildReply() {
+    var dir = currentDirection();
+    var steals = [], skips = [];
+    chips.forEach(function (c) {
+      if (!c.classList.contains('on')) return;
+      var label = decode(c.getAttribute('data-label'));
+      if (c.classList.contains('steal')) steals.push(label);
+      else skips.push(label);
+    });
+    var lines = [];
+    lines.push('Go with ' + (dir || '[pick a direction]') + '.');
+    if (steals.length) lines.push('Steal: ' + steals.join('; ') + '.');
+    if (skips.length) lines.push('Skip: ' + skips.join('; ') + '.');
+    if (!steals.length && !skips.length) {
+      lines.push('(Tap the steal/skip chips under each frame to fill this in.)');
+    }
+    lines.push('Then build the real page at src/pages/ReviewQueue.tsx against the /api/reviews?team=launch-content endpoint.');
+    replyEl.textContent = lines.join('\n');
+  }
+
+  picks.forEach(function (p) {
+    p.addEventListener('click', function () {
+      picks.forEach(function (q) { q.classList.remove('on'); });
+      p.classList.add('on');
+      buildReply();
+    });
+  });
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      c.classList.toggle('on');
+      buildReply();
+    });
+  });
+
+  // sensible starting selection so the reply never opens empty
+  var preselect = [
+    'the big serif numeral headline (D2)',
+    'the 4-stat metric strip (D1)',
+    'the age-in-queue timeline strip (D3)'
+  ];
+  chips.forEach(function (c) {
+    if (preselect.indexOf(c.getAttribute('data-label')) !== -1) c.classList.add('on');
+  });
+  buildReply();
+
+  // ---- copy reply --------------------------------------------------------
+  var replyBtn = document.getElementById('copy-reply');
+  replyBtn.addEventListener('click', function () {
+    copyText(replyEl.textContent, replyBtn, 'Copy reply');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!-- Offprint: reference static block for manual/LLM flattening.
+     To flatten an artifact by hand: (1) delete everything between the
+     artifact-shell fence comments (inclusive), (2) paste the block below
+     into <head> and fill each var() with the resolved value you want
+     (open the artifact, pick your recipe, and use the panel's Flatten
+     button to get exact values — or copy from shell/artifact-shell.css),
+     (3) remove data-edit / data-block / data-reveal attributes and any
+     data-* recipe attributes on <html>, (4) keep the artifact-kit fence
+     and the #a2-motion script if present. Pages only ever touch
+     window.ArtifactShell?.x — the stub below keeps their JS alive. -->
+<style id="offprint-static">
+:root {
+  color-scheme: light;
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f2f2f2;
+  --ink: #1a1a1a; --ink-muted: #767676; --ink-subtle: #3f3f3f;
+  --accent: #c81e1e; --accent-strong: #a11919; --accent-contrast: #ffffff;
+  --tint: #f7dede; --line: #dedede; --line-strong: #9d9d9d; --focus: var(--accent);
+  --positive: #4c7a3d; --warning: #9a7b1c; --negative: #a04024;
+  --shadow-color: rgb(0 0 0 / .1); --shadow-1: none; --shadow-2: none;
+  --font-display: "Helvetica Neue", Helvetica, "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+  --font-body: var(--font-display);
+  --font-mono: ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --display-weight: 700; --display-track: -0.02em; --lh-body: 1.6;
+  --radius-s: 2px; --radius-m: 3px; --radius-l: 4px; --radius-full: 999px;
+  --border-w: 1px; --line-style: solid; --space: 1rem;
+  --dur-1: 120ms; --dur-2: 240ms; --dur-3: 420ms;
+  --ease-out: cubic-bezier(.2,.7,.2,1); --ease-spring: ease-out;
+}
+:where(body) { background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: var(--lh-body); }
+:where(h1,h2,h3,h4) { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-track); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@media print { * { box-shadow: none !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+</style>
+<script id="offprint-stub">
+const __S = null; // or paste the artifact's exported "state" object
+window.ArtifactShell = Object.freeze({ version: 3, flat: true, slug: "flattened",
+  state: { get: () => __S, set: () => {}, clear: () => {}, onRestore: f => { if (__S != null) try { f(__S) } catch (e) {} } },
+  toast: () => {}, isEditing: () => false, setEditing: () => {},
+  applySettings: () => {}, applyTheme: () => {}, applyRecipe: () => {}, saveRecipe: () => {},
+  setAccent: () => {}, randomPalette: () => null, generatePalette: () => null,
+  exportJSON: () => {}, importJSON: () => {}, resetAll: () => {},
+  readSettings: () => ({}),
+  recipes: { list: () => ({}), save: () => {}, remove: () => {} },
+  blocks: { order: () => [], set: () => {}, reset: () => {} },
+  get motion() { return window.Motion ?? null; } });
+</script>
