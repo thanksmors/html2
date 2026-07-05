@@ -1,12 +1,17 @@
 [
  {
   "path": "21-theme-lab.html",
-  "title": "The Theme Lab",
+  "title": "The Recipe Lab",
   "category": "Reference"
  },
  {
   "path": "32-kit-gallery.html",
   "title": "The Kit",
+  "category": "Reference"
+ },
+ {
+  "path": "34-issue-tracker.html",
+  "title": "Offprint — live tracker",
   "category": "Reference"
  },
  {
@@ -67,6 +72,11 @@
  {
   "path": "08-prototype-interaction.html",
   "title": "Clickable flow",
+  "category": "Prototyping"
+ },
+ {
+  "path": "33-onboarding-tour.html",
+  "title": "First-run onboarding & tours",
   "category": "Prototyping"
  },
  {

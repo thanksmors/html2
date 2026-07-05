@@ -706,7 +706,7 @@ animation-duration: var(--dur-2);
 (() => {
 "use strict";
 const VERSION = 3;
-const ARTIFACTS = [{"path":"21-theme-lab.html","title":"The Theme Lab","category":"Reference"},{"path":"32-kit-gallery.html","title":"The Kit","category":"Reference"},{"path":"01-exploration-code-approaches.html","title":"Three code approaches","category":"Exploration & Planning"},{"path":"02-exploration-visual-designs.html","title":"Visual design directions","category":"Exploration & Planning"},{"path":"16-implementation-plan.html","title":"Implementation plan","category":"Exploration & Planning"},{"path":"26-decision-matrix.html","title":"Decision matrix","category":"Exploration & Planning"},{"path":"28-roadmap-gantt.html","title":"Roadmap Gantt","category":"Exploration & Planning"},{"path":"03-code-review-pr.html","title":"Annotated pull request","category":"Code Review & Understanding"},{"path":"17-pr-writeup.html","title":"PR writeup for reviewers","category":"Code Review & Understanding"},{"path":"04-code-understanding.html","title":"Module map","category":"Code Review & Understanding"},{"path":"05-design-system.html","title":"Living design system","category":"Design"},{"path":"06-component-variants.html","title":"Component variants","category":"Design"},{"path":"07-prototype-animation.html","title":"Animation sandbox","category":"Prototyping"},{"path":"08-prototype-interaction.html","title":"Clickable flow","category":"Prototyping"},{"path":"10-svg-illustrations.html","title":"SVG figure sheet","category":"Illustrations & Diagrams"},{"path":"13-flowchart-diagram.html","title":"Annotated flowchart","category":"Illustrations & Diagrams"},{"path":"09-slide-deck.html","title":"Arrow-key slide deck","category":"Decks"},{"path":"14-research-feature-explainer.html","title":"How a feature works","category":"Research & Learning"},{"path":"15-research-concept-explainer.html","title":"Concept explainer","category":"Research & Learning"},{"path":"11-status-report.html","title":"Weekly status","category":"Reports"},{"path":"12-incident-report.html","title":"Incident timeline","category":"Reports"},{"path":"27-postmortem-timeline.html","title":"Postmortem timeline","category":"Reports"},{"path":"18-editor-triage-board.html","title":"Ticket triage board","category":"Custom Editing Interfaces"},{"path":"19-editor-feature-flags.html","title":"Feature flag editor","category":"Custom Editing Interfaces"},{"path":"20-editor-prompt-tuner.html","title":"Prompt tuner","category":"Custom Editing Interfaces"},{"path":"29-kanban-board.html","title":"Week 28 kanban","category":"Custom Editing Interfaces"},{"path":"30-tier-list.html","title":"Tooling tier list","category":"Custom Editing Interfaces"},{"path":"31-todo-list.html","title":"Ship-week todo list","category":"Custom Editing Interfaces"},{"path":"22-metrics-dashboard.html","title":"Metrics dashboard","category":"Data & Dashboards"},{"path":"23-benchmark-comparison.html","title":"Benchmark comparison","category":"Data & Dashboards"},{"path":"24-data-table-explorer.html","title":"Support queue table","category":"Data & Dashboards"},{"path":"25-log-trace-explorer.html","title":"Trace waterfall","category":"Data & Dashboards"}];
+const ARTIFACTS = [{"path":"21-theme-lab.html","title":"The Recipe Lab","category":"Reference"},{"path":"32-kit-gallery.html","title":"The Kit","category":"Reference"},{"path":"34-issue-tracker.html","title":"Offprint — live tracker","category":"Reference"},{"path":"01-exploration-code-approaches.html","title":"Three code approaches","category":"Exploration & Planning"},{"path":"02-exploration-visual-designs.html","title":"Visual design directions","category":"Exploration & Planning"},{"path":"16-implementation-plan.html","title":"Implementation plan","category":"Exploration & Planning"},{"path":"26-decision-matrix.html","title":"Decision matrix","category":"Exploration & Planning"},{"path":"28-roadmap-gantt.html","title":"Roadmap Gantt","category":"Exploration & Planning"},{"path":"03-code-review-pr.html","title":"Annotated pull request","category":"Code Review & Understanding"},{"path":"17-pr-writeup.html","title":"PR writeup for reviewers","category":"Code Review & Understanding"},{"path":"04-code-understanding.html","title":"Module map","category":"Code Review & Understanding"},{"path":"05-design-system.html","title":"Living design system","category":"Design"},{"path":"06-component-variants.html","title":"Component variants","category":"Design"},{"path":"07-prototype-animation.html","title":"Animation sandbox","category":"Prototyping"},{"path":"08-prototype-interaction.html","title":"Clickable flow","category":"Prototyping"},{"path":"33-onboarding-tour.html","title":"First-run onboarding & tours","category":"Prototyping"},{"path":"10-svg-illustrations.html","title":"SVG figure sheet","category":"Illustrations & Diagrams"},{"path":"13-flowchart-diagram.html","title":"Annotated flowchart","category":"Illustrations & Diagrams"},{"path":"09-slide-deck.html","title":"Arrow-key slide deck","category":"Decks"},{"path":"14-research-feature-explainer.html","title":"How a feature works","category":"Research & Learning"},{"path":"15-research-concept-explainer.html","title":"Concept explainer","category":"Research & Learning"},{"path":"11-status-report.html","title":"Weekly status","category":"Reports"},{"path":"12-incident-report.html","title":"Incident timeline","category":"Reports"},{"path":"27-postmortem-timeline.html","title":"Postmortem timeline","category":"Reports"},{"path":"18-editor-triage-board.html","title":"Ticket triage board","category":"Custom Editing Interfaces"},{"path":"19-editor-feature-flags.html","title":"Feature flag editor","category":"Custom Editing Interfaces"},{"path":"20-editor-prompt-tuner.html","title":"Prompt tuner","category":"Custom Editing Interfaces"},{"path":"29-kanban-board.html","title":"Week 28 kanban","category":"Custom Editing Interfaces"},{"path":"30-tier-list.html","title":"Tooling tier list","category":"Custom Editing Interfaces"},{"path":"31-todo-list.html","title":"Ship-week todo list","category":"Custom Editing Interfaces"},{"path":"22-metrics-dashboard.html","title":"Metrics dashboard","category":"Data & Dashboards"},{"path":"23-benchmark-comparison.html","title":"Benchmark comparison","category":"Data & Dashboards"},{"path":"24-data-table-explorer.html","title":"Support queue table","category":"Data & Dashboards"},{"path":"25-log-trace-explorer.html","title":"Trace waterfall","category":"Data & Dashboards"}];
 const PALETTES = ["claude", "newsprint", "paperback", "swiss", "terminal",
 "brutalist", "glass", "synthwave", "pastel", "notebook", "solarized"];
 const TYPES = {
@@ -1760,6 +1760,1076 @@ get motion() { return window.Motion ?? null; },
 })();
 </script>
 <!-- ═══ /artifact-shell ═══ -->
+<!-- ═══ artifact-kit v1 ═══ -->
+<style id="artifact-kit-css">
+@layer kit {
+.k-card,.k-panel,.k-toolbar,.k-stat,.k-acc,.k-sort-item,.k-tier,.k-menu,.k-dialog,.k-stepper,.k-tags,.k-kcard,.k-btn,.k-chip,.k-input,.k-textarea,.k-select,.k-search{background:var(--surface);border:var(--border-w) var(--line-style) var(--line);color:var(--ink)}
+.k-card,.k-panel,.k-empty,.k-drop,.k-dialog{border-radius:var(--radius-l)}
+.k-toolbar,.k-stat,.k-btn,.k-input,.k-textarea,.k-select,.k-seg,.k-stepper,.k-tags,.k-menu,.k-acc,.k-sort-item,.k-tier,.k-col{border-radius:var(--radius-m)}
+.k-chip,.k-search,.k-switch,.k-avatar,.k-badge,.k-tier-chip,.k-progress,.k-col-count{border-radius:var(--radius-full)}
+.k-panel-head,.k-stat-label,.k-col-head,.k-table th,.k-wiz-steps button{font:600 11px/1.3 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+.k-x,.k-kdel,.k-todo-del,.k-cdel{border:0;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;line-height:1;padding:2px 5px}
+.k-kdel:hover,.k-todo-del:hover,.k-cdel:hover{color:var(--negative)}
+.k-input,.k-textarea,.k-select,.k-search input,.k-tags input,.k-stepper input{font:inherit;font-size:13.5px;color:var(--ink)}
+.k-input::placeholder,.k-textarea::placeholder,.k-search input::placeholder,.k-tags input::placeholder{color:var(--ink-muted)}
+.k-card,.k-panel{box-shadow:var(--shadow-1)}
+.k-card{padding:calc(var(--space)*1.1)}
+.k-panel{overflow:clip}
+.k-panel>.k-panel-head{display:flex;align-items:center;gap:8px;padding:9px 14px;border-block-end:1px var(--line-style) var(--line);background:var(--surface-2)}
+.k-panel>.k-panel-head>:last-child{margin-inline-start:auto}
+.k-panel>.k-panel-body{padding:calc(var(--space)*.9) 14px}
+.k-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px}
+.k-toolbar .k-gap{flex:1}
+.k-split{display:grid;gap:var(--space);grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
+.k-stat{padding:12px 14px}
+.k-stat-value{font-family:var(--font-display);font-weight:var(--display-weight);font-size:clamp(1.5rem,1.2rem + 1vw,2rem);line-height:1.15;font-variant-numeric:tabular-nums}
+.k-stat-delta{font:600 12px/1.3 var(--font-mono)}
+.k-stat-delta.up{color:var(--positive)}
+.k-stat-delta.down{color:var(--negative)}
+.k-empty{display:grid;place-items:center;gap:6px;text-align:center;padding:calc(var(--space)*2.2) var(--space);border:var(--border-w) dashed var(--line);color:var(--ink-muted)}
+.k-empty-icon{font-size:26px;opacity:.6}
+.k-empty strong{color:var(--ink-subtle)}
+.k-btn{display:inline-flex;align-items:center;gap:6px;font:500 13.5px/1.2 var(--font-body);padding:7px 13px;cursor:pointer;border-style:solid;transition:border-color var(--dur-1),background var(--dur-1),scale var(--dur-1) var(--ease-spring)}
+.k-btn:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.k-btn:active{scale:.96}
+.k-btn:disabled{opacity:.45;cursor:not-allowed}
+.k-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
+.k-btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.k-btn.ghost{background:transparent;border-color:transparent}
+.k-btn.ghost:hover{background:var(--surface-2)}
+.k-btn.danger{color:var(--negative);border-color:color-mix(in oklch,var(--negative) 45%,var(--line))}
+.k-btn.danger:hover{background:color-mix(in oklch,var(--negative) 10%,var(--surface))}
+.k-btn.icon{padding:7px;inline-size:34px;block-size:34px;justify-content:center}
+.k-btn.sm{padding:4px 9px;font-size:12px}
+.k-btn.sm.icon{inline-size:26px;block-size:26px;padding:4px}
+.k-badge{display:inline-flex;align-items:center;gap:5px;font:600 11px/1.4 var(--font-mono);letter-spacing:.04em;padding:2px 8px;background:var(--tint);color:var(--accent-strong)}
+.k-badge.ok{background:color-mix(in oklch,var(--positive) 14%,var(--surface));color:var(--positive)}
+.k-badge.warn{background:color-mix(in oklch,var(--warning) 16%,var(--surface));color:color-mix(in oklch,var(--warning),var(--ink) 25%)}
+.k-badge.bad{background:color-mix(in oklch,var(--negative) 12%,var(--surface));color:var(--negative)}
+.k-badge.mute{background:var(--surface-2);color:var(--ink-muted)}
+.k-chip{display:inline-flex;align-items:center;gap:6px;font:500 12.5px/1.3 var(--font-body);padding:4px 11px;cursor:pointer;border-style:solid;transition:background var(--dur-1),border-color var(--dur-1),color var(--dur-1)}
+.k-chip:hover{border-color:var(--line-strong)}
+.k-chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
+.k-chip .k-x{color:inherit;font:inherit;padding:0 2px;opacity:.65}
+.k-chip .k-x:hover{opacity:1}
+.k-kbd{font:600 11px/1 var(--font-mono);padding:3px 6px 4px;border:1px solid var(--line-strong);border-block-end-width:2px;border-radius:var(--radius-s);background:var(--surface-2);color:var(--ink-subtle)}
+.k-diff{font:600 11.5px/1.4 var(--font-mono);padding:1px 7px;border-radius:var(--radius-s)}
+.k-diff.add{background:color-mix(in oklch,var(--positive) 16%,var(--surface));color:var(--positive)}
+.k-diff.del{background:color-mix(in oklch,var(--negative) 13%,var(--surface));color:var(--negative);text-decoration:line-through}
+.k-avatar{display:inline-grid;place-items:center;inline-size:30px;block-size:30px;background:var(--tint);color:var(--accent-strong);border:2px solid var(--surface);font:700 11px/1 var(--font-body);text-transform:uppercase}
+.k-avatars{display:inline-flex}
+.k-avatars .k-avatar{transition:translate var(--dur-1) var(--ease-spring)}
+.k-avatars .k-avatar:not(:first-child){margin-inline-start:-9px}
+.k-avatars:hover .k-avatar{translate:0 -2px}
+.k-callout{--k-co:var(--accent);display:grid;gap:3px;padding:11px 14px;border-inline-start:3px solid var(--k-co);border-radius:var(--radius-s) var(--radius-m) var(--radius-m) var(--radius-s);background:color-mix(in oklch,var(--k-co) 8%,var(--surface))}
+.k-callout-title{font-weight:650;font-size:13.5px;color:color-mix(in oklch,var(--k-co),var(--ink) 30%)}
+.k-callout p{margin:0;font-size:13.5px;color:var(--ink-subtle)}
+.k-callout.warn{--k-co:var(--warning)}
+.k-callout.danger{--k-co:var(--negative)}
+.k-callout.ok{--k-co:var(--positive)}
+.k-skeleton{border-radius:var(--radius-s);background:linear-gradient(100deg,var(--surface-2) 40%,color-mix(in oklch,var(--surface-2) 55%,var(--surface)) 50%,var(--surface-2) 60%);background-size:300% 100%;animation:k-shimmer 1.4s linear infinite;color:transparent;user-select:none}
+@keyframes k-shimmer{from{background-position:100% 0}to{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.k-skeleton{animation:none}}
+.k-rating{display:inline-flex;gap:2px}
+.k-rating button{border:0;background:none;cursor:pointer;padding:1px;font-size:18px;line-height:1;color:var(--line-strong);transition:color var(--dur-1),scale var(--dur-1) var(--ease-spring)}
+.k-rating button.on{color:var(--warning)}
+.k-rating button:hover{scale:1.2}
+.k-progress{--value:0;block-size:8px;background:var(--surface-2);overflow:hidden}
+.k-progress::before{content:"";display:block;block-size:100%;inline-size:calc(var(--value)*1%);border-radius:inherit;background:var(--accent);transition:inline-size var(--dur-3) var(--ease-out)}
+.k-ring{--value:0;--k-rs:64px;--k-rw:7px;inline-size:var(--k-rs);block-size:var(--k-rs);border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--value)*1%),var(--surface-2) 0);font:700 12.5px/1 var(--font-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.k-ring::after{content:attr(data-label);display:grid;place-items:center;inline-size:calc(var(--k-rs) - var(--k-rw)*2);block-size:calc(var(--k-rs) - var(--k-rw)*2);border-radius:50%;background:var(--surface)}
+.k-meter{--value:0;--k-lo:clamp(0,(39.999 - var(--value))*infinity,1);--k-mid:clamp(0,(69.999 - var(--value))*infinity,1);block-size:10px;border-radius:var(--radius-s);background:var(--surface-2);overflow:hidden;position:relative}
+.k-meter::before{content:"";position:absolute;inset:0;inline-size:calc(var(--value)*1%);transition:inline-size var(--dur-3) var(--ease-out),background var(--dur-2);background:color-mix(in oklch,var(--negative) calc(var(--k-lo)*100%),color-mix(in oklch,var(--warning) calc(var(--k-mid)*100%),var(--positive)))}
+.k-meter::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),var(--surface) calc(10% - 2px) 10%)}
+.k-table{inline-size:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.k-table th,.k-table td{padding:8px 12px;text-align:start;border-block-end:1px var(--line-style) var(--line)}
+.k-table th{border-block-end-color:var(--line-strong)}
+.k-table tbody tr:hover{background:var(--surface-2)}
+.k-table th[data-k-sort]{cursor:pointer;user-select:none}
+.k-table th[data-k-sort]::after{content:" ↕";opacity:.35}
+.k-table th[aria-sort="ascending"]::after{content:" ↑";opacity:1;color:var(--accent)}
+.k-table th[aria-sort="descending"]::after{content:" ↓";opacity:1;color:var(--accent)}
+.k-table th[data-k-sort]:hover{color:var(--ink)}
+.k-table .num{text-align:end}
+.k-timeline{list-style:none;margin:0;padding:0;position:relative}
+.k-timeline::before{content:"";position:absolute;inset-block:6px;inset-inline-start:5px;inline-size:2px;background:var(--line)}
+.k-timeline>li{position:relative;padding:0 0 18px 26px}
+.k-timeline>li::before{content:"";position:absolute;inset-inline-start:0;inset-block-start:5px;inline-size:12px;block-size:12px;border-radius:50%;background:var(--surface);border:3px solid var(--accent)}
+.k-timeline>li.muted::before{border-color:var(--line-strong)}
+.k-timeline time{font:600 11px/1.5 var(--font-mono);color:var(--ink-muted);display:block}
+.k-timeline li p{margin:2px 0 0;font-size:13px;color:var(--ink-subtle)}
+.k-tree{list-style:none;margin:0;padding:0;font-size:13.5px}
+.k-tree ul{list-style:none;padding-inline-start:20px;border-inline-start:1px var(--line-style) var(--line);margin-inline-start:7px}
+.k-tree li{padding:2px 0}
+.k-tree summary{display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 6px;border-radius:var(--radius-s);list-style:none}
+.k-tree summary::-webkit-details-marker{display:none}
+.k-tree summary::before{content:"▸";font-size:10px;color:var(--ink-muted);transition:rotate var(--dur-1) var(--ease-out)}
+.k-tree summary:hover{background:var(--surface-2)}
+.k-tree details[open]>summary::before{rotate:90deg}
+.k-leaf{display:flex;align-items:center;gap:6px;padding:2px 6px 2px 22px;color:var(--ink-subtle)}
+.k-acc+.k-acc{margin-block-start:8px}
+.k-acc>summary{display:flex;align-items:center;gap:8px;padding:11px 14px;font-weight:600;font-size:14px;list-style:none;cursor:pointer}
+.k-acc>summary::-webkit-details-marker{display:none}
+.k-acc>summary::after{content:"＋";margin-inline-start:auto;color:var(--ink-muted);transition:rotate var(--dur-2) var(--ease-spring)}
+.k-acc[open]>summary::after{rotate:45deg}
+.k-acc-body{padding:0 14px 12px;font-size:13.5px;color:var(--ink-subtle)}
+@supports selector(::details-content) {
+.k-acc::details-content{block-size:0;overflow:clip;opacity:0;transition:block-size var(--dur-2) var(--ease-out),opacity var(--dur-2),content-visibility var(--dur-2) allow-discrete}
+.k-acc[open]::details-content{block-size:auto;opacity:1}
+@supports (interpolate-size:allow-keywords){.k-acc{interpolate-size:allow-keywords}}
+}
+.k-field{display:grid;gap:5px}
+.k-field>label{font:600 12px/1.3 var(--font-body);color:var(--ink-subtle)}
+.k-field .k-hint{font-size:11.5px;color:var(--ink-muted);margin:0}
+.k-input,.k-textarea,.k-select{padding:8px 11px;inline-size:100%;border-style:solid;transition:border-color var(--dur-1)}
+.k-input:hover,.k-textarea:hover,.k-select:hover{border-color:var(--line-strong)}
+.k-textarea{resize:vertical;min-block-size:68px}
+@supports (field-sizing:content){.k-textarea{field-sizing:content;resize:none}}
+.k-search{display:flex;align-items:center;gap:7px;padding:7px 11px;border-style:solid}
+.k-search:focus-within,.k-tags:focus-within{border-color:var(--focus)}
+.k-search::before{content:"⌕";font-size:16px;color:var(--ink-muted);rotate:-90deg}
+.k-search input,.k-tags input{border:0;background:none;flex:1;min-inline-size:0;outline:none}
+.k-switch{appearance:none;margin:0;cursor:pointer;flex:none;inline-size:38px;block-size:22px;background:var(--surface-2);border:var(--border-w) solid var(--line);transition:background var(--dur-2) var(--ease-out),border-color var(--dur-2)}
+.k-switch::before{content:"";display:block;inline-size:16px;block-size:16px;border-radius:50%;margin:1.5px;background:var(--ink-muted);transition:translate var(--dur-2) var(--ease-spring),background var(--dur-2)}
+.k-switch:checked{background:var(--accent);border-color:var(--accent)}
+.k-switch:checked::before{translate:15px 0;background:var(--accent-contrast)}
+.k-check,.k-radio{appearance:none;margin:0;cursor:pointer;flex:none;inline-size:17px;block-size:17px;border:var(--border-w) solid var(--line-strong);border-radius:var(--radius-s);background:var(--surface);display:inline-grid;place-items:center;vertical-align:-3px;transition:background var(--dur-1),border-color var(--dur-1)}
+.k-check::before,.k-radio::before{content:"";inline-size:9px;block-size:9px;scale:0;transition:scale var(--dur-1) var(--ease-spring);background:var(--accent-contrast);clip-path:polygon(14% 44%,0 62%,40% 100%,100% 16%,84% 4%,38% 68%)}
+.k-check:checked,.k-radio:checked{background:var(--accent);border-color:var(--accent)}
+.k-check:checked::before,.k-radio:checked::before{scale:1}
+.k-radio{border-radius:50%}
+.k-radio::before{clip-path:none;border-radius:50%}
+.k-checkrow{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;padding:3px 0}
+.k-range{appearance:none;inline-size:100%;block-size:22px;background:none;cursor:pointer;--k-fill:calc((var(--value,50) - var(--min,0))/(var(--max,100) - var(--min,0))*100%)}
+.k-range::-webkit-slider-runnable-track{block-size:6px;border-radius:var(--radius-full);background:linear-gradient(90deg,var(--accent) var(--k-fill),var(--surface-2) 0)}
+.k-range::-webkit-slider-thumb{appearance:none;inline-size:16px;block-size:16px;margin-block-start:-5px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:var(--shadow-1)}
+.k-range::-moz-range-track{block-size:6px;border-radius:var(--radius-full);background:var(--surface-2)}
+.k-range::-moz-range-progress{block-size:6px;border-radius:var(--radius-full);background:var(--accent)}
+.k-range::-moz-range-thumb{inline-size:16px;block-size:16px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:var(--shadow-1)}
+.k-seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:3px;background:var(--surface-2)}
+.k-seg label{position:relative;text-align:center;padding:5px 13px;font-size:12.5px;border-radius:calc(var(--radius-m) - 2px);cursor:pointer;color:var(--ink-muted);transition:color var(--dur-1)}
+.k-seg label:has(input:checked){background:var(--surface);color:var(--ink);box-shadow:var(--shadow-1)}
+.k-seg input{position:absolute;opacity:0;pointer-events:none}
+.k-stepper{display:inline-flex;align-items:stretch;border-style:solid;overflow:hidden}
+.k-stepper button{border:0;background:none;cursor:pointer;padding:5px 11px;font:600 14px/1 var(--font-body);color:var(--ink-muted)}
+.k-stepper button:hover{background:var(--surface-2);color:var(--ink)}
+.k-stepper input{border:0;border-inline:1px var(--line-style) var(--line);background:none;inline-size:52px;text-align:center;appearance:textfield;font-variant-numeric:tabular-nums}
+.k-stepper input::-webkit-inner-spin-button,.k-stepper input::-webkit-outer-spin-button{appearance:none}
+.k-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 9px;cursor:text;border-style:solid}
+.k-tags input{font-size:13px;min-inline-size:90px}
+.k-drop{display:grid;place-items:center;gap:4px;text-align:center;padding:calc(var(--space)*1.8) var(--space);border:2px dashed var(--line-strong);color:var(--ink-muted);font-size:13.5px;cursor:pointer;transition:border-color var(--dur-1),background var(--dur-1),scale var(--dur-2) var(--ease-spring)}
+.k-drop strong{color:var(--ink-subtle)}
+.k-drop.is-over{border-color:var(--accent);background:color-mix(in oklch,var(--accent) 8%,var(--surface));scale:1.015}
+.k-dialog{margin:auto;padding:0;inline-size:min(92vw,460px);box-shadow:var(--shadow-2);opacity:0;translate:0 10px;transition:opacity var(--dur-2) var(--ease-out),translate var(--dur-2) var(--ease-spring),display var(--dur-2) allow-discrete,overlay var(--dur-2) allow-discrete}
+.k-dialog::backdrop{background:color-mix(in oklch,var(--ink) 32%,transparent);backdrop-filter:blur(2px)}
+.k-dialog[open]{opacity:1;translate:0 0;@starting-style{opacity:0;translate:0 10px}}
+.k-dialog-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-block-end:1px var(--line-style) var(--line)}
+.k-dialog-head h3{margin:0;font-size:16px}
+.k-dialog-head .k-btn{margin-inline-start:auto}
+.k-dialog-body{padding:14px 16px;font-size:13.5px;color:var(--ink-subtle);display:grid;gap:10px}
+.k-dialog-foot{display:flex;justify-content:end;gap:8px;padding:12px 16px;border-block-start:1px var(--line-style) var(--line);background:var(--surface-2)}
+.k-menuwrap{position:relative;display:inline-block}
+.k-menu{position:absolute;inset-block-start:calc(100% + 6px);inset-inline-start:0;z-index:50;min-inline-size:180px;margin:0;padding:5px;list-style:none;box-shadow:var(--shadow-2);display:none;opacity:0;translate:0 6px;transition:opacity var(--dur-1) var(--ease-out),translate var(--dur-2) var(--ease-spring),display var(--dur-1) allow-discrete}
+.k-menu.is-open{display:block;opacity:1;translate:0 0;@starting-style{opacity:0;translate:0 6px}}
+.k-menu button,.k-menu a{display:flex;align-items:center;gap:8px;inline-size:100%;border:0;background:none;cursor:pointer;text-align:start;font:inherit;font-size:13.5px;color:var(--ink);padding:7px 10px;border-radius:var(--radius-s);text-decoration:none}
+.k-menu button:hover,.k-menu a:hover{background:var(--surface-2)}
+.k-menu .danger{color:var(--negative)}
+.k-menu .danger:hover{background:color-mix(in oklch,var(--negative) 9%,var(--surface))}
+.k-menu hr{border:0;border-block-start:1px var(--line-style) var(--line);margin:5px 4px}
+.k-wiz-steps{display:flex;gap:6px;margin-block-end:14px}
+.k-wiz-steps button{flex:1;display:grid;gap:3px;text-align:center;cursor:pointer;border:0;background:none;padding:0 0 8px}
+.k-wiz-steps button::after{content:"";block-size:3px;border-radius:var(--radius-full);background:var(--surface-2);transition:background var(--dur-2)}
+.k-wiz-steps button.done::after{background:color-mix(in oklch,var(--accent) 45%,var(--surface-2))}
+.k-wiz-steps button[aria-current="step"]{color:var(--ink)}
+.k-wiz-steps button[aria-current="step"]::after{background:var(--accent)}
+.k-wiz-panel[hidden]{display:none}
+.k-wiz-nav{display:flex;justify-content:space-between;margin-block-start:14px}
+[data-k-sortable]>[data-k-item],.k-tier-body>[data-k-item],.k-kcard{cursor:grab;transition:box-shadow var(--dur-1),opacity var(--dur-1)}
+[data-k-item]:active,.k-kcard:active{cursor:grabbing}
+.k-dragging{opacity:.4}
+.k-drop-before{box-shadow:inset 0 3px 0 var(--accent)}
+[data-k-item]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.k-sort-item{display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:13.5px}
+.k-sort-item .k-grip{color:var(--ink-muted);font-size:12px;user-select:none}
+.k-sort-item+.k-sort-item{margin-block-start:6px}
+.k-tiers{display:grid;gap:8px}
+.k-tier{display:grid;grid-template-columns:52px 1fr;align-items:stretch;overflow:clip}
+.k-tier-label{display:grid;place-items:center;font:700 18px/1 var(--font-display);background:color-mix(in oklch,var(--accent) calc(var(--k-heat,40)*1%),var(--surface-2));color:var(--ink)}
+.k-tier-body{display:flex;flex-wrap:wrap;gap:6px;padding:8px;min-block-size:44px}
+.k-tier-body.k-over{background:var(--tint)}
+.k-tier-chip{padding:5px 11px;font-size:12.5px;font-weight:550;background:var(--surface-2);border:var(--border-w) solid var(--line)}
+.k-board{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));align-items:start}
+.k-col{background:var(--surface-2);border:var(--border-w) var(--line-style) var(--line)}
+.k-col.over-wip{border-color:color-mix(in oklch,var(--negative) 55%,var(--line))}
+.k-col.over-wip .k-col-head{color:var(--negative)}
+.k-col.over-wip .k-col-count{background:color-mix(in oklch,var(--negative) 14%,var(--surface));color:var(--negative)}
+.k-col.k-over{outline:2px dashed var(--accent);outline-offset:-2px}
+.k-col-head{display:flex;align-items:center;gap:7px;padding:9px 11px 5px}
+.k-col-count{font:600 10.5px/1 var(--font-mono);padding:3px 7px;background:var(--surface)}
+.k-col-body{display:grid;gap:7px;padding:6px 8px;min-block-size:40px}
+.k-col-add{display:block;inline-size:calc(100% - 16px);margin:0 8px 8px;border:1px dashed var(--line-strong);border-radius:var(--radius-s);background:none;cursor:pointer;padding:5px;font:500 12px/1.3 var(--font-body);color:var(--ink-muted)}
+.k-col-add:hover{color:var(--ink);background:var(--surface)}
+.k-col-head{cursor:grab}
+.k-col-head:active{cursor:grabbing}
+.k-col-head:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-radius:var(--radius-s)}
+.k-col.k-dragging{opacity:.4}
+.k-col.k-drop-before{box-shadow:inset 3px 0 0 var(--accent)}
+.k-col-label[contenteditable]{cursor:text;outline:1.5px dashed color-mix(in oklch,var(--accent) 55%,transparent);outline-offset:2px;border-radius:2px}
+.k-col-label[contenteditable]:focus{outline:2px solid var(--accent)}
+.k-cdel{margin-inline-start:auto;opacity:0;transition:opacity var(--dur-1)}
+.k-col-head:hover .k-cdel,.k-col-head:focus-within .k-cdel{opacity:1}
+.k-colghost{border:2px dashed var(--line);border-radius:var(--radius-m);min-block-size:76px;display:grid;align-content:start;padding:8px;transition:border-color var(--dur-1)}
+.k-colghost:hover{border-color:var(--line-strong)}
+.k-colghost>button{border:0;background:none;cursor:pointer;padding:9px 6px;font:500 12.5px/1.3 var(--font-body);color:var(--ink-muted);border-radius:var(--radius-s)}
+.k-colghost>button:hover{color:var(--ink);background:var(--surface)}
+.k-colghost .k-input{font-size:12.5px;padding:6px 9px}
+.k-kcard{position:relative;padding:9px 11px;font-size:13px;border-radius:var(--radius-s);box-shadow:var(--shadow-1)}
+.k-kdel{position:absolute;inset-block-start:3px;inset-inline-end:4px;opacity:0;transition:opacity var(--dur-1)}
+.k-kcard:hover .k-kdel,.k-kdel:focus-visible{opacity:1}
+.k-kmeta{display:block;margin-block-start:4px;font:500 10.5px/1.3 var(--font-mono);color:var(--ink-muted)}
+[data-k-todo]{list-style:none;margin:0;padding:0}
+[data-k-todo]>li{display:flex;align-items:center;gap:9px;padding:7px 4px;font-size:13.5px;border-block-end:1px var(--line-style) var(--line)}
+.k-todo-text{flex:1;text-decoration:line-through transparent;transition:color var(--dur-2),text-decoration-color var(--dur-2)}
+li.done .k-todo-text{color:var(--ink-muted);text-decoration-color:var(--ink-muted)}
+.k-todo-del{opacity:0;transition:opacity var(--dur-1)}
+[data-k-todo] li:hover .k-todo-del,.k-todo-del:focus-visible{opacity:1}
+.k-todo-add{margin-block-start:8px}
+[data-k-collapse]::after{content:" ▾";font-size:10px}
+[data-k-collapse][aria-expanded="false"]::after{content:" ▸"}
+@supports (interpolate-size:allow-keywords) {
+.k-clps{interpolate-size:allow-keywords;block-size:auto;overflow:clip;transition:block-size var(--dur-2) var(--ease-out),opacity var(--dur-2),display var(--dur-2) allow-discrete}
+.k-clps[hidden]{display:none;block-size:0;opacity:0}
+}
+.k-spot{position:fixed;z-index:1200;pointer-events:none;border-radius:var(--radius-m);box-shadow:0 0 0 100vmax color-mix(in oklch,var(--ink) 45%,transparent);transition:left var(--dur-2) var(--ease-out),top var(--dur-2) var(--ease-out),width var(--dur-2) var(--ease-out),height var(--dur-2) var(--ease-out)}
+.k-coach{position:fixed;z-index:1201;inline-size:min(88vw,300px);display:grid;gap:7px;padding:14px;background:var(--surface);border:var(--border-w) var(--line-style) var(--line);border-radius:var(--radius-l);color:var(--ink);box-shadow:var(--shadow-2);transition:left var(--dur-2) var(--ease-out),top var(--dur-2) var(--ease-out)}
+.k-coach:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.k-coach-title{font-weight:650;font-size:14px}
+.k-coach-body{font-size:13px;line-height:1.5;color:var(--ink-subtle)}
+.k-dots{display:flex;gap:5px}
+.k-dots i{inline-size:7px;block-size:7px;border-radius:50%;background:var(--line-strong);transition:background var(--dur-1),scale var(--dur-1) var(--ease-spring)}
+.k-dots i.on{background:var(--accent);scale:1.25}
+.k-coach-nav{display:flex;align-items:center;gap:6px;margin-block-start:3px}
+.k-coach-nav .k-gap{flex:1}
+@media (prefers-reduced-motion:reduce){.k-spot,.k-coach{transition:none}}
+.k-onboard{inline-size:min(92vw,400px)}
+.k-onboard-art{display:grid;place-items:center;font-size:38px;padding:24px 16px;background:var(--tint);border-block-end:1px var(--line-style) var(--line)}
+.k-onboard-art[hidden]{display:none}
+.k-onboard h3{margin:0;font-size:16px;color:var(--ink)}
+.k-onboard-foot{align-items:center}
+.k-onboard-foot .k-checkrow{font-size:12px;color:var(--ink-muted)}
+.k-onboard-foot .k-gap{flex:1}
+@media print {
+.k-card,.k-panel,.k-stat,.k-col,.k-acc{break-inside:avoid}
+.k-skeleton{animation:none}
+.k-kdel,.k-todo-del,.k-col-add,.k-menu,.k-cdel,.k-colghost,.k-spot,.k-coach{display:none!important}
+}
+}
+</style>
+<script id="artifact-kit">
+(() => {
+"use strict";
+const $ = (s, r = document) => [...r.querySelectorAll(s)];
+const fire = (el, n, d) => el.dispatchEvent(new CustomEvent(n, { detail: d, bubbles: true }));
+const noMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const closest = (t, s) => t && t.closest ? t.closest(s) : null;
+const boards = new WeakMap(), sorters = new WeakMap();
+function flip(scope, mutate, sel = "[data-k-item]") {
+const M = window.Motion;
+if (!M || noMotion()) { mutate(); return; }
+const els = $(sel, scope);
+const pos = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+mutate();
+els.forEach(el => {
+const b = pos.get(el);
+if (!b || !el.isConnected) return;
+const a = el.getBoundingClientRect(), dx = b.left - a.left, dy = b.top - a.top;
+if (dx || dy) M.animate(el,
+{ transform: [`translate(${dx}px,${dy}px)`, "translate(0px,0px)"] },
+{ type: M.spring, bounce: .22, visualDuration: .55 });
+});
+}
+const zone = el => closest(el, "[data-k-sortable],.k-tier-body,.k-col-body");
+const groupOf = z => z.closest(".k-board,.k-tiers") || z;
+let drag = null;
+const clearMarks = () => $(".k-drop-before,.k-over").forEach(x => x.classList.remove("k-drop-before", "k-over"));
+function placeRef(z, x, y) {
+const items = [...z.children].filter(it =>
+it.hasAttribute("data-k-item") && !(drag && it === drag.it));
+const horiz = items.length > 1 &&
+Math.abs(items[0].getBoundingClientRect().top - items[1].getBoundingClientRect().top) < 1;
+for (const it of items) {
+const r = it.getBoundingClientRect();
+if (horiz ? (y < r.top || (y < r.bottom && x < r.left + r.width / 2))
+: y < r.top + r.height / 2) return it;
+}
+return null;
+}
+function persist(id, order) {
+const s = window.ArtifactShell;
+if (!s || !id) return;
+const st = Object.assign({}, s.state.get());
+st["kit.sortable." + id] = order;
+s.state.set(st);
+}
+function settle(z) {
+if (z.hasAttribute("data-k-sortable")) {
+const order = $(":scope>[data-k-item]", z).map(x => x.dataset.kItem);
+persist(z.dataset.kId, order);
+const o = sorters.get(z);
+if (o && o.onChange) o.onChange(order);
+fire(z, "k:sort", { order });
+} else if (z.matches(".k-tier-body")) {
+const t = z.closest(".k-tiers"), map = {};
+$(".k-tier", t).forEach(r => { map[r.dataset.kTier] = $("[data-k-item]", r).map(x => x.dataset.kItem); });
+const o = sorters.get(t);
+if (o && o.onChange) o.onChange(map);
+fire(t, "k:tiers", { tiers: map });
+} else if (z.matches(".k-col-body")) kupdate(z.closest(".k-board"));
+}
+function moveTo(z, ref) {
+flip(groupOf(z), () => z.insertBefore(drag.it, ref));
+settle(z);
+}
+function prepItem(it) {
+it.draggable = true;
+if (it.tabIndex < 0) it.tabIndex = 0;
+}
+function sortable(c, opts) {
+sorters.set(c, opts || {});
+const s = window.ArtifactShell;
+const saved = s && c.dataset.kId && (s.state.get() || {})["kit.sortable." + c.dataset.kId];
+if (Array.isArray(saved)) saved.forEach(k => {
+const el = $(":scope>[data-k-item]", c).find(x => x.dataset.kItem === k);
+if (el) c.append(el);
+});
+$(":scope>[data-k-item]", c).forEach(prepItem);
+}
+const colRef = (b, x) => $(".k-col", b).find(c => c !== drag.col &&
+x < c.getBoundingClientRect().left + c.getBoundingClientRect().width / 2) || null;
+document.addEventListener("dragstart", e => {
+const it = closest(e.target, "[data-k-item]"), z = it && zone(it);
+if (!z) {
+const h = closest(e.target, ".k-col-head"), col = h && h.closest(".k-col");
+const b = col && col.closest(".k-board");
+if (!b || !h.draggable) return;
+drag = { col, g: b };
+col.classList.add("k-dragging");
+e.dataTransfer.effectAllowed = "move";
+e.dataTransfer.setData("text/plain", col.dataset.kCol || "");
+return;
+}
+drag = { it, g: groupOf(z) };
+it.classList.add("k-dragging");
+e.dataTransfer.effectAllowed = "move";
+e.dataTransfer.setData("text/plain", it.dataset.kItem || "");
+});
+document.addEventListener("dragend", () => {
+if (drag) (drag.it || drag.col).classList.remove("k-dragging");
+drag = null;
+clearMarks();
+});
+document.addEventListener("dragover", e => {
+const dz = closest(e.target, "[data-k-drop]");
+if (dz && !drag) { e.preventDefault(); dz.classList.add("is-over"); return; }
+if (drag && drag.col) {
+const b = closest(e.target, ".k-board");
+if (b !== drag.g) return;
+e.preventDefault();
+e.dataTransfer.dropEffect = "move";
+clearMarks();
+const ref = colRef(b, e.clientX);
+if (ref) ref.classList.add("k-drop-before");
+return;
+}
+const z = zone(e.target);
+if (!drag || !z || groupOf(z) !== drag.g) return;
+e.preventDefault();
+e.dataTransfer.dropEffect = "move";
+clearMarks();
+const ref = placeRef(z, e.clientX, e.clientY);
+if (ref) ref.classList.add("k-drop-before"); else z.classList.add("k-over");
+});
+document.addEventListener("dragleave", e => {
+const dz = closest(e.target, "[data-k-drop]");
+if (dz && !dz.contains(e.relatedTarget)) dz.classList.remove("is-over");
+});
+document.addEventListener("drop", e => {
+const dz = closest(e.target, "[data-k-drop]");
+if (dz && !drag) {
+e.preventDefault();
+dz.classList.remove("is-over");
+const f = e.dataTransfer && e.dataTransfer.files;
+if (f && f.length) fire(dz, "k:files", { files: f });
+return;
+}
+if (drag && drag.col) {
+const b = closest(e.target, ".k-board");
+if (b !== drag.g) return;
+e.preventDefault();
+const ref = colRef(b, e.clientX), col = drag.col;
+flip(b, () => b.insertBefore(col, ref || b.querySelector(".k-colghost")), ".k-col");
+kupdate(b);
+clearMarks();
+return;
+}
+const z = zone(e.target);
+if (!drag || !z || groupOf(z) !== drag.g) return;
+e.preventDefault();
+moveTo(z, placeRef(z, e.clientX, e.clientY));
+clearMarks();
+});
+function byCol(b) {
+const o = {};
+$(".k-col", b).forEach(c => { o[c.dataset.kCol] = $(".k-kcard", c).map(k => k.dataset.kItem); });
+return o;
+}
+function kdata(b) {
+const defs = {};
+$(".k-col", b).forEach(c => {
+const l = c.querySelector(".k-col-label");
+defs[c.dataset.kCol] = (l ? l.textContent : c.dataset.kCol || "").trim();
+});
+return { cols: byCol(b), order: $(".k-col", b).map(c => c.dataset.kCol), defs };
+}
+function kupdate(b) {
+if (!b) return;
+$(".k-col", b).forEach(c => {
+const n = $(".k-kcard", c).length, wip = +c.dataset.kWip || Infinity;
+c.classList.toggle("over-wip", n > wip);
+const cnt = c.querySelector(".k-col-count");
+if (cnt) cnt.textContent = n;
+});
+const o = boards.get(b);
+if (o && o.onChange) o.onChange(kdata(b));
+}
+function ensureDel(card) {
+if (card.querySelector(".k-kdel")) return;
+const x = document.createElement("button");
+x.className = "k-kdel";
+x.textContent = "×";
+x.setAttribute("aria-label", "Delete card");
+card.append(x);
+}
+function prepCol(col) {
+const h = col.querySelector(".k-col-head");
+if (!h) return;
+if (!h.querySelector(".k-col-label")) {
+const tn = [...h.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+const l = document.createElement("span");
+l.className = "k-col-label";
+if (tn) { l.textContent = tn.textContent.trim(); tn.replaceWith(l); }
+else { l.textContent = col.dataset.kCol || ""; h.prepend(l); }
+}
+if (!h.querySelector(".k-cdel")) {
+const x = document.createElement("button");
+x.type = "button";
+x.className = "k-cdel";
+x.textContent = "×";
+x.setAttribute("aria-label", "Delete column");
+h.append(x);
+}
+h.draggable = true;
+if (h.tabIndex < 0) h.tabIndex = 0;
+}
+function prepGhost(b) {
+if (b.querySelector(":scope>.k-colghost")) return;
+const g = document.createElement("div");
+g.className = "k-colghost";
+const btn = document.createElement("button");
+btn.type = "button";
+btn.textContent = "＋ Add column";
+g.append(btn);
+b.append(g);
+}
+function colKey(b, name) {
+const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "col";
+let key = base, i = 2;
+while ($(".k-col", b).some(c => c.dataset.kCol === key)) key = base + "-" + i++;
+return key;
+}
+function addColumn(b, name, before) {
+const col = document.createElement("div");
+col.className = "k-col";
+col.dataset.kCol = colKey(b, name);
+const h = document.createElement("div");
+h.className = "k-col-head";
+const l = document.createElement("span");
+l.className = "k-col-label";
+l.textContent = name;
+const cnt = document.createElement("span");
+cnt.className = "k-col-count";
+cnt.textContent = "0";
+h.append(l, " ", cnt);
+const body = document.createElement("div");
+body.className = "k-col-body";
+const add = document.createElement("button");
+add.type = "button";
+add.className = "k-col-add";
+add.textContent = "＋ Add card";
+col.append(h, body, add);
+b.insertBefore(col, before || null);
+prepCol(col);
+kupdate(b);
+return col;
+}
+function ghostInput(g) {
+const btn = g.querySelector("button");
+if (g.querySelector("input")) return;
+const inp = document.createElement("input");
+inp.className = "k-input";
+inp.placeholder = "Column name…";
+btn.hidden = true;
+g.append(inp);
+inp.focus();
+let done = false;
+const close = ok => {
+if (done) return;
+done = true;
+const v = inp.value.trim();
+inp.remove();
+btn.hidden = false;
+if (ok && v) addColumn(g.closest(".k-board"), v, g);
+};
+inp.addEventListener("keydown", e => {
+if (e.key === "Enter") close(true);
+if (e.key === "Escape") close(false);
+});
+inp.addEventListener("blur", () => close(true));
+}
+function delColumn(col) {
+const b = col.closest(".k-board");
+const cols = $(".k-col", b), idx = cols.indexOf(col);
+const rest = cols.filter(c => c !== col);
+if (!rest.length) return;
+const cards = $(".k-kcard", col);
+const label = (col.querySelector(".k-col-label") || col).textContent.trim();
+rest[0].querySelector(".k-col-body").append(...cards);
+col.remove();
+kupdate(b);
+const s = window.ArtifactShell;
+if (s && s.toast) s.toast("Deleted column “" + label + "” — cards moved", {
+label: "Undo",
+action() {
+if (!b.isConnected || col.isConnected) return;
+b.insertBefore(col, $(".k-col", b)[idx] || b.querySelector(".k-colghost"));
+col.querySelector(".k-col-body").append(...cards.filter(c => c.isConnected));
+kupdate(b);
+},
+});
+}
+function renameCol(l) {
+if (l.isContentEditable) return;
+const h = l.closest(".k-col-head"), old = l.textContent;
+if (h) h.draggable = false;
+l.setAttribute("contenteditable", "plaintext-only");
+l.focus();
+try { getSelection().selectAllChildren(l); } catch {}
+const kd = e => {
+if (e.key === "Enter") { e.preventDefault(); l.blur(); }
+if (e.key === "Escape") { e.stopPropagation(); l.textContent = old; l.blur(); }
+};
+l.addEventListener("keydown", kd);
+l.addEventListener("blur", () => {
+l.removeEventListener("keydown", kd);
+l.removeAttribute("contenteditable");
+if (h) h.draggable = true;
+if (!l.textContent.trim()) l.textContent = old;
+kupdate(l.closest(".k-board"));
+}, { once: true });
+}
+function kanban(b, opts) {
+boards.set(b, opts || {});
+$(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
+$(".k-col", b).forEach(prepCol);
+prepGhost(b);
+kupdate(b);
+return { update: () => kupdate(b), cards: () => byCol(b), data: () => kdata(b) };
+}
+function addCard(btn) {
+const col = btn.closest(".k-col"), b = btn.closest(".k-board");
+const inp = document.createElement("input");
+inp.className = "k-input";
+inp.placeholder = "Card title…";
+btn.hidden = true;
+btn.after(inp);
+inp.focus();
+let done = false;
+const close = ok => {
+if (done) return;
+done = true;
+const v = inp.value.trim();
+if (ok && v) {
+const c = document.createElement("div");
+c.className = "k-kcard";
+c.dataset.kItem = "c" + Date.now().toString(36);
+c.textContent = v;
+ensureDel(c);
+prepItem(c);
+col.querySelector(".k-col-body").append(c);
+kupdate(b);
+}
+inp.remove();
+btn.hidden = false;
+};
+inp.addEventListener("keydown", e => {
+if (e.key === "Enter") close(true);
+if (e.key === "Escape") close(false);
+});
+inp.addEventListener("blur", () => close(true));
+}
+function sortTable(th) {
+const tb = th.closest("table"), col = [...th.parentElement.children].indexOf(th);
+const dir = th.getAttribute("aria-sort") === "ascending" ? -1 : 1;
+$("th[data-k-sort]", tb).forEach(x => x.removeAttribute("aria-sort"));
+th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending");
+const num = th.dataset.type === "num", body = tb.tBodies[0];
+const key = tr => tr.children[col] ? tr.children[col].textContent.trim() : "";
+[...body.rows].sort((a, b) => dir * (num
+? (parseFloat(key(a).replace(/[^\d.-]/g, "")) || 0) - (parseFloat(key(b).replace(/[^\d.-]/g, "")) || 0)
+: key(a).localeCompare(key(b)))).forEach(tr => body.append(tr));
+}
+function paintStars(r) {
+const v = +r.dataset.value || 0;
+$("button", r).forEach((s, i) => {
+if (!s.textContent) s.textContent = "★";
+if (!s.getAttribute("aria-label")) s.setAttribute("aria-label", (i + 1) + " stars");
+s.classList.toggle("on", i < v);
+s.setAttribute("aria-pressed", i < v);
+});
+}
+function syncRange(r) {
+r.style.setProperty("--value", r.value);
+r.style.setProperty("--min", r.min || 0);
+r.style.setProperty("--max", r.max || 100);
+}
+function wgo(w, i) {
+const steps = $(".k-wiz-steps button", w), panels = $(".k-wiz-panel", w);
+i = Math.max(0, Math.min(steps.length - 1, i));
+steps.forEach((s, j) => {
+s.classList.toggle("done", j < i);
+if (j === i) s.setAttribute("aria-current", "step");
+else s.removeAttribute("aria-current");
+});
+panels.forEach((p, j) => { p.hidden = j !== i; });
+const pv = w.querySelector("[data-k-prev]"), nx = w.querySelector("[data-k-next]");
+if (pv) pv.disabled = i === 0;
+if (nx) nx.disabled = i === steps.length - 1;
+fire(w, "k:step", { step: i });
+}
+const wcur = w => Math.max(0, $(".k-wiz-steps button", w).findIndex(s => s.getAttribute("aria-current") === "step"));
+function roll(list) {
+const items = $(":scope>li", list);
+const done = items.filter(li => li.classList.contains("done")).length;
+const pct = items.length ? Math.round(done / items.length * 100) : 0;
+const host = list.closest(".k-panel") || list.parentElement;
+const p = host && host.querySelector(".k-progress");
+if (p) { p.style.setProperty("--value", pct); p.setAttribute("aria-valuenow", pct); }
+fire(list, "k:todo", { done, total: items.length, pct });
+}
+const tagVals = w => $(".k-chip", w).map(c => c.firstChild.textContent.trim());
+const emitTags = w => fire(w, "k:tags", { tags: tagVals(w) });
+function mkChip(v) {
+const c = document.createElement("span");
+c.className = "k-chip";
+c.append(v);
+const x = document.createElement("button");
+x.className = "k-x";
+x.textContent = "×";
+x.setAttribute("aria-label", "Remove " + v);
+c.append(x);
+return c;
+}
+function mkTodo(v) {
+const li = document.createElement("li");
+li.innerHTML = '<input type="checkbox" class="k-check"><span class="k-todo-text"></span><button class="k-todo-del" aria-label="Remove">×</button>';
+li.querySelector(".k-todo-text").textContent = v;
+return li;
+}
+document.addEventListener("click", e => {
+const t = e.target;
+const mb = closest(t, "[data-k-menu-for]");
+const open = $(".k-menu.is-open");
+if (mb) {
+const m = document.getElementById(mb.dataset.kMenuFor);
+if (m) {
+const on = !m.classList.contains("is-open");
+open.forEach(x => x.classList.remove("is-open"));
+$("[data-k-menu-for]").forEach(x => x.setAttribute("aria-expanded", "false"));
+m.classList.toggle("is-open", on);
+mb.setAttribute("aria-expanded", on);
+}
+return;
+}
+if (open.length && !closest(t, ".k-menu")) {
+open.forEach(x => x.classList.remove("is-open"));
+$("[data-k-menu-for]").forEach(x => x.setAttribute("aria-expanded", "false"));
+}
+const dOpen = closest(t, "[data-k-dialog-open]");
+if (dOpen) {
+const d = document.getElementById(dOpen.dataset.kDialogOpen);
+if (d && d.showModal) d.showModal();
+return;
+}
+const dClose = closest(t, "[data-k-dialog-close]");
+if (dClose) {
+const d = dClose.closest("dialog");
+if (d) d.close();
+return;
+}
+const del = closest(t, ".k-kdel");
+if (del) {
+const b = del.closest(".k-board");
+del.closest(".k-kcard").remove();
+kupdate(b);
+return;
+}
+const cdel = closest(t, ".k-cdel");
+if (cdel) { delColumn(cdel.closest(".k-col")); return; }
+const gh = closest(t, ".k-colghost");
+if (gh && t.closest("button")) { ghostInput(gh); return; }
+const add = closest(t, ".k-col-add");
+if (add) { addCard(add); return; }
+const star = closest(t, ".k-rating button");
+if (star) {
+const r = star.closest(".k-rating"), i = $("button", r).indexOf(star) + 1;
+r.dataset.value = +r.dataset.value === i ? 0 : i;
+paintStars(r);
+fire(r, "k:rating", { value: +r.dataset.value });
+return;
+}
+const sb = closest(t, ".k-stepper button");
+if (sb) {
+const st = sb.closest(".k-stepper"), inp = st.querySelector("input");
+if (!inp) return;
+const d = sb === $("button", st)[0] ? -1 : 1;
+const step = +inp.step || 1;
+const lo = inp.min === "" ? -Infinity : +inp.min, hi = inp.max === "" ? Infinity : +inp.max;
+inp.value = Math.min(hi, Math.max(lo, (+inp.value || 0) + d * step));
+inp.dispatchEvent(new Event("change", { bubbles: true }));
+return;
+}
+const x = closest(t, "[data-k-tags] .k-x");
+if (x) {
+const w = x.closest("[data-k-tags]");
+x.closest(".k-chip").remove();
+emitTags(w);
+return;
+}
+const tw = closest(t, "[data-k-tags]");
+if (tw) {
+const i = tw.querySelector("input");
+if (i) i.focus();
+}
+const td = closest(t, ".k-todo-del");
+if (td) {
+const l = td.closest("[data-k-todo]");
+td.closest("li").remove();
+roll(l);
+return;
+}
+const cb = closest(t, "[data-k-collapse]");
+if (cb) {
+const tgt = document.getElementById(cb.dataset.kCollapse);
+if (tgt) {
+tgt.hidden = !tgt.hidden;
+cb.setAttribute("aria-expanded", String(!tgt.hidden));
+}
+return;
+}
+const ws = closest(t, ".k-wiz-steps button");
+if (ws) {
+wgo(ws.closest("[data-k-wizard]"), [...ws.parentElement.children].indexOf(ws));
+return;
+}
+const pv = closest(t, "[data-k-prev]");
+if (pv) {
+const w = pv.closest("[data-k-wizard]");
+if (w) { wgo(w, wcur(w) - 1); return; }
+}
+const nx = closest(t, "[data-k-next]");
+if (nx) {
+const w = nx.closest("[data-k-wizard]");
+if (w) { wgo(w, wcur(w) + 1); return; }
+}
+const th = closest(t, "th[data-k-sort]");
+if (th) sortTable(th);
+});
+document.addEventListener("change", e => {
+const list = closest(e.target, "[data-k-todo]");
+if (list && e.target.matches("input[type=checkbox]")) {
+e.target.closest("li").classList.toggle("done", e.target.checked);
+roll(list);
+}
+});
+document.addEventListener("input", e => {
+if (e.target.matches && e.target.matches(".k-range")) syncRange(e.target);
+});
+document.addEventListener("dblclick", e => {
+const l = closest(e.target, ".k-board .k-col-label");
+if (l) renameCol(l);
+});
+document.addEventListener("a2:editmode", e => {
+const on = !!(e.detail && e.detail.editing);
+$(".k-board .k-col-label").forEach(l => {
+if (on) l.setAttribute("contenteditable", "plaintext-only");
+else l.removeAttribute("contenteditable");
+});
+$(".k-board .k-col-head").forEach(h => { h.draggable = !on; });
+});
+document.addEventListener("focusout", e => {
+const t = e.target;
+if (t && t.matches && t.matches(".k-board .k-col-label[contenteditable]"))
+kupdate(closest(t, ".k-board"));
+});
+document.addEventListener("keydown", e => {
+const t = e.target;
+if (e.key === "Escape") {
+$(".k-menu.is-open").forEach(m => m.classList.remove("is-open"));
+$("[data-k-menu-for]").forEach(x => x.setAttribute("aria-expanded", "false"));
+}
+if (!t || !t.matches) return;
+if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && t.matches(".k-col-head")) {
+const col = t.closest(".k-col"), b = col && col.closest(".k-board");
+if (!b) return;
+e.preventDefault();
+const cols = $(".k-col", b), i = cols.indexOf(col);
+const j = e.key === "ArrowLeft" ? i - 1 : i + 1;
+if (j < 0 || j >= cols.length) return;
+flip(b, () => b.insertBefore(col,
+e.key === "ArrowLeft" ? cols[j] : cols[j].nextSibling), ".k-col");
+kupdate(b);
+t.focus();
+return;
+}
+if ((e.key === "ArrowUp" || e.key === "ArrowDown") && t.matches("[data-k-item]")) {
+const z = zone(t);
+if (!z) return;
+e.preventDefault();
+const sibs = $(":scope>[data-k-item]", z), i = sibs.indexOf(t);
+const j = e.key === "ArrowUp" ? i - 1 : i + 1;
+if (j < 0 || j >= sibs.length) return;
+drag = { it: t, g: groupOf(z) };
+moveTo(z, e.key === "ArrowUp" ? sibs[j] : sibs[j].nextSibling);
+drag = null;
+t.focus();
+return;
+}
+const tw = closest(t, "[data-k-tags]");
+if (tw && t.matches("input")) {
+const v = t.value.trim();
+if ((e.key === "Enter" || e.key === ",") && v) {
+e.preventDefault();
+if (!tagVals(tw).includes(v)) { t.before(mkChip(v)); emitTags(tw); }
+t.value = "";
+} else if (e.key === "Backspace" && !t.value) {
+const last = $(".k-chip", tw).pop();
+if (last) { last.remove(); emitTags(tw); }
+}
+return;
+}
+if (t.matches(".k-todo-add") && e.key === "Enter" && t.value.trim()) {
+const host = t.closest(".k-panel") || t.parentElement;
+const list = host && host.querySelector("[data-k-todo]");
+if (list) { list.append(mkTodo(t.value.trim())); t.value = ""; roll(list); }
+return;
+}
+if ((e.key === "Enter" || e.key === " ") && t.matches("th[data-k-sort]")) {
+e.preventDefault();
+sortTable(t);
+}
+});
+function tour(steps, opts) {
+steps = (steps || []).filter(Boolean);
+const api = { end: () => end(true) };
+if (!steps.length) return api;
+const spot = document.createElement("div");
+spot.className = "k-spot";
+const card = document.createElement("div");
+card.className = "k-coach";
+card.tabIndex = -1;
+card.setAttribute("role", "dialog");
+card.setAttribute("aria-label", "Tour");
+const mk = (tag, cls) => { const el = document.createElement(tag); el.className = cls; return el; };
+const ttl = mk("div", "k-coach-title"), bdy = mk("div", "k-coach-body");
+const dots = mk("div", "k-dots"), nav = mk("div", "k-coach-nav");
+steps.forEach(() => dots.append(document.createElement("i")));
+const btn = (cls, txt) => {
+const b = mk("button", "k-btn sm" + (cls ? " " + cls : ""));
+b.type = "button";
+b.textContent = txt;
+return b;
+};
+const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+const gap = mk("span", "k-gap");
+nav.append(skip, gap, back, next);
+card.append(ttl, bdy, dots, nav);
+document.body.append(spot, card);
+const prev = document.activeElement;
+let i = -1, target = null, live = true;
+const el4 = st => typeof st.target === "string" ? document.querySelector(st.target) : st.target;
+function place() {
+if (!live || !target || !target.isConnected) return;
+const r = target.getBoundingClientRect(), pad = 6;
+spot.style.left = r.left - pad + "px";
+spot.style.top = r.top - pad + "px";
+spot.style.width = r.width + pad * 2 + "px";
+spot.style.height = r.height + pad * 2 + "px";
+const ch = card.offsetHeight, cw = card.offsetWidth;
+const below = r.bottom + pad + 12, above = r.top - pad - 12 - ch;
+const want = (steps[i] || {}).placement;
+let top = want === "top" && above >= 8 ? above : below;
+if (want !== "top" && below + ch > innerHeight - 8 && above >= 8) top = above;
+card.style.top = Math.max(8, Math.min(innerHeight - ch - 8, top)) + "px";
+card.style.left = Math.max(8, Math.min(innerWidth - cw - 8, r.left)) + "px";
+}
+function show(n) {
+while (n < steps.length && !el4(steps[n])) n++;
+if (n >= steps.length) return end(true);
+i = n;
+target = el4(steps[i]);
+const st = steps[i];
+ttl.textContent = st.title || "";
+bdy.textContent = st.body || "";
+[...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
+back.disabled = i === 0;
+next.textContent = i === steps.length - 1 ? "Done" : "Next";
+try { target.scrollIntoView({ block: "center", behavior: noMotion() ? "auto" : "smooth" }); } catch {}
+place();
+card.focus({ preventScroll: true });
+fire(document, "k:tour", { step: i });
+}
+function end(skipped) {
+if (!live) return;
+live = false;
+removeEventListener("resize", place);
+removeEventListener("scroll", place, true);
+document.removeEventListener("keydown", onKey, true);
+spot.remove();
+card.remove();
+const d = { step: Math.max(0, i) };
+d[skipped ? "skipped" : "done"] = true;
+fire(document, "k:tour", d);
+if (prev && prev.focus) try { prev.focus(); } catch {}
+if (opts && opts.onEnd) opts.onEnd(d);
+}
+const fwd = () => { if (i >= steps.length - 1) end(false); else show(i + 1); };
+const bck = () => { if (i > 0) { const j = i - 1; i = -1; show(j); } };
+skip.addEventListener("click", () => end(true));
+back.addEventListener("click", bck);
+next.addEventListener("click", fwd);
+function onKey(e) {
+if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); end(true); }
+else if (e.key === "ArrowRight") { e.preventDefault(); fwd(); }
+else if (e.key === "ArrowLeft") { e.preventDefault(); bck(); }
+}
+document.addEventListener("keydown", onKey, true);
+addEventListener("resize", place);
+addEventListener("scroll", place, true);
+show(0);
+return api;
+}
+function onboard(cfg) {
+cfg = cfg || {};
+const steps = cfg.steps || [];
+if (!steps.length) return null;
+const s = window.ArtifactShell, key = "kit.onboard." + (cfg.id || "default");
+if (s && (s.state.get() || {})[key]) return null;
+const d = document.createElement("dialog");
+d.className = "k-dialog k-onboard";
+const art = document.createElement("div");
+art.className = "k-onboard-art";
+const body = document.createElement("div");
+body.className = "k-dialog-body";
+const h = document.createElement("h3");
+const p = document.createElement("p");
+const dots = document.createElement("div");
+dots.className = "k-dots";
+steps.forEach(() => dots.append(document.createElement("i")));
+body.append(h, p, dots);
+const foot = document.createElement("div");
+foot.className = "k-dialog-foot k-onboard-foot";
+const row = document.createElement("label");
+row.className = "k-checkrow";
+const chk = document.createElement("input");
+chk.type = "checkbox";
+chk.className = "k-check";
+row.append(chk, "Don’t show again");
+const gap = document.createElement("span");
+gap.className = "k-gap";
+const btn = (cls, txt) => {
+const b = document.createElement("button");
+b.type = "button";
+b.className = "k-btn sm" + (cls ? " " + cls : "");
+b.textContent = txt;
+return b;
+};
+const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+foot.append(row, gap, skip, back, next);
+d.append(art, body, foot);
+document.body.append(d);
+let i = 0, fin = false;
+const paint = () => {
+const st = steps[i] || {};
+art.textContent = st.art || "";
+art.hidden = !st.art;
+h.textContent = st.title || "";
+p.textContent = st.body || "";
+[...dots.children].forEach((el, j) => el.classList.toggle("on", j === i));
+back.disabled = i === 0;
+next.textContent = i === steps.length - 1 ? "Done" : "Next";
+};
+skip.addEventListener("click", () => d.close());
+back.addEventListener("click", () => { i = Math.max(0, i - 1); paint(); });
+next.addEventListener("click", () => {
+if (i >= steps.length - 1) { fin = true; d.close(); }
+else { i++; paint(); }
+});
+d.addEventListener("close", () => {
+if (s && (fin || chk.checked)) {
+const st = Object.assign({}, s.state.get());
+st[key] = true;
+s.state.set(st);
+}
+d.remove();
+if (fin && cfg.onDone) cfg.onDone();
+});
+paint();
+d.showModal();
+return d;
+}
+function refresh(root = document) {
+$("[data-k-sortable]", root).forEach(c => { if (!sorters.has(c)) sortable(c); });
+$(".k-tiers", root).forEach(tr => {
+if (!sorters.has(tr)) sorters.set(tr, {});
+$("[data-k-item]", tr).forEach(prepItem);
+});
+$(".k-board", root).forEach(b => {
+$(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
+$(".k-col", b).forEach(prepCol);
+prepGhost(b);
+kupdate(b);
+});
+$(".k-rating", root).forEach(paintStars);
+$(".k-range", root).forEach(syncRange);
+$("[data-k-wizard]", root).forEach(w => wgo(w, wcur(w)));
+$("[data-k-todo]", root).forEach(roll);
+$("th[data-k-sort]", root).forEach(th => { if (th.tabIndex < 0) th.tabIndex = 0; });
+$("[data-k-drop]", root).forEach(z => { if (z.tabIndex < 0) z.tabIndex = 0; });
+$("[data-k-collapse]", root).forEach(b => {
+const tgt = document.getElementById(b.dataset.kCollapse);
+if (!tgt) return;
+tgt.classList.add("k-clps");
+b.setAttribute("aria-expanded", String(!tgt.hidden));
+b.setAttribute("aria-controls", tgt.id);
+});
+}
+if (document.readyState === "loading")
+document.addEventListener("DOMContentLoaded", () => refresh());
+else refresh();
+window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
+})();
+</script>
+<!-- ═══ /artifact-kit ═══ -->
 <title>Offprint — self-contained pages</title>
 <style>
   /* colors come from the artifact shell's semantic tokens */
@@ -2097,11 +3167,11 @@ get motion() { return window.Motion ?? null; },
           "unreasonable effectiveness of HTML".
         </p>
         <nav class="toc">
-          <a href="#reference">Reference <span class="n">1</span></a>
+          <a href="#reference">Reference <span class="n">3</span></a>
           <a href="#exploration">Exploration &amp; Planning <span class="n">5</span></a>
           <a href="#code-review">Code Review <span class="n">3</span></a>
           <a href="#design">Design <span class="n">2</span></a>
-          <a href="#prototyping">Prototyping <span class="n">2</span></a>
+          <a href="#prototyping">Prototyping <span class="n">3</span></a>
           <a href="#illustrations">Diagrams <span class="n">2</span></a>
           <a href="#decks">Decks <span class="n">1</span></a>
           <a href="#research">Research <span class="n">2</span></a>
@@ -2132,11 +3202,11 @@ get motion() { return window.Motion ?? null; },
 
   <!-- ============================== Reference ============================== -->
   <section id="reference" data-block="category-reference" data-reveal>
-    <div class="sec-head"><span class="idx">00</span><h2>Reference</h2><span class="count">2 demos</span></div>
+    <div class="sec-head"><span class="idx">00</span><h2>Reference</h2><span class="count">3 demos</span></div>
     <p class="sec-intro">
       Every file on this page embeds the same artifact shell — themes, tokens, edit mode, export. The
-      Theme Lab is its living reference: flip all eleven themes, read the token table, check the contrast
-      grid, and copy the shell block for your own artifacts.
+      Recipe Lab is its living reference: flip all eleven palettes, read the token table, check the contrast
+      grid, and copy the shell block for your own artifacts. The live tracker is this repo keeping its own books.
     </p>
     <div class="grid">
       <a class="card" href="21-theme-lab.html">
@@ -2153,7 +3223,7 @@ get motion() { return window.Motion ?? null; },
           <path class="sl" d="M97 45 a11 11 0 0 1 0 22 Z"/>
         </svg></div>
         <div class="body">
-          <div class="title">The Theme Lab</div>
+          <div class="title">The Recipe Lab</div>
           <div class="desc">The artifact shell's live reference: 11 themes, semantic tokens, a contrast grid, and the copyable shell block every artifact here embeds.</div>
           <div class="file"><span>21-theme-lab.html</span><span class="arrow">→</span></div>
         </div>
@@ -2177,6 +3247,27 @@ get motion() { return window.Motion ?? null; },
           <div class="title">The Kit</div>
           <div class="desc">Storybook for the artifact kit: every k- component live — cards, tables, forms, kanban, tiers, wizards — with copyable snippets per family.</div>
           <div class="file"><span>32-kit-gallery.html</span><span class="arrow">→</span></div>
+        </div>
+      </a>
+      <a class="card" href="34-issue-tracker.html">
+        <div class="thumb"><svg viewBox="0 0 120 80">
+          <rect class="wh" x="6" y="26" width="24" height="46" rx="4"/>
+          <rect class="wh" x="34" y="26" width="24" height="46" rx="4"/>
+          <rect class="wh" x="62" y="26" width="24" height="46" rx="4"/>
+          <rect class="wh" x="90" y="26" width="24" height="46" rx="4"/>
+          <rect class="cl" x="10" y="33" width="16" height="10" rx="2"/>
+          <rect class="fl" x="10" y="47" width="16" height="10" rx="2"/>
+          <rect class="fl" x="38" y="33" width="16" height="10" rx="2"/>
+          <rect class="oa" x="52" y="44" width="20" height="12" rx="2"/>
+          <rect class="ol" x="94" y="33" width="16" height="10" rx="2"/>
+          <rect class="ol" x="94" y="47" width="16" height="10" rx="2"/>
+          <path class="lc" d="M8 18 L40 14 L72 12 L112 6" fill="none"/>
+          <path class="ln" d="M8 20 L64 18 L112 14" fill="none"/>
+        </svg></div>
+        <div class="body">
+          <div class="title">Offprint — live tracker</div>
+          <div class="desc">The repo's own meta board: real OFF-* issues on a kit kanban, a burn-up line, the actual changelog, and a "Copy for LLM" work-order exit.</div>
+          <div class="file"><span>34-issue-tracker.html</span><span class="arrow">→</span></div>
         </div>
       </a>
     </div>
@@ -2385,7 +3476,7 @@ get motion() { return window.Motion ?? null; },
 
   <!-- ============================== Prototyping ============================== -->
   <section id="prototyping" data-block="category-prototyping" data-reveal="scroll">
-    <div class="sec-head"><span class="idx">04</span><h2>Prototyping</h2><span class="count">2 demos</span></div>
+    <div class="sec-head"><span class="idx">04</span><h2>Prototyping</h2><span class="count">3 demos</span></div>
     <p class="sec-intro">
       Motion and interaction can't be described, only felt. A throwaway page with the real easing curve or
       the real click-through tells you in five seconds what a paragraph of prose never could.
@@ -2418,6 +3509,25 @@ get motion() { return window.Motion ?? null; },
           <div class="title">Clickable flow</div>
           <div class="desc">Four screens linked together — enough fidelity to feel whether the interaction is right.</div>
           <div class="file"><span>08-prototype-interaction.html</span><span class="arrow">→</span></div>
+        </div>
+      </a>
+      <a class="card" href="33-onboarding-tour.html">
+        <div class="thumb"><svg viewBox="0 0 120 80">
+          <rect class="wh" x="8" y="8" width="104" height="64" rx="5"/>
+          <rect class="fl" x="14" y="15" width="34" height="6" rx="3"/>
+          <rect class="fl" x="14" y="27" width="26" height="6" rx="3"/>
+          <rect class="fl" x="14" y="39" width="30" height="6" rx="3"/>
+          <rect class="oa" x="58" y="12" width="48" height="18" rx="4"/>
+          <rect class="wh" x="54" y="40" width="52" height="26" rx="5"/>
+          <rect class="fl" x="60" y="46" width="28" height="4" rx="2"/>
+          <rect class="fl" x="60" y="53" width="38" height="4" rx="2"/>
+          <circle class="cl" cx="63" cy="61" r="3"/><circle class="fl" cx="72" cy="61" r="3"/><circle class="fl" cx="81" cy="61" r="3"/>
+          <line class="lc da" x1="82" y1="30" x2="82" y2="40"/>
+        </svg></div>
+        <div class="body">
+          <div class="title">First-run onboarding &amp; tours</div>
+          <div class="desc">A one-shot welcome modal that remembers being dismissed, and a spotlight tour over a mock console — with knobs for placement and dim strength.</div>
+          <div class="file"><span>33-onboarding-tour.html</span><span class="arrow">→</span></div>
         </div>
       </a>
     </div>
@@ -2825,5 +3935,22 @@ get motion() { return window.Motion ?? null; },
   </footer>
 
 </div>
+<script>
+(() => {
+  "use strict";
+  /* first-visit tour — only when the kit's tour engine and live shell are present */
+  const S = window.ArtifactShell, K = window.ArtifactKit;
+  if (!S || !K || !K.tour || S.flat) return;
+  if ((S.state.get() || {}).tourDone) return;
+  const remember = () => S.state.set(Object.assign({}, S.state.get(), { tourDone: true }));
+  setTimeout(() => {
+    K.tour([
+      { target: "header.masthead", title: "Welcome to Offprint", body: "Every card is one self-contained .html file. Open any page, restyle it from the gear, press E to edit the text in place — it all travels with the file." },
+      { target: "nav.toc", title: "Find your pattern", body: "Pages are grouped by job: exploration, review, dashboards, editors. The pills jump straight to a category." },
+      { target: "#reference .grid", title: "Start at the reference", body: "The Recipe Lab documents the shell, the Kit documents the components, and the live tracker keeps this repo honest. Everything else is built from those." },
+    ], { onEnd: remember });
+  }, 700);
+})();
+</script>
 </body>
 </html>

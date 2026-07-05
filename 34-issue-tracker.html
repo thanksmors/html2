@@ -1,6 +1,6 @@
 <!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <!doctype html>
-<html lang="en" data-artifact="31-todo-list">
+<html lang="en" data-artifact="34-issue-tracker">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -2833,7 +2833,7 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
 })();
 </script>
 <!-- ═══ /artifact-kit ═══ -->
-<title>Acme — ship week, running list</title>
+<title>Offprint — live tracker</title>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -2844,10 +2844,10 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
     font-size: 14px;
     line-height: var(--lh-body, 1.55);
   }
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 48px 32px 72px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 48px 32px 72px; }
 
   /* ---------- masthead ---------- */
-  header { margin-bottom: 24px; max-width: 720px; }
+  header.mast { margin-bottom: 26px; max-width: 760px; }
   .eyebrow {
     font: 600 11px/1.4 var(--font-mono);
     letter-spacing: .12em;
@@ -2856,12 +2856,15 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
     margin-bottom: 10px;
   }
   h1 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight, 500);
     font-size: clamp(1.9rem, 1.4rem + 2vw, 2.7rem);
     line-height: 1.08;
+    letter-spacing: var(--display-track, -0.015em);
     margin: 0 0 10px;
   }
   h1 em { color: var(--accent); }
-  .sub { color: var(--ink-subtle); margin: 0; max-width: 62ch; }
+  .sub { color: var(--ink-subtle); margin: 0; max-width: 66ch; }
   .hintline {
     font: 500 11.5px/1.5 var(--font-mono);
     color: var(--ink-muted);
@@ -2869,98 +2872,296 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
   }
   .hintline::before { content: "›"; color: var(--accent); margin-right: 6px; }
 
-  /* ---------- pulse row ---------- */
-  .pulse {
+  h2 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight, 500);
+    font-size: 20px;
+    letter-spacing: var(--display-track, -0.01em);
+    margin: 0 0 8px;
+  }
+  section { margin-block: 40px; }
+  .lede { color: var(--ink-subtle); max-width: 66ch; margin: 0 0 16px; }
+
+  /* ---------- toolbar / filters ---------- */
+  .trk-toolbar { flex-wrap: wrap; margin-block: 18px 14px; row-gap: 10px; }
+  .fgroup { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .flabel {
+    font: 600 10.5px/1 var(--font-mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-inline-end: 2px;
+  }
+  .k-kcard.dim { opacity: .25; }
+
+  /* ---------- add-issue form ---------- */
+  .add-form {
     display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 18px;
-    margin-block: 0 18px;
+    padding: 12px 14px;
+    margin-block-end: 14px;
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-m);
+    background: var(--surface);
   }
-  .pulse .k-ring { --k-rs: 72px; }
-  .pulse-copy { max-width: 46ch; }
-  .pulse-copy strong { font-family: var(--font-display); font-size: 15.5px; }
-  .pulse-copy p { margin: 2px 0 0; font-size: 13px; color: var(--ink-muted); }
+  .add-form .k-input { flex: 1 1 220px; min-width: 0; }
+  .add-form .k-select { flex: 0 1 auto; }
 
-  /* ---------- groups: k-tiers engine wearing k-panel clothes ---------- */
-  .groups {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    align-items: start;
+  /* ---------- card anatomy ---------- */
+  .kc-top { display: flex; align-items: center; gap: 6px; padding-inline-end: 14px; }
+  .kc-id {
+    font: 700 10.5px/1 var(--font-mono);
+    letter-spacing: .06em;
+    color: var(--ink-muted);
   }
-  .groups .k-tier {
+  .age {
+    inline-size: 7px; block-size: 7px; border-radius: 50%;
+    background: var(--warning);
+    display: inline-block;
+  }
+  .kc-title { display: block; margin-block: 4px 6px; }
+  .k-kmeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .k-kmeta .k-badge { font-size: 10px; padding: 1px 7px; }
+  .who {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 21px;
+    block-size: 21px;
+    border-radius: 50%;
+    font: 700 8.5px/1 var(--font-body);
+    letter-spacing: .04em;
+  }
+  .who.cl {
+    background: color-mix(in oklch, var(--accent) 22%, var(--surface));
+    color: var(--accent-strong);
+  }
+  .who.mo {
+    background: color-mix(in oklch, var(--warning) 30%, var(--surface));
+    color: color-mix(in oklch, var(--warning) 55%, var(--ink));
+  }
+  .area {
+    font: 600 10px/1 var(--font-mono);
+    color: var(--accent-strong);
+    text-decoration: none;
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-full, 999px);
+    padding: 2.5px 8px;
+    background: color-mix(in oklch, var(--accent) 7%, var(--surface));
+  }
+  .area:hover { border-color: var(--accent); }
+  .kc-date {
+    font: 500 10px/1 var(--font-mono);
+    color: var(--ink-muted);
+    margin-inline-start: auto;
+    white-space: nowrap;
+  }
+
+  /* edit mode: titles become text fields, dragging pauses */
+  :root[data-editing] .kc-title, :root[data-editing] .cl-text {
+    outline: 1.5px dashed color-mix(in oklch, var(--accent) 55%, transparent);
+    outline-offset: 2px; border-radius: 2px; cursor: text;
+  }
+  :root[data-editing] .kc-title:focus, :root[data-editing] .cl-text:focus { outline: 2px solid var(--accent); }
+  :root[data-editing] .k-kcard { cursor: default; }
+
+  /* ---------- burn-up ---------- */
+  .burn { display: grid; gap: 10px; }
+  .burn svg { width: 100%; height: 76px; display: block; }
+  .burn-legend {
     display: flex;
-    flex-direction: column;
-    grid-template-columns: none;
+    gap: 16px;
+    flex-wrap: wrap;
+    font: 500 11px/1.5 var(--font-mono);
+    color: var(--ink-muted);
   }
-  .groups .k-tier-body {
-    display: block;
-    flex-wrap: nowrap;
-    gap: 0;
-    padding: 0;
-    min-block-size: 44px;
+  .burn-legend i {
+    display: inline-block;
+    inline-size: 14px; block-size: 3px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-inline-end: 6px;
   }
-  .groups .k-panel-head .k-badge { font-variant-numeric: tabular-nums; }
-  .groups .k-progress { margin-block-end: 6px; }
-  .groups [data-k-todo] > li { cursor: grab; }
-  .groups [data-k-todo] > li:active { cursor: grabbing; }
-  .groups [data-k-todo] > li:last-child { border-block-end: none; }
+  .burn-legend .lo i { background: var(--accent); }
+  .burn-legend .ls i { background: var(--positive); }
 
+  /* ---------- changelog ---------- */
+  .cl-add-row { margin-top: 6px; display: none; }
+  :root[data-editing] .cl-add-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .cl-refs { font: 600 10px/1.6 var(--font-mono); color: var(--accent-strong); }
+  .k-timeline .cl-text { color: var(--ink-subtle); font-size: 13px; }
+  .k-timeline strong { font-size: 13.5px; }
+
+  /* ---------- responsive / print ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding-inline: 20px; }
+  }
   @media print {
-    .k-todo-add, .hintline { display: none !important; }
-    .groups { grid-template-columns: repeat(3, 1fr); }
-    .k-panel { break-inside: avoid; }
+    .trk-toolbar, .add-form, .cl-add-row { display: none !important; }
+    .k-board { grid-template-columns: repeat(2, 1fr) !important; }
+    .k-kcard, section { break-inside: avoid; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header data-reveal>
-    <div class="eyebrow" data-edit="sw-eyebrow">Acme / platform / ship week</div>
-    <h1 data-edit="sw-title">Ship week — the <em>running</em> list</h1>
-    <p class="sub" data-edit="sw-sub">
-      Everything between here and Friday's release, sorted by honesty: what
-      happens today, what happens this week, and what we keep claiming will
-      happen someday. Items drag between columns as reality intervenes.
+  <header class="mast" data-reveal>
+    <div class="eyebrow" data-edit="tk-eyebrow">offprint · meta</div>
+    <h1 data-edit="tk-title">The tracker that <em>tracks itself</em></h1>
+    <p class="sub" data-edit="tk-sub">
+      This is not a demo. These are the real open issues of this repository —
+      the kit that outgrew its byte budget, the Firefox origin rule we route
+      around, the board you are looking at. It gets updated as work happens,
+      which makes it the only page here that is allowed to be wrong about the
+      others.
     </p>
-    <div class="hintline">Enter adds an item · drag items between groups · × deletes on hover</div>
+    <div class="hintline">drag to move · filters dim, never hide · E edits titles &amp; changelog · Copy for LLM exports the open set</div>
   </header>
 
-  <div class="pulse" data-block="pulse" data-reveal>
-    <div class="k-ring" id="ring" style="--value:0" data-label="0%" role="img" aria-label="Overall completion"></div>
-    <div class="pulse-copy">
-      <strong data-edit="sw-pulse-h">Week pulse</strong>
-      <p data-edit="sw-pulse-p">The ring is the whole week in one number. It only moves when you check things off, which is the point.</p>
+  <div class="k-toolbar trk-toolbar" data-block="toolbar" data-reveal>
+    <span class="fgroup"><span class="flabel">who</span>
+      <button class="k-chip" data-f="who" data-v="mors">MO</button>
+      <button class="k-chip" data-f="who" data-v="claude">CL</button>
+    </span>
+    <span class="fgroup"><span class="flabel">pri</span>
+      <button class="k-chip" data-f="pri" data-v="p1">P1</button>
+      <button class="k-chip" data-f="pri" data-v="p2">P2</button>
+      <button class="k-chip" data-f="pri" data-v="p3">P3</button>
+    </span>
+    <span class="fgroup"><span class="flabel">area</span>
+      <button class="k-chip" data-f="area" data-v="kit">kit</button>
+      <button class="k-chip" data-f="area" data-v="shell">shell</button>
+      <button class="k-chip" data-f="area" data-v="artifacts">artifacts</button>
+      <button class="k-chip" data-f="area" data-v="gallery">gallery</button>
+    </span>
+    <span class="k-gap"></span>
+    <button class="k-btn sm" id="new-issue">＋ New issue</button>
+    <button class="k-btn sm primary" id="copy-llm">Copy for LLM</button>
+  </div>
+
+  <div class="add-form" id="add-form" hidden>
+    <input class="k-input" id="af-title" placeholder="Issue title…" aria-label="Issue title">
+    <select class="k-select" id="af-who" aria-label="Assignee"><option value="claude">claude</option><option value="mors">mors</option></select>
+    <select class="k-select" id="af-pri" aria-label="Priority"><option value="p2">P2</option><option value="p1">P1</option><option value="p3">P3</option></select>
+    <select class="k-select" id="af-area" aria-label="Area"><option>kit</option><option>shell</option><option>artifacts</option><option>gallery</option></select>
+    <button class="k-btn sm primary" id="af-add">Add to backlog</button>
+    <button class="k-btn sm ghost" id="af-cancel">Cancel</button>
+  </div>
+
+  <div class="k-board" id="board" data-block="board" data-reveal>
+    <div class="k-col" data-k-col="backlog">
+      <div class="k-col-head">Backlog <span class="k-col-count">5</span></div>
+      <div class="k-col-body">
+        <div class="k-kcard" data-k-item="off-1" data-who="claude" data-pri="p2" data-area="kit" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-1</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Kit size over budget (41KB raw vs 30KB target)</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge warn">P2</span><a class="area" href="32-kit-gallery.html">kit</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-4" data-who="claude" data-pri="p3" data-area="artifacts" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-4</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Triage board (18) lacks keyboard alternative to drag</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge mute">P3</span><a class="area" href="18-editor-triage-board.html">artifacts</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-5" data-who="claude" data-pri="p3" data-area="shell" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-5</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Shell stripped size ~60KB/file — consider tighter strip or split</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge mute">P3</span><a class="area" href="21-theme-lab.html">shell</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-6" data-who="mors" data-pri="p3" data-area="gallery" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-6</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Index thumbnails could live-preview the active recipe</span>
+          <span class="k-kmeta"><span class="who mo" title="mors">MO</span><span class="k-badge mute">P3</span><a class="area" href="index.html">gallery</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-8" data-who="claude" data-pri="p3" data-area="kit" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-8</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">OS file-drag over k-drop vs shell import veil edge cases</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge mute">P3</span><a class="area" href="32-kit-gallery.html">kit</a><span class="kc-date">Jul 5</span></span>
+        </div>
+      </div>
+      <button class="k-col-add">＋ Add card</button>
+    </div>
+    <div class="k-col" data-k-col="accepted">
+      <div class="k-col-head">Accepted <span class="k-col-count">2</span></div>
+      <div class="k-col-body">
+        <div class="k-kcard" data-k-item="off-2" data-who="claude" data-pri="p1" data-area="shell" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-2</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Firefox file:// unique-origin: no cross-page persistence (mitigated by #o= hash-carry; serve.sh for real persistence)</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge bad">P1</span><a class="area" href="21-theme-lab.html">shell</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-9" data-who="mors" data-pri="p2" data-area="shell" data-opened="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-9</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Settings hash makes long URLs — consider shortening payload</span>
+          <span class="k-kmeta"><span class="who mo" title="mors">MO</span><span class="k-badge warn">P2</span><a class="area" href="21-theme-lab.html">shell</a><span class="kc-date">Jul 5</span></span>
+        </div>
+      </div>
+      <button class="k-col-add">＋ Add card</button>
+    </div>
+    <div class="k-col" data-k-col="in-progress">
+      <div class="k-col-head">In progress <span class="k-col-count">0</span></div>
+      <div class="k-col-body"></div>
+      <button class="k-col-add">＋ Add card</button>
+    </div>
+    <div class="k-col" data-k-col="shipped">
+      <div class="k-col-head">Shipped <span class="k-col-count">2</span></div>
+      <div class="k-col-body">
+        <div class="k-kcard" data-k-item="off-3" data-who="claude" data-pri="p1" data-area="shell" data-opened="2026-07-05" data-shipped="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-3</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Chrome (dock/panel) inconsistent across pages — fixed via offprint-ui shadow DOM</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge bad">P1</span><a class="area" href="21-theme-lab.html">shell</a><span class="kc-date">Jul 5</span></span>
+        </div>
+        <div class="k-kcard" data-k-item="off-7" data-who="claude" data-pri="p2" data-area="artifacts" data-opened="2026-07-05" data-shipped="2026-07-05">
+          <span class="kc-top"><span class="kc-id">OFF-7</span><i class="age" hidden title="open more than 14 days"></i></span>
+          <span class="kc-title">Responsive: 9 files had 375px overflow — swept 2026-07-05</span>
+          <span class="k-kmeta"><span class="who cl" title="claude">CL</span><span class="k-badge warn">P2</span><a class="area" href="18-editor-triage-board.html">artifacts</a><span class="kc-date">Jul 5</span></span>
+        </div>
+      </div>
+      <button class="k-col-add">＋ Add card</button>
     </div>
   </div>
 
-  <div class="groups k-tiers" id="groups" data-block="groups" data-reveal>
-    <section class="k-panel k-tier" data-k-tier="today">
-      <div class="k-panel-head">Today <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="Today progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for today…" aria-label="Add item for today">
+  <section data-block="burnup" data-reveal="scroll">
+    <h2 data-edit="tk-bu-h">Burn-up</h2>
+    <p class="lede" data-edit="tk-bu-p">
+      Opened versus shipped, cumulative by date. Two lines, one honest gap.
+      Everything so far happened in a single loud day, so the chart is modest —
+      it is built from the live data and will grow teeth as the dates spread out.
+    </p>
+    <div class="k-panel">
+      <div class="k-panel-body burn">
+        <svg id="burn-svg" viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="Burn-up: cumulative opened vs shipped issues"></svg>
+        <div class="burn-legend">
+          <span class="lo"><i></i>opened <b id="burn-open">0</b></span>
+          <span class="ls"><i></i>shipped <b id="burn-ship">0</b></span>
+          <span id="burn-range"></span>
+        </div>
       </div>
-    </section>
-    <section class="k-panel k-tier" data-k-tier="week">
-      <div class="k-panel-head">This week <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="This week progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for this week…" aria-label="Add item for this week">
-      </div>
-    </section>
-    <section class="k-panel k-tier" data-k-tier="someday">
-      <div class="k-panel-head">Someday <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="Someday progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for someday…" aria-label="Add item for someday">
-      </div>
-    </section>
-  </div>
+    </div>
+  </section>
+
+  <section data-block="changelog" data-reveal="scroll">
+    <h2 data-edit="tk-cl-h">Changelog</h2>
+    <p class="lede" data-edit="tk-cl-p">
+      What actually shipped, newest first. In edit mode the entries are
+      editable and the add-row appears — future sessions append here.
+    </p>
+    <ul class="k-timeline" id="changelog">
+      <li><time data-edit="tk-cl1-d">2026-07-05</time><strong data-edit="tk-cl1-t">v3.1</strong>
+        <p class="cl-text" data-edit="tk-cl1-b">Shadow-DOM chrome, settings hash-carry, drawer default, random ? swatch, kanban column CRUD, tour/onboarding, responsive sweep.</p>
+        <span class="cl-refs">OFF-3 · OFF-7 shipped</span></li>
+      <li><time data-edit="tk-cl2-d">2026-07-04</time><strong data-edit="tk-cl2-t">v3</strong>
+        <p class="cl-text" data-edit="tk-cl2-b">Offprint rebrand, studio default, recipes v3, nav shells, random palettes, flatten, artifact kit, artifacts 29–32.</p></li>
+      <li><time data-edit="tk-cl3-d">2026-07-03</time><strong data-edit="tk-cl3-t">v2</strong>
+        <p class="cl-text" data-edit="tk-cl3-b">Style recipes, Firefox fixes.</p></li>
+      <li class="muted"><time data-edit="tk-cl4-d">2026-07-02</time><strong data-edit="tk-cl4-t">v1</strong>
+        <p class="cl-text" data-edit="tk-cl4-b">Artifact shell, 11 themes, editing, export.</p></li>
+    </ul>
+    <div class="cl-add-row">
+      <input class="k-input" id="cl-input" placeholder="New changelog entry… (Enter adds, dated today)" aria-label="New changelog entry" style="flex:1 1 260px">
+      <button class="k-btn sm" id="cl-add">＋ Add entry</button>
+    </div>
+  </section>
 
 </div>
 
@@ -2970,113 +3171,367 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
   const S = window.ArtifactShell;
   const $ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const SEED = {
-    today: [
-      { id: "sw-01", t: "Tag release 2026.28-rc1", done: true },
-      { id: "sw-02", t: "Migration dry-run against the staging snapshot", done: true },
-      { id: "sw-03", t: "Flip dispatch-v2 flag for internal orgs", done: false },
-      { id: "sw-04", t: "Brief the on-call pair on the rollback plan", done: false },
-      { id: "sw-05", t: "Close BIR-2829 or admit it slips", done: false },
-    ],
-    week: [
-      { id: "sw-06", t: "Canary to 25% once error budget holds a day", done: false },
-      { id: "sw-07", t: "Changelog draft past the marketing filter", done: false },
-      { id: "sw-08", t: "Load test the webhook fan-out at 3× peak", done: true },
-      { id: "sw-09", t: "Status page copy for the maintenance window", done: false },
-      { id: "sw-10", t: "Retire the 2024 deploy runbook, finally", done: false },
-    ],
-    someday: [
-      { id: "sw-11", t: "Auto-generate the release notes from merge titles", done: false },
-      { id: "sw-12", t: "One-click rollback that actually takes one click", done: false },
-      { id: "sw-13", t: "Delete the “temporary” feature-flag cron", done: false },
-      { id: "sw-14", t: "Teach the deploy bot sarcasm", done: false },
-    ],
+  const PRI = { p1: ["P1", "bad"], p2: ["P2", "warn"], p3: ["P3", "mute"] };
+  const AREAS = {
+    kit: "32-kit-gallery.html",
+    shell: "21-theme-lab.html",
+    artifacts: "18-editor-triage-board.html",
+    gallery: "index.html",
+  };
+  const DAY = 864e5;
+  const iso = d => new Date(d).toISOString().slice(0, 10);
+  const today = () => iso(Date.now());
+  const short = d => {
+    const t = new Date(d + "T12:00:00");
+    return isNaN(t) ? d : t.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
-  const groups = document.getElementById("groups");
+  const board = document.getElementById("board");
+  const clog = document.getElementById("changelog");
+  const pristineBoard = board.innerHTML;
+  let filters = { who: null, pri: null, area: null };
+  let added = [];               /* JS-owned changelog entries (seeded ones are static + data-edit) */
   let restoring = false;
-  let uid = 0;
 
-  function buildItem(d) {
-    const li = document.createElement("li");
-    li.dataset.kItem = d.id;
-    if (d.done) li.className = "done";
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.className = "k-check";
-    cb.checked = !!d.done;
-    const tx = document.createElement("span");
-    tx.className = "k-todo-text";
-    tx.textContent = d.t;
-    const del = document.createElement("button");
-    del.className = "k-todo-del";
-    del.setAttribute("aria-label", "Remove");
-    del.textContent = "×";
-    li.append(cb, tx, del);
-    return li;
-  }
-  function render(data) {
-    restoring = true;
-    $(".k-tier", groups).forEach(sec => {
-      const list = sec.querySelector("[data-k-todo]");
-      list.replaceChildren(...(data[sec.dataset.kTier] || []).map(buildItem));
-    });
-    window.ArtifactKit?.refresh();
-    restoring = false;
-    sync(false);
-  }
+  const cardTitle = c => (c.querySelector(".kc-title")?.textContent ?? "").trim();
 
-  /* ---------- snapshot / rollups ---------- */
+  /* ---------- snapshot / persist: {issues, changelog, order, defs, filters} ---------- */
   function snap() {
-    const o = {};
-    $(".k-tier", groups).forEach(sec => {
-      o[sec.dataset.kTier] = $("[data-k-todo] > li", sec).map(li => ({
-        id: li.dataset.kItem,
-        t: li.querySelector(".k-todo-text")?.textContent ?? "",
-        done: li.classList.contains("done"),
+    const d = { order: [], defs: {}, issues: {} };
+    $(".k-col", board).forEach(col => {
+      const k = col.dataset.kCol;
+      d.order.push(k);
+      d.defs[k] = col.querySelector(".k-col-label")?.textContent.trim()
+        || col.querySelector(".k-col-head")?.childNodes[0]?.textContent.trim() || k;
+      d.issues[k] = $(".k-kcard", col).map(c => ({
+        id: c.dataset.kItem,
+        t: cardTitle(c),
+        who: c.dataset.who || "claude",
+        pri: c.dataset.pri || "p3",
+        area: c.dataset.area || "artifacts",
+        opened: c.dataset.opened || today(),
+        shipped: c.dataset.shipped || null,
+        link: c.querySelector(".area")?.getAttribute("href") || AREAS[c.dataset.area] || null,
       }));
     });
-    return o;
+    return d;
   }
-  function sync(persist = true) {
-    /* adopt kit-created items into the drag engine */
-    $("[data-k-todo] > li", groups).forEach(li => {
-      if (!li.dataset.kItem) li.dataset.kItem = "sw-n" + Date.now().toString(36) + (uid++);
-      li.draggable = !(S && S.isEditing());
-      if (li.tabIndex < 0) li.tabIndex = 0;
-    });
-    let done = 0, total = 0;
-    $(".k-tier", groups).forEach(sec => {
-      const items = $("[data-k-todo] > li", sec);
-      const d = items.filter(li => li.classList.contains("done")).length;
-      done += d; total += items.length;
-      const badge = sec.querySelector("[data-count]");
-      if (badge) badge.textContent = d + "/" + items.length;
-      const pct = items.length ? Math.round(d / items.length * 100) : 0;
-      const bar = sec.querySelector(".k-progress");
-      bar.style.setProperty("--value", pct);
-      bar.setAttribute("aria-valuenow", pct);
-    });
-    const pct = total ? Math.round(done / total * 100) : 0;
-    const ring = document.getElementById("ring");
-    ring.style.setProperty("--value", pct);
-    ring.dataset.label = pct + "%";
-    ring.setAttribute("aria-label", "Overall completion " + pct + " percent");
-    if (persist && S && !restoring)
-      S.state.set(Object.assign({}, S.state.get(), { groups: snap() }));
+  function save() {
+    if (!S || restoring) return;
+    S.state.set(Object.assign({}, S.state.get(), snap(), { filters, changelog: added }));
   }
 
-  /* kit events: check/add/delete fire k:todo, cross-group drags fire k:tiers */
-  document.addEventListener("k:todo", () => sync());
-  document.addEventListener("k:tiers", () => sync());
+  /* ---------- build DOM from data ---------- */
+  function buildCard(d) {
+    const c = document.createElement("div");
+    c.className = "k-kcard";
+    c.dataset.kItem = d.id;
+    c.dataset.who = d.who;
+    c.dataset.pri = d.pri;
+    c.dataset.area = d.area;
+    c.dataset.opened = d.opened;
+    if (d.shipped) c.dataset.shipped = d.shipped;
+    const top = document.createElement("span");
+    top.className = "kc-top";
+    const id = document.createElement("span");
+    id.className = "kc-id";
+    id.textContent = d.id.toUpperCase();
+    const age = document.createElement("i");
+    age.className = "age";
+    age.hidden = true;
+    age.title = "open more than 14 days";
+    top.append(id, age);
+    const t = document.createElement("span");
+    t.className = "kc-title";
+    t.textContent = d.t;
+    const m = document.createElement("span");
+    m.className = "k-kmeta";
+    const who = document.createElement("span");
+    who.className = "who " + (d.who === "mors" ? "mo" : "cl");
+    who.title = d.who;
+    who.textContent = d.who === "mors" ? "MO" : "CL";
+    const b = document.createElement("span");
+    b.className = "k-badge " + (PRI[d.pri]?.[1] || "mute");
+    b.textContent = PRI[d.pri]?.[0] || d.pri.toUpperCase();
+    const a = document.createElement("a");
+    a.className = "area";
+    a.href = d.link || AREAS[d.area] || "index.html";
+    a.textContent = d.area;
+    const dt = document.createElement("span");
+    dt.className = "kc-date";
+    dt.textContent = short(d.opened);
+    m.append(who, b, a, dt);
+    c.append(top, t, m);
+    return c;
+  }
+  function buildCol(k) {
+    const col = document.createElement("div");
+    col.className = "k-col";
+    col.dataset.kCol = k;
+    col.innerHTML = '<div class="k-col-head"><span class="k-col-label"></span> <span class="k-col-count">0</span></div><div class="k-col-body"></div><button class="k-col-add">＋ Add card</button>';
+    return col;
+  }
+  function restore(v) {
+    if (!v) return;
+    restoring = true;
+    window.ArtifactKit?.refresh();               /* prime labels + ghost first */
+    if (v.issues) {
+      const order = Array.isArray(v.order) && v.order.length ? v.order : Object.keys(v.issues);
+      const defs = v.defs || {};
+      const have = {};
+      $(".k-col", board).forEach(c => { have[c.dataset.kCol] = c; });
+      const ghost = board.querySelector(".k-colghost");
+      order.forEach(k => {
+        const col = have[k] || buildCol(k);
+        delete have[k];
+        const l = col.querySelector(".k-col-label");
+        if (l && defs[k]) l.textContent = defs[k];
+        board.insertBefore(col, ghost);
+        const cards = v.issues[k];
+        if (Array.isArray(cards))
+          col.querySelector(".k-col-body").replaceChildren(...cards.map(buildCard));
+      });
+      Object.values(have).forEach(c => c.remove());
+    }
+    filters = Object.assign({ who: null, pri: null, area: null }, v.filters);
+    added = Array.isArray(v.changelog) ? v.changelog : [];
+    renderAdded();
+    window.ArtifactKit?.refresh();
+    restoring = false;
+    paint();
+  }
 
-  S?.state.onRestore(v => { if (v && v.groups) render(v.groups); });
-  document.addEventListener("a2:reset", () => render(SEED));
-  document.addEventListener("a2:editmode", e => {
-    $("[data-k-todo] > li", groups).forEach(li => { li.draggable = !e.detail.editing; });
+  /* ---------- filters + aging + shipped-stamp ---------- */
+  function paint() {
+    $(".trk-toolbar .k-chip[data-f]").forEach(ch =>
+      ch.classList.toggle("on", filters[ch.dataset.f] === ch.dataset.v));
+    const active = Object.entries(filters).filter(([, v]) => v);
+    const shippedCol = $('.k-col', board).find(c => c.dataset.kCol === "shipped");
+    $(".k-kcard", board).forEach(c => {
+      /* stamp / unstamp shipped date as cards cross the shipped column */
+      const inShipped = shippedCol && shippedCol.contains(c);
+      if (inShipped && !c.dataset.shipped) c.dataset.shipped = today();
+      if (!inShipped && c.dataset.shipped) delete c.dataset.shipped;
+      /* dim non-matching */
+      c.classList.toggle("dim", active.length > 0 &&
+        !active.every(([f, v]) => (f === "who" ? c.dataset.who : f === "pri" ? c.dataset.pri : c.dataset.area) === v));
+      /* aging dot */
+      const agedot = c.querySelector(".age");
+      if (agedot) agedot.hidden = c.dataset.shipped ||
+        (Date.now() - new Date(c.dataset.opened + "T00:00:00").getTime()) <= 14 * DAY;
+    });
+    burnup();
+  }
+  document.querySelector(".trk-toolbar").addEventListener("click", e => {
+    const ch = e.target.closest(".k-chip[data-f]");
+    if (!ch) return;
+    const f = ch.dataset.f;
+    filters[f] = filters[f] === ch.dataset.v ? null : ch.dataset.v;
+    paint();
+    save();
   });
 
-  render(S?.state.get()?.groups || SEED);
+  /* ---------- burn-up sparkline (data-driven; grows with the data) ---------- */
+  function burnup() {
+    const d = snap();
+    const opened = [], shipped = [];
+    Object.entries(d.issues).forEach(([k, cards]) => cards.forEach(c => {
+      opened.push(c.opened);
+      if (k === "shipped" && c.shipped) shipped.push(c.shipped);
+    }));
+    const clDates = $("#changelog time").map(t => t.textContent.trim()).filter(t => /^\d{4}-\d{2}-\d{2}$/.test(t));
+    added.forEach(e => clDates.push(e.date));
+    let dates = [...new Set([...opened, ...shipped, ...clDates])].sort();
+    if (!dates.length) dates = [today()];
+    /* pad a day either side so single-date data still draws a line */
+    const t0 = new Date(dates[0] + "T12:00:00").getTime() - DAY;
+    const t1 = new Date(dates[dates.length - 1] + "T12:00:00").getTime() + DAY;
+    const X = t => 20 + 560 * ((new Date(t + "T12:00:00").getTime() - t0) / (t1 - t0));
+    const maxY = Math.max(opened.length, 1);
+    const Y = n => 88 - 72 * (n / maxY);
+    const cum = list => {
+      const pts = [[20, Y(0)]];
+      let n = 0;
+      dates.forEach(dt => {
+        n += list.filter(x => x === dt).length;
+        pts.push([X(dt), Y(n)]);
+      });
+      pts.push([580, Y(n)]);
+      return pts;
+    };
+    const line = (pts, tok, w) =>
+      '<polyline points="' + pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ") +
+      '" fill="none" stroke="var(--' + tok + ')" stroke-width="' + w + '" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+    const dots = (pts, tok) => pts.slice(1, -1).map(p =>
+      '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.5" fill="var(--' + tok + ')"/>').join("");
+    document.getElementById("burn-svg").innerHTML =
+      '<line x1="20" y1="88" x2="580" y2="88" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>' +
+      line(cum(opened), "accent", 2.5) + line(cum(shipped), "positive", 2.5) +
+      dots(cum(opened), "accent") + dots(cum(shipped), "positive");
+    document.getElementById("burn-open").textContent = opened.length;
+    document.getElementById("burn-ship").textContent = shipped.length;
+    document.getElementById("burn-range").textContent = short(dates[0]) + " → " + short(dates[dates.length - 1]);
+  }
+
+  /* ---------- new issue form ---------- */
+  const form = document.getElementById("add-form");
+  document.getElementById("new-issue").addEventListener("click", () => {
+    form.hidden = !form.hidden;
+    if (!form.hidden) document.getElementById("af-title").focus();
+  });
+  document.getElementById("af-cancel").addEventListener("click", () => { form.hidden = true; });
+  function nextId() {
+    const ns = $(".k-kcard", board).map(c => +(c.dataset.kItem || "").replace(/\D+/g, "") || 0);
+    return "off-" + (Math.max(0, ...ns) + 1);
+  }
+  function addIssue() {
+    const t = document.getElementById("af-title").value.trim();
+    if (!t) { document.getElementById("af-title").focus(); return; }
+    const card = buildCard({
+      id: nextId(), t,
+      who: document.getElementById("af-who").value,
+      pri: document.getElementById("af-pri").value,
+      area: document.getElementById("af-area").value,
+      opened: today(),
+    });
+    const backlog = $(".k-col", board).find(c => c.dataset.kCol === "backlog") || $(".k-col", board)[0];
+    backlog.querySelector(".k-col-body").append(card);
+    window.ArtifactKit?.refresh();
+    document.getElementById("af-title").value = "";
+    form.hidden = true;
+    paint();
+    save();
+    S?.toast("Filed " + card.dataset.kItem.toUpperCase() + " to backlog");
+  }
+  document.getElementById("af-add").addEventListener("click", addIssue);
+  document.getElementById("af-title").addEventListener("keydown", e => { if (e.key === "Enter") addIssue(); });
+
+  /* ---------- delete with undo (wraps the kit's ×, capture phase) ---------- */
+  document.addEventListener("click", e => {
+    const del = e.target.closest?.(".k-kdel");
+    if (!del || !board.contains(del)) return;
+    const card = del.closest(".k-kcard");
+    const body = card.parentElement, next = card.nextElementSibling;
+    const label = card.dataset.kItem.toUpperCase();
+    setTimeout(() => {                     /* after the kit removes it */
+      if (card.isConnected) return;
+      paint(); save();
+      S?.toast("Deleted " + label, {
+        label: "Undo",
+        action() {
+          body.insertBefore(card, next && next.isConnected ? next : null);
+          window.ArtifactKit?.refresh();
+          paint(); save();
+        },
+      });
+    }, 0);
+  }, true);
+
+  /* ---------- changelog: JS-owned added entries ---------- */
+  function renderAdded() {
+    $(".cl-added", clog).forEach(li => li.remove());
+    added.forEach(en => {                          /* newest first at the top */
+      const li = document.createElement("li");
+      li.className = "cl-added";
+      const tm = document.createElement("time");
+      tm.textContent = en.date;
+      const p = document.createElement("p");
+      p.className = "cl-text";
+      p.textContent = en.text;
+      li.append(tm, p);
+      if (en.refs && en.refs.length) {
+        const r = document.createElement("span");
+        r.className = "cl-refs";
+        r.textContent = en.refs.join(" · ");
+        li.append(r);
+      }
+      clog.prepend(li);
+    });
+    applyEditable(S?.isEditing?.() || false);
+  }
+  function addEntry() {
+    const inp = document.getElementById("cl-input");
+    const t = inp.value.trim();
+    if (!t) { inp.focus(); return; }
+    const refs = (t.match(/OFF-\d+/g) || []);
+    added.push({ date: today(), text: t, refs });
+    inp.value = "";
+    renderAdded();
+    burnup();
+    save();
+    S?.toast("Changelog entry added");
+  }
+  document.getElementById("cl-add").addEventListener("click", addEntry);
+  document.getElementById("cl-input").addEventListener("keydown", e => { if (e.key === "Enter") addEntry(); });
+
+  /* ---------- copy for LLM: open issues as a markdown work order ---------- */
+  function workOrder() {
+    const d = snap();
+    const rows = [];
+    d.order.forEach(k => {
+      if (k === "shipped") return;
+      (d.issues[k] || []).forEach(c => rows.push(Object.assign({ col: d.defs[k] || k }, c)));
+    });
+    rows.sort((a, b) => a.pri.localeCompare(b.pri) || a.id.localeCompare(b.id, undefined, { numeric: true }));
+    const lines = [
+      "# Offprint — open work order (" + today() + ")",
+      "",
+      "Repo: Offprint — a gallery of self-contained HTML artifacts; every page embeds the",
+      "artifact shell (+ kit where used). Conventions in CLAUDE.md; live tracker: 34-issue-tracker.html.",
+      "",
+    ];
+    rows.forEach(c => lines.push(
+      "- **" + c.id.toUpperCase() + "** [" + (PRI[c.pri]?.[0] || c.pri) + " · " + c.who + " · area:" + c.area + " · " + c.col.toLowerCase() + "] " + c.t));
+    lines.push("", "Shipped issues omitted. Priorities: P1 first.");
+    return lines.join("\n");
+  }
+  document.getElementById("copy-llm").addEventListener("click", () => {
+    const md = workOrder();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(
+        () => S?.toast("Open issues copied as a work order"),
+        () => S?.toast("Copy failed — clipboard blocked"));
+    } else S?.toast("Copy failed — no clipboard access");
+  });
+
+  /* ---------- kit wiring ---------- */
+  S?.state.onRestore(restore);
+  window.ArtifactKit?.kanban(board, { onChange: () => { paint(); save(); } });
+  paint();
+
+  document.addEventListener("a2:reset", () => {
+    restoring = true;
+    board.innerHTML = pristineBoard;
+    filters = { who: null, pri: null, area: null };
+    added = [];
+    renderAdded();
+    window.ArtifactKit?.refresh();
+    restoring = false;
+    paint();
+  });
+
+  /* ---------- edit mode: card titles + added changelog entries ---------- */
+  function applyEditable(on) {
+    $(".k-kcard", board).forEach(c => { c.draggable = !on; });
+    $(".kc-title", board).forEach(t => {
+      if (on) t.setAttribute("contenteditable", "plaintext-only");
+      else t.removeAttribute("contenteditable");
+    });
+    $(".cl-added .cl-text", clog).forEach(t => {
+      if (on) t.setAttribute("contenteditable", "plaintext-only");
+      else t.removeAttribute("contenteditable");
+    });
+  }
+  document.addEventListener("a2:editmode", e => applyEditable(!!e.detail.editing));
+  board.addEventListener("focusout", e => {
+    if (e.target.matches?.(".kc-title[contenteditable]")) save();
+  });
+  clog.addEventListener("focusout", e => {
+    if (!e.target.matches?.(".cl-added .cl-text[contenteditable]")) return;
+    const li = e.target.closest(".cl-added");
+    const idx = added.length - 1 - $(".cl-added", clog).indexOf(li);
+    if (added[idx]) { added[idx].text = e.target.textContent.trim(); save(); }
+  });
 })();
 </script>
 </body>

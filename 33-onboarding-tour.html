@@ -1,6 +1,6 @@
 <!-- Copyright 2026 Anthropic PBC · SPDX-License-Identifier: Apache-2.0 -->
 <!doctype html>
-<html lang="en" data-artifact="31-todo-list">
+<html lang="en" data-artifact="33-onboarding-tour">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -2833,7 +2833,7 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
 })();
 </script>
 <!-- ═══ /artifact-kit ═══ -->
-<title>Acme — ship week, running list</title>
+<title>First run — onboarding &amp; tours</title>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -2844,10 +2844,10 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
     font-size: 14px;
     line-height: var(--lh-body, 1.55);
   }
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 48px 32px 72px; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 32px 72px; }
 
   /* ---------- masthead ---------- */
-  header { margin-bottom: 24px; max-width: 720px; }
+  header.mast { margin-bottom: 40px; max-width: 720px; }
   .eyebrow {
     font: 600 11px/1.4 var(--font-mono);
     letter-spacing: .12em;
@@ -2856,12 +2856,15 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
     margin-bottom: 10px;
   }
   h1 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight, 500);
     font-size: clamp(1.9rem, 1.4rem + 2vw, 2.7rem);
     line-height: 1.08;
+    letter-spacing: var(--display-track, -0.015em);
     margin: 0 0 10px;
   }
   h1 em { color: var(--accent); }
-  .sub { color: var(--ink-subtle); margin: 0; max-width: 62ch; }
+  .sub { color: var(--ink-subtle); margin: 0; max-width: 64ch; }
   .hintline {
     font: 500 11.5px/1.5 var(--font-mono);
     color: var(--ink-muted);
@@ -2869,98 +2872,280 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
   }
   .hintline::before { content: "›"; color: var(--accent); margin-right: 6px; }
 
-  /* ---------- pulse row ---------- */
-  .pulse {
+  /* ---------- sections ---------- */
+  section { margin-block: 44px; }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight, 500);
+    font-size: 21px;
+    letter-spacing: var(--display-track, -0.01em);
+    margin: 0 0 8px;
+  }
+  .lede { color: var(--ink-subtle); max-width: 66ch; margin: 0 0 18px; }
+  .prose p { max-width: 66ch; color: var(--ink-subtle); }
+  .prose strong { color: var(--ink); }
+
+  /* ---------- demo stage ---------- */
+  .stage {
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-l);
+    background: color-mix(in oklch, var(--surface-2) 55%, var(--bg));
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+  }
+  .stage .k-toolbar { flex-wrap: wrap; }
+  .stage .relay-row {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-block: 0 18px;
+    gap: 10px;
+    padding: 9px 4px;
+    border-block-end: 1px var(--line-style) var(--line);
+    font-size: 13px;
   }
-  .pulse .k-ring { --k-rs: 72px; }
-  .pulse-copy { max-width: 46ch; }
-  .pulse-copy strong { font-family: var(--font-display); font-size: 15.5px; }
-  .pulse-copy p { margin: 2px 0 0; font-size: 13px; color: var(--ink-muted); }
+  .stage .relay-row:last-child { border-block-end: none; }
+  .relay-row .dot {
+    inline-size: 8px; block-size: 8px; border-radius: 50%;
+    background: var(--positive); flex-shrink: 0;
+  }
+  .relay-row.paused .dot { background: var(--line-strong); }
+  .relay-row .route { font: 600 12px/1.4 var(--font-mono); }
+  .relay-row .k-badge { margin-inline-start: auto; }
 
-  /* ---------- groups: k-tiers engine wearing k-panel clothes ---------- */
-  .groups {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    align-items: start;
-  }
-  .groups .k-tier {
+  .demobar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .knobs {
     display: flex;
-    flex-direction: column;
-    grid-template-columns: none;
+    gap: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 12px 14px;
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-m);
+    background: var(--surface);
   }
-  .groups .k-tier-body {
-    display: block;
-    flex-wrap: nowrap;
-    gap: 0;
-    padding: 0;
-    min-block-size: 44px;
+  .knob { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .knob > label:first-child {
+    font: 600 10.5px/1 var(--font-mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    white-space: nowrap;
   }
-  .groups .k-panel-head .k-badge { font-variant-numeric: tabular-nums; }
-  .groups .k-progress { margin-block-end: 6px; }
-  .groups [data-k-todo] > li { cursor: grab; }
-  .groups [data-k-todo] > li:active { cursor: grabbing; }
-  .groups [data-k-todo] > li:last-child { border-block-end: none; }
+  .knob .k-range { width: 140px; max-width: 34vw; }
+  .knob .val {
+    font: 600 11.5px/1 var(--font-mono);
+    color: var(--ink-subtle);
+    font-variant-numeric: tabular-nums;
+    min-width: 34px;
+  }
 
+  /* dim strength knob — page CSS wins over the kit layer */
+  .k-spot {
+    box-shadow: 0 0 0 100vmax
+      color-mix(in oklch, var(--ink) calc(var(--tour-dim, 45) * 1%), transparent);
+  }
+
+  /* ---------- snippets ---------- */
+  .snip {
+    margin-top: 14px;
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+  }
+  .snip summary {
+    cursor: pointer;
+    padding: 9px 14px;
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+  }
+  .snip summary::-webkit-details-marker { display: none; }
+  .snip summary::before { content: "▸"; transition: rotate var(--dur-1) var(--ease-out); }
+  .snip[open] summary::before { rotate: 90deg; }
+  .snip .copy {
+    margin-inline-start: auto;
+    font: 600 10.5px/1 var(--font-mono);
+    letter-spacing: .06em;
+    padding: 4px 10px;
+    border: var(--border-w) var(--line-style) var(--line);
+    border-radius: var(--radius-full, 999px);
+    background: var(--surface);
+    color: var(--ink-subtle);
+    cursor: pointer;
+  }
+  .snip .copy:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .snip pre {
+    margin: 0;
+    padding: 4px 16px 14px;
+    overflow-x: auto;
+    font: 12px/1.65 var(--font-mono);
+    color: var(--ink-subtle);
+    tab-size: 2;
+  }
+
+  /* ---------- pattern notes ---------- */
+  .notegrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 12px;
+  }
+  .notegrid .k-callout p { margin: 0; font-size: 13px; }
+
+  /* ---------- responsive / print ---------- */
+  @media (max-width: 640px) {
+    .wrap { padding-inline: 20px; }
+  }
   @media print {
-    .k-todo-add, .hintline { display: none !important; }
-    .groups { grid-template-columns: repeat(3, 1fr); }
-    .k-panel { break-inside: avoid; }
+    .demobar, .knobs, .snip .copy { display: none !important; }
+    section, .stage, .k-callout { break-inside: avoid; }
+    .snip { border: none; }
+    .snip pre { white-space: pre-wrap; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header data-reveal>
-    <div class="eyebrow" data-edit="sw-eyebrow">Acme / platform / ship week</div>
-    <h1 data-edit="sw-title">Ship week — the <em>running</em> list</h1>
-    <p class="sub" data-edit="sw-sub">
-      Everything between here and Friday's release, sorted by honesty: what
-      happens today, what happens this week, and what we keep claiming will
-      happen someday. Items drag between columns as reality intervenes.
+  <header class="mast" data-reveal>
+    <div class="eyebrow" data-edit="fr-eyebrow">Offprint · pattern · first run</div>
+    <h1 data-edit="fr-title">First run, <em>handled</em></h1>
+    <p class="sub" data-edit="fr-sub">
+      Two kit primitives for a page's opening thirty seconds: a one-shot welcome
+      dialog that remembers being dismissed, and a spotlight tour that walks the
+      actual UI. Both live demos below run against a fictional Acme Relay console
+      — restart them as often as your patience allows.
     </p>
-    <div class="hintline">Enter adds an item · drag items between groups · × deletes on hover</div>
+    <div class="hintline">launch the welcome · start the tour · arrow keys step, Escape bails</div>
   </header>
 
-  <div class="pulse" data-block="pulse" data-reveal>
-    <div class="k-ring" id="ring" style="--value:0" data-label="0%" role="img" aria-label="Overall completion"></div>
-    <div class="pulse-copy">
-      <strong data-edit="sw-pulse-h">Week pulse</strong>
-      <p data-edit="sw-pulse-p">The ring is the whole week in one number. It only moves when you check things off, which is the point.</p>
-    </div>
-  </div>
+  <section data-block="why" data-reveal class="prose">
+    <h2 data-edit="fr-why-h">Why a first-run pattern at all</h2>
+    <p data-edit="fr-why-p1">
+      A first visit is the one moment a page gets undivided attention, and most
+      pages spend it on a wall of everything. The kit takes the opposite bet:
+      say three things, in order, then get out of the way — permanently, because
+      the dismissal is remembered in artifact state and rides export, import and
+      flatten like any other edit.
+    </p>
+    <p data-edit="fr-why-p2">
+      <strong>Modal or tour?</strong> Use the <strong>onboarding modal</strong>
+      when the message is about the page as a whole — what it is, why it exists,
+      what to do first. It interrupts once, cleanly, before the user has formed a
+      plan. Use the <strong>spotlight tour</strong> when the message is spatial —
+      <em>this</em> button, <em>that</em> list — and only after there is real UI
+      worth pointing at. A tour over an empty page is a guided walk through fog.
+    </p>
+  </section>
 
-  <div class="groups k-tiers" id="groups" data-block="groups" data-reveal>
-    <section class="k-panel k-tier" data-k-tier="today">
-      <div class="k-panel-head">Today <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="Today progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for today…" aria-label="Add item for today">
+  <section data-block="onboard-demo" data-reveal="scroll">
+    <h2 data-edit="fr-ob-h">The onboarding modal</h2>
+    <p class="lede" data-edit="fr-ob-p">
+      A three-step welcome for Acme Relay. Finish it (or tick “don’t show
+      again”) and it stores <code>kit.onboard.acme-relay</code> in artifact
+      state — after that, the launch button politely declines until you forget
+      the dismissal.
+    </p>
+    <div class="demobar">
+      <button class="k-btn primary" id="ob-launch">Launch welcome</button>
+      <button class="k-btn ghost sm" id="ob-forget">Forget dismissal</button>
+    </div>
+    <details class="snip"><summary>snippet <button class="copy" type="button">copy</button></summary>
+<pre><code>ArtifactKit.onboard({
+  id: "acme-relay",                    // dismissal key: kit.onboard.&lt;id&gt;
+  onDone: () =&gt; ArtifactShell?.toast("Welcome aboard"),
+  steps: [
+    { art: "…", title: "Welcome to Relay", body: "Route events anywhere." },
+    { art: "…", title: "Wire a route",     body: "Source, filter, sink." },
+    { art: "…", title: "Invite the team",  body: "Relays are shareable." },
+  ],
+});
+// returns null if already dismissed — remembered in artifact state</code></pre></details>
+  </section>
+
+  <section data-block="tour-demo" data-reveal="scroll">
+    <h2 data-edit="fr-tr-h">The spotlight tour</h2>
+    <p class="lede" data-edit="fr-tr-p">
+      A mock Relay console built from kit components, and a four-stop tour over
+      it. The spotlight dims everything but the target; the coach card places
+      itself below or above, whichever fits. Tune both knobs, then restart —
+      tours are cheap, run them until it reads right.
+    </p>
+
+    <div class="demobar">
+      <button class="k-btn primary" id="tour-start">Start tour</button>
+      <div class="knobs" aria-label="Tour knobs">
+        <div class="knob">
+          <label id="place-label">placement</label>
+          <div class="k-seg" role="radiogroup" aria-labelledby="place-label">
+            <label><input type="radio" name="place" value="auto" checked>Auto</label>
+            <label><input type="radio" name="place" value="top">Prefer above</label>
+          </div>
+        </div>
+        <div class="knob">
+          <label for="dim-range">dim</label>
+          <input class="k-range" id="dim-range" type="range" min="10" max="80" value="45">
+          <span class="val" id="dim-val">45%</span>
+        </div>
       </div>
-    </section>
-    <section class="k-panel k-tier" data-k-tier="week">
-      <div class="k-panel-head">This week <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="This week progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for this week…" aria-label="Add item for this week">
+    </div>
+
+    <div class="stage" id="mock-app" aria-label="Acme Relay console (mock)">
+      <div class="k-toolbar" id="mock-toolbar">
+        <button class="k-btn sm primary" id="mock-new">New relay</button>
+        <button class="k-btn sm">Import</button>
+        <label class="k-search" style="max-width:200px"><input placeholder="Search relays…" aria-label="Search relays"></label>
+        <span class="k-gap"></span>
+        <span class="k-badge ok">3 live</span>
+        <button class="k-btn sm icon" id="mock-cog" aria-label="Relay settings">⚙</button>
       </div>
-    </section>
-    <section class="k-panel k-tier" data-k-tier="someday">
-      <div class="k-panel-head">Someday <span class="k-badge" data-count>0/0</span></div>
-      <div class="k-panel-body">
-        <div class="k-progress" style="--value:0" role="progressbar" aria-valuenow="0" aria-label="Someday progress"></div>
-        <ul class="k-tier-body" data-k-todo></ul>
-        <input class="k-input k-todo-add" placeholder="Add for someday…" aria-label="Add item for someday">
+      <div class="k-panel" id="mock-list">
+        <div class="k-panel-head">Relays <span class="k-badge mute">prod</span></div>
+        <div class="k-panel-body">
+          <div class="relay-row"><span class="dot"></span><span class="route">webhooks → billing</span><span class="k-badge ok">healthy</span></div>
+          <div class="relay-row"><span class="dot"></span><span class="route">signups → crm</span><span class="k-badge ok">healthy</span></div>
+          <div class="relay-row paused"><span class="dot"></span><span class="route">audit → coldline</span><span class="k-badge mute">paused</span></div>
+        </div>
       </div>
-    </section>
-  </div>
+    </div>
+
+    <details class="snip"><summary>snippet <button class="copy" type="button">copy</button></summary>
+<pre><code>const t = ArtifactKit.tour([
+  { target: "#mock-toolbar", title: "The toolbar", body: "Everything starts here." },
+  { target: "#mock-new",     title: "New relay",   body: "One button, one route." },
+  { target: "#mock-list",    title: "Your relays", body: "Live status per route." },
+  { target: "#mock-cog",     title: "Settings",    body: "Placement: 'top' prefers above.", placement: "top" },
+], { onEnd: d =&gt; console.log(d.done ? "finished" : "skipped", "at step", d.step) });
+// t.end() stops it early · ←/→ step · Esc bails · fires "k:tour"
+// dim strength: page CSS overrides .k-spot via a --tour-dim custom property</code></pre></details>
+  </section>
+
+  <section data-block="notes" data-reveal="scroll">
+    <h2 data-edit="fr-nt-h">Pattern notes</h2>
+    <p class="lede" data-edit="fr-nt-p">Four rules that keep first-run help from becoming a recurring apology.</p>
+    <div class="notegrid">
+      <div class="k-callout">
+        <div class="k-callout-title" data-edit="fr-nt1-t">Dismissal is state, not vibes</div>
+        <p data-edit="fr-nt1-b">The modal writes <code>kit.onboard.&lt;id&gt;</code> into artifact state, so “never again” survives reloads, rides export/import, and bakes into flattened copies. Change the id when the content changes enough to earn a second showing.</p>
+      </div>
+      <div class="k-callout">
+        <div class="k-callout-title" data-edit="fr-nt2-t">Keyboard first</div>
+        <p data-edit="fr-nt2-b">Arrow keys step, Escape bails, and focus returns to wherever it was before the tour grabbed it. If your tour only works with a mouse, it is a screenshot with extra steps.</p>
+      </div>
+      <div class="k-callout">
+        <div class="k-callout-title" data-edit="fr-nt3-t">Respect reduced motion</div>
+        <p data-edit="fr-nt3-b">With <code>prefers-reduced-motion</code> set, the spotlight stops gliding and scrolling snaps instead of easing. The information is identical; only the theatre is cut.</p>
+      </div>
+      <div class="k-callout warn">
+        <div class="k-callout-title" data-edit="fr-nt4-t">When not to tour</div>
+        <p data-edit="fr-nt4-b">Fewer than three stops, a page with one obvious action, or a returning user — skip it. An empty state with a good first-action button beats a tour every time. Nobody has ever asked for a longer tour.</p>
+      </div>
+    </div>
+  </section>
 
 </div>
 
@@ -2968,115 +3153,82 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
 (() => {
   "use strict";
   const S = window.ArtifactShell;
+  const K = window.ArtifactKit;
   const $ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const SEED = {
-    today: [
-      { id: "sw-01", t: "Tag release 2026.28-rc1", done: true },
-      { id: "sw-02", t: "Migration dry-run against the staging snapshot", done: true },
-      { id: "sw-03", t: "Flip dispatch-v2 flag for internal orgs", done: false },
-      { id: "sw-04", t: "Brief the on-call pair on the rollback plan", done: false },
-      { id: "sw-05", t: "Close BIR-2829 or admit it slips", done: false },
-    ],
-    week: [
-      { id: "sw-06", t: "Canary to 25% once error budget holds a day", done: false },
-      { id: "sw-07", t: "Changelog draft past the marketing filter", done: false },
-      { id: "sw-08", t: "Load test the webhook fan-out at 3× peak", done: true },
-      { id: "sw-09", t: "Status page copy for the maintenance window", done: false },
-      { id: "sw-10", t: "Retire the 2024 deploy runbook, finally", done: false },
-    ],
-    someday: [
-      { id: "sw-11", t: "Auto-generate the release notes from merge titles", done: false },
-      { id: "sw-12", t: "One-click rollback that actually takes one click", done: false },
-      { id: "sw-13", t: "Delete the “temporary” feature-flag cron", done: false },
-      { id: "sw-14", t: "Teach the deploy bot sarcasm", done: false },
-    ],
+  /* ---------- onboarding: Acme Relay welcome with SVG vignettes ---------- */
+  const V = 'viewBox="0 0 240 100" role="img" aria-hidden="true" style="width:min(240px,70%);height:auto;display:block"';
+  const ART = {
+    "relay-route": '<svg ' + V + '><circle cx="36" cy="50" r="14" fill="var(--accent)"/><circle cx="120" cy="50" r="10" fill="var(--surface)" stroke="var(--accent)" stroke-width="3"/><circle cx="204" cy="50" r="14" fill="var(--positive)"/><path d="M52 50 H108 M132 50 H188" stroke="var(--ink-muted)" stroke-width="3" stroke-dasharray="7 6" fill="none"/><path d="M100 44 l9 6 -9 6 Z M180 44 l9 6 -9 6 Z" fill="var(--ink-muted)"/></svg>',
+    "relay-wire": '<svg ' + V + '><rect x="24" y="22" width="192" height="24" rx="12" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2.5"/><circle cx="200" cy="34" r="9" fill="var(--accent)"/><rect x="24" y="58" width="120" height="24" rx="12" fill="var(--tint)"/><circle cx="42" cy="70" r="9" fill="var(--surface)" stroke="var(--accent)" stroke-width="3"/><path d="M156 70 h58" stroke="var(--ink-muted)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 7"/></svg>',
+    "relay-team": '<svg ' + V + '><circle cx="96" cy="42" r="16" fill="var(--tint)" stroke="var(--accent)" stroke-width="3"/><circle cx="132" cy="42" r="16" fill="var(--surface)" stroke="var(--ink-muted)" stroke-width="3"/><path d="M70 84 q26 -26 50 0 M114 84 q26 -26 50 0" stroke="var(--ink-muted)" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M176 28 l7 8 13 -16" stroke="var(--positive)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
-
-  const groups = document.getElementById("groups");
-  let restoring = false;
-  let uid = 0;
-
-  function buildItem(d) {
-    const li = document.createElement("li");
-    li.dataset.kItem = d.id;
-    if (d.done) li.className = "done";
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.className = "k-check";
-    cb.checked = !!d.done;
-    const tx = document.createElement("span");
-    tx.className = "k-todo-text";
-    tx.textContent = d.t;
-    const del = document.createElement("button");
-    del.className = "k-todo-del";
-    del.setAttribute("aria-label", "Remove");
-    del.textContent = "×";
-    li.append(cb, tx, del);
-    return li;
-  }
-  function render(data) {
-    restoring = true;
-    $(".k-tier", groups).forEach(sec => {
-      const list = sec.querySelector("[data-k-todo]");
-      list.replaceChildren(...(data[sec.dataset.kTier] || []).map(buildItem));
+  function launchOnboard() {
+    const d = K?.onboard({
+      id: "acme-relay",
+      onDone: () => S?.toast("Welcome aboard — Relay is all yours"),
+      steps: [
+        { art: "relay-route", title: "Welcome to Acme Relay", body: "Route events from anywhere to anywhere. Three screens from now you will have opinions about dead-letter queues." },
+        { art: "relay-wire", title: "Wire your first route", body: "Pick a source, add a filter if you must, point it at a sink. Relay handles retries, backoff and the 3 a.m. paging decision." },
+        { art: "relay-team", title: "Invite the team", body: "Relays are shared by default. Your colleagues see the same routes, the same status, and the same suspicious pause on audit → coldline." },
+      ],
     });
-    window.ArtifactKit?.refresh();
-    restoring = false;
-    sync(false);
+    if (!d) {
+      S?.toast("Dismissal remembered in state — press “Forget dismissal” first");
+      return;
+    }
+    /* swap the marker text the kit sets for inline SVG vignettes */
+    const artEl = d.querySelector(".k-onboard-art");
+    const swap = () => {
+      const key = artEl.textContent.trim();
+      if (ART[key]) artEl.innerHTML = ART[key];
+    };
+    new MutationObserver(swap).observe(artEl, { childList: true });
+    swap();
   }
-
-  /* ---------- snapshot / rollups ---------- */
-  function snap() {
-    const o = {};
-    $(".k-tier", groups).forEach(sec => {
-      o[sec.dataset.kTier] = $("[data-k-todo] > li", sec).map(li => ({
-        id: li.dataset.kItem,
-        t: li.querySelector(".k-todo-text")?.textContent ?? "",
-        done: li.classList.contains("done"),
-      }));
-    });
-    return o;
-  }
-  function sync(persist = true) {
-    /* adopt kit-created items into the drag engine */
-    $("[data-k-todo] > li", groups).forEach(li => {
-      if (!li.dataset.kItem) li.dataset.kItem = "sw-n" + Date.now().toString(36) + (uid++);
-      li.draggable = !(S && S.isEditing());
-      if (li.tabIndex < 0) li.tabIndex = 0;
-    });
-    let done = 0, total = 0;
-    $(".k-tier", groups).forEach(sec => {
-      const items = $("[data-k-todo] > li", sec);
-      const d = items.filter(li => li.classList.contains("done")).length;
-      done += d; total += items.length;
-      const badge = sec.querySelector("[data-count]");
-      if (badge) badge.textContent = d + "/" + items.length;
-      const pct = items.length ? Math.round(d / items.length * 100) : 0;
-      const bar = sec.querySelector(".k-progress");
-      bar.style.setProperty("--value", pct);
-      bar.setAttribute("aria-valuenow", pct);
-    });
-    const pct = total ? Math.round(done / total * 100) : 0;
-    const ring = document.getElementById("ring");
-    ring.style.setProperty("--value", pct);
-    ring.dataset.label = pct + "%";
-    ring.setAttribute("aria-label", "Overall completion " + pct + " percent");
-    if (persist && S && !restoring)
-      S.state.set(Object.assign({}, S.state.get(), { groups: snap() }));
-  }
-
-  /* kit events: check/add/delete fire k:todo, cross-group drags fire k:tiers */
-  document.addEventListener("k:todo", () => sync());
-  document.addEventListener("k:tiers", () => sync());
-
-  S?.state.onRestore(v => { if (v && v.groups) render(v.groups); });
-  document.addEventListener("a2:reset", () => render(SEED));
-  document.addEventListener("a2:editmode", e => {
-    $("[data-k-todo] > li", groups).forEach(li => { li.draggable = !e.detail.editing; });
+  document.getElementById("ob-launch").addEventListener("click", launchOnboard);
+  document.getElementById("ob-forget").addEventListener("click", () => {
+    if (!S) return;
+    const st = Object.assign({}, S.state.get());
+    delete st["kit.onboard.acme-relay"];
+    S.state.set(st);
+    S.toast("Onboarding dismissal forgotten — launch away");
   });
 
-  render(S?.state.get()?.groups || SEED);
+  /* ---------- spotlight tour over the mock console ---------- */
+  let running = null;
+  function startTour() {
+    running?.end();
+    const top = document.querySelector('input[name="place"]:checked')?.value === "top";
+    const p = top ? "top" : undefined;
+    running = K?.tour([
+      { target: "#mock-toolbar", placement: p, title: "The toolbar", body: "Search, import, and the one button that matters. Everything in Relay starts on this strip." },
+      { target: "#mock-new", placement: p, title: "New relay", body: "One click, one route. Source on the left, sink on the right, regrets optional." },
+      { target: "#mock-list", placement: p, title: "Your relays", body: "Live status per route. Green is healthy; grey is paused; anything else pages someone." },
+      { target: "#mock-cog", placement: p || "top", title: "Settings live here", body: "Retries, backoff, dead letters. This step prefers the space above — resize and it flips when it must." },
+    ], { onEnd: () => { running = null; } });
+  }
+  document.getElementById("tour-start").addEventListener("click", startTour);
+
+  /* dim strength knob → CSS custom property consumed by .k-spot override */
+  const dim = document.getElementById("dim-range");
+  const dimVal = document.getElementById("dim-val");
+  const applyDim = () => {
+    document.documentElement.style.setProperty("--tour-dim", dim.value);
+    dimVal.textContent = dim.value + "%";
+  };
+  dim.addEventListener("input", applyDim);
+  applyDim();
+
+  /* ---------- snippet copy buttons ---------- */
+  $(".snip .copy").forEach(b => b.addEventListener("click", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const code = b.closest(".snip").querySelector("code");
+    navigator.clipboard?.writeText(code.textContent).then(
+      () => S?.toast("Snippet copied"),
+      () => S?.toast("Copy failed — select and copy manually"));
+  }));
 })();
 </script>
 </body>
