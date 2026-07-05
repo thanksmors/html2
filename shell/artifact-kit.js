@@ -13,10 +13,10 @@ const closest = (t, s) => t && t.closest ? t.closest(s) : null;
 const boards = new WeakMap(), sorters = new WeakMap();
 
 /* FLIP spring — Motion optional, always null-checked */
-function flip(scope, mutate) {
+function flip(scope, mutate, sel = "[data-k-item]") {
   const M = window.Motion;
   if (!M || noMotion()) { mutate(); return; }
-  const els = $("[data-k-item]", scope);
+  const els = $(sel, scope);
   const pos = new Map(els.map(el => [el, el.getBoundingClientRect()]));
   mutate();
   els.forEach(el => {
@@ -88,22 +88,43 @@ function sortable(c, opts) {
   $(":scope>[data-k-item]", c).forEach(prepItem);
 }
 
+const colRef = (b, x) => $(".k-col", b).find(c => c !== drag.col &&
+  x < c.getBoundingClientRect().left + c.getBoundingClientRect().width / 2) || null;
 document.addEventListener("dragstart", e => {
   const it = closest(e.target, "[data-k-item]"), z = it && zone(it);
-  if (!z) return;
+  if (!z) {
+    const h = closest(e.target, ".k-col-head"), col = h && h.closest(".k-col");
+    const b = col && col.closest(".k-board");
+    if (!b || !h.draggable) return;
+    drag = { col, g: b };
+    col.classList.add("k-dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", col.dataset.kCol || "");
+    return;
+  }
   drag = { it, g: groupOf(z) };
   it.classList.add("k-dragging");
   e.dataTransfer.effectAllowed = "move";
   e.dataTransfer.setData("text/plain", it.dataset.kItem || "");
 });
 document.addEventListener("dragend", () => {
-  if (drag) drag.it.classList.remove("k-dragging");
+  if (drag) (drag.it || drag.col).classList.remove("k-dragging");
   drag = null;
   clearMarks();
 });
 document.addEventListener("dragover", e => {
   const dz = closest(e.target, "[data-k-drop]");
   if (dz && !drag) { e.preventDefault(); dz.classList.add("is-over"); return; }
+  if (drag && drag.col) {
+    const b = closest(e.target, ".k-board");
+    if (b !== drag.g) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    clearMarks();
+    const ref = colRef(b, e.clientX);
+    if (ref) ref.classList.add("k-drop-before");
+    return;
+  }
   const z = zone(e.target);
   if (!drag || !z || groupOf(z) !== drag.g) return;
   e.preventDefault();
@@ -125,6 +146,16 @@ document.addEventListener("drop", e => {
     if (f && f.length) fire(dz, "k:files", { files: f });
     return;
   }
+  if (drag && drag.col) {
+    const b = closest(e.target, ".k-board");
+    if (b !== drag.g) return;
+    e.preventDefault();
+    const ref = colRef(b, e.clientX), col = drag.col;
+    flip(b, () => b.insertBefore(col, ref || b.querySelector(".k-colghost")), ".k-col");
+    kupdate(b);
+    clearMarks();
+    return;
+  }
   const z = zone(e.target);
   if (!drag || !z || groupOf(z) !== drag.g) return;
   e.preventDefault();
@@ -138,6 +169,14 @@ function byCol(b) {
   $(".k-col", b).forEach(c => { o[c.dataset.kCol] = $(".k-kcard", c).map(k => k.dataset.kItem); });
   return o;
 }
+function kdata(b) {
+  const defs = {};
+  $(".k-col", b).forEach(c => {
+    const l = c.querySelector(".k-col-label");
+    defs[c.dataset.kCol] = (l ? l.textContent : c.dataset.kCol || "").trim();
+  });
+  return { cols: byCol(b), order: $(".k-col", b).map(c => c.dataset.kCol), defs };
+}
 function kupdate(b) {
   if (!b) return;
   $(".k-col", b).forEach(c => {
@@ -147,7 +186,7 @@ function kupdate(b) {
     if (cnt) cnt.textContent = n;
   });
   const o = boards.get(b);
-  if (o && o.onChange) o.onChange(byCol(b));
+  if (o && o.onChange) o.onChange(kdata(b));
 }
 function ensureDel(card) {
   if (card.querySelector(".k-kdel")) return;
@@ -157,11 +196,140 @@ function ensureDel(card) {
   x.setAttribute("aria-label", "Delete card");
   card.append(x);
 }
+function prepCol(col) {
+  const h = col.querySelector(".k-col-head");
+  if (!h) return;
+  if (!h.querySelector(".k-col-label")) {
+    const tn = [...h.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+    const l = document.createElement("span");
+    l.className = "k-col-label";
+    if (tn) { l.textContent = tn.textContent.trim(); tn.replaceWith(l); }
+    else { l.textContent = col.dataset.kCol || ""; h.prepend(l); }
+  }
+  if (!h.querySelector(".k-cdel")) {
+    const x = document.createElement("button");
+    x.type = "button";
+    x.className = "k-cdel";
+    x.textContent = "×";
+    x.setAttribute("aria-label", "Delete column");
+    h.append(x);
+  }
+  h.draggable = true;
+  if (h.tabIndex < 0) h.tabIndex = 0;
+}
+function prepGhost(b) {
+  if (b.querySelector(":scope>.k-colghost")) return;
+  const g = document.createElement("div");
+  g.className = "k-colghost";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "＋ Add column";
+  g.append(btn);
+  b.append(g);
+}
+function colKey(b, name) {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "col";
+  let key = base, i = 2;
+  while ($(".k-col", b).some(c => c.dataset.kCol === key)) key = base + "-" + i++;
+  return key;
+}
+function addColumn(b, name, before) {
+  const col = document.createElement("div");
+  col.className = "k-col";
+  col.dataset.kCol = colKey(b, name);
+  const h = document.createElement("div");
+  h.className = "k-col-head";
+  const l = document.createElement("span");
+  l.className = "k-col-label";
+  l.textContent = name;
+  const cnt = document.createElement("span");
+  cnt.className = "k-col-count";
+  cnt.textContent = "0";
+  h.append(l, " ", cnt);
+  const body = document.createElement("div");
+  body.className = "k-col-body";
+  const add = document.createElement("button");
+  add.type = "button";
+  add.className = "k-col-add";
+  add.textContent = "＋ Add card";
+  col.append(h, body, add);
+  b.insertBefore(col, before || null);
+  prepCol(col);
+  kupdate(b);
+  return col;
+}
+function ghostInput(g) {
+  const btn = g.querySelector("button");
+  if (g.querySelector("input")) return;
+  const inp = document.createElement("input");
+  inp.className = "k-input";
+  inp.placeholder = "Column name…";
+  btn.hidden = true;
+  g.append(inp);
+  inp.focus();
+  let done = false;
+  const close = ok => {
+    if (done) return;
+    done = true;
+    const v = inp.value.trim();
+    inp.remove();
+    btn.hidden = false;
+    if (ok && v) addColumn(g.closest(".k-board"), v, g);
+  };
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Enter") close(true);
+    if (e.key === "Escape") close(false);
+  });
+  inp.addEventListener("blur", () => close(true));
+}
+function delColumn(col) {
+  const b = col.closest(".k-board");
+  const cols = $(".k-col", b), idx = cols.indexOf(col);
+  const rest = cols.filter(c => c !== col);
+  if (!rest.length) return;
+  const cards = $(".k-kcard", col);
+  const label = (col.querySelector(".k-col-label") || col).textContent.trim();
+  rest[0].querySelector(".k-col-body").append(...cards);
+  col.remove();
+  kupdate(b);
+  const s = window.ArtifactShell;
+  if (s && s.toast) s.toast("Deleted column “" + label + "” — cards moved", {
+    label: "Undo",
+    action() {
+      if (!b.isConnected || col.isConnected) return;
+      b.insertBefore(col, $(".k-col", b)[idx] || b.querySelector(".k-colghost"));
+      col.querySelector(".k-col-body").append(...cards.filter(c => c.isConnected));
+      kupdate(b);
+    },
+  });
+}
+function renameCol(l) {
+  if (l.isContentEditable) return;
+  const h = l.closest(".k-col-head"), old = l.textContent;
+  if (h) h.draggable = false;
+  l.setAttribute("contenteditable", "plaintext-only");
+  l.focus();
+  try { getSelection().selectAllChildren(l); } catch {}
+  const kd = e => {
+    if (e.key === "Enter") { e.preventDefault(); l.blur(); }
+    if (e.key === "Escape") { e.stopPropagation(); l.textContent = old; l.blur(); }
+  };
+  l.addEventListener("keydown", kd);
+  l.addEventListener("blur", () => {
+    l.removeEventListener("keydown", kd);
+    l.removeAttribute("contenteditable");
+    if (h) h.draggable = true;
+    if (!l.textContent.trim()) l.textContent = old;
+    kupdate(l.closest(".k-board"));
+  }, { once: true });
+}
 function kanban(b, opts) {
   boards.set(b, opts || {});
   $(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
+  $(".k-col", b).forEach(prepCol);
+  prepGhost(b);
   kupdate(b);
-  return { update: () => kupdate(b), cards: () => byCol(b) };
+  return { update: () => kupdate(b), cards: () => byCol(b), data: () => kdata(b) };
 }
 function addCard(btn) {
   const col = btn.closest(".k-col"), b = btn.closest(".k-board");
@@ -305,6 +473,10 @@ document.addEventListener("click", e => {
     kupdate(b);
     return;
   }
+  const cdel = closest(t, ".k-cdel");
+  if (cdel) { delColumn(cdel.closest(".k-col")); return; }
+  const gh = closest(t, ".k-colghost");
+  if (gh && t.closest("button")) { ghostInput(gh); return; }
   const add = closest(t, ".k-col-add");
   if (add) { addCard(add); return; }
   const star = closest(t, ".k-rating button");
@@ -384,6 +556,23 @@ document.addEventListener("input", e => {
   if (e.target.matches && e.target.matches(".k-range")) syncRange(e.target);
 });
 
+document.addEventListener("dblclick", e => {
+  const l = closest(e.target, ".k-board .k-col-label");
+  if (l) renameCol(l);
+});
+document.addEventListener("a2:editmode", e => {
+  const on = !!(e.detail && e.detail.editing);
+  $(".k-board .k-col-label").forEach(l => {
+    if (on) l.setAttribute("contenteditable", "plaintext-only");
+    else l.removeAttribute("contenteditable");
+  });
+  $(".k-board .k-col-head").forEach(h => { h.draggable = !on; });
+});
+document.addEventListener("focusout", e => {
+  const t = e.target;
+  if (t && t.matches && t.matches(".k-board .k-col-label[contenteditable]"))
+    kupdate(closest(t, ".k-board"));
+});
 document.addEventListener("keydown", e => {
   const t = e.target;
   if (e.key === "Escape") {
@@ -391,6 +580,19 @@ document.addEventListener("keydown", e => {
     $("[data-k-menu-for]").forEach(x => x.setAttribute("aria-expanded", "false"));
   }
   if (!t || !t.matches) return;
+  if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && t.matches(".k-col-head")) {
+    const col = t.closest(".k-col"), b = col && col.closest(".k-board");
+    if (!b) return;
+    e.preventDefault();
+    const cols = $(".k-col", b), i = cols.indexOf(col);
+    const j = e.key === "ArrowLeft" ? i - 1 : i + 1;
+    if (j < 0 || j >= cols.length) return;
+    flip(b, () => b.insertBefore(col,
+      e.key === "ArrowLeft" ? cols[j] : cols[j].nextSibling), ".k-col");
+    kupdate(b);
+    t.focus();
+    return;
+  }
   if ((e.key === "ArrowUp" || e.key === "ArrowDown") && t.matches("[data-k-item]")) {
     const z = zone(t);
     if (!z) return;
@@ -429,6 +631,169 @@ document.addEventListener("keydown", e => {
   }
 });
 
+/* ── tour: spotlight cutout + coach card ── */
+function tour(steps, opts) {
+  steps = (steps || []).filter(Boolean);
+  const api = { end: () => end(true) };
+  if (!steps.length) return api;
+  const spot = document.createElement("div");
+  spot.className = "k-spot";
+  const card = document.createElement("div");
+  card.className = "k-coach";
+  card.tabIndex = -1;
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-label", "Tour");
+  const mk = (tag, cls) => { const el = document.createElement(tag); el.className = cls; return el; };
+  const ttl = mk("div", "k-coach-title"), bdy = mk("div", "k-coach-body");
+  const dots = mk("div", "k-dots"), nav = mk("div", "k-coach-nav");
+  steps.forEach(() => dots.append(document.createElement("i")));
+  const btn = (cls, txt) => {
+    const b = mk("button", "k-btn sm" + (cls ? " " + cls : ""));
+    b.type = "button";
+    b.textContent = txt;
+    return b;
+  };
+  const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+  const gap = mk("span", "k-gap");
+  nav.append(skip, gap, back, next);
+  card.append(ttl, bdy, dots, nav);
+  document.body.append(spot, card);
+  const prev = document.activeElement;
+  let i = -1, target = null, live = true;
+  const el4 = st => typeof st.target === "string" ? document.querySelector(st.target) : st.target;
+  function place() {
+    if (!live || !target || !target.isConnected) return;
+    const r = target.getBoundingClientRect(), pad = 6;
+    spot.style.left = r.left - pad + "px";
+    spot.style.top = r.top - pad + "px";
+    spot.style.width = r.width + pad * 2 + "px";
+    spot.style.height = r.height + pad * 2 + "px";
+    const ch = card.offsetHeight, cw = card.offsetWidth;
+    const below = r.bottom + pad + 12, above = r.top - pad - 12 - ch;
+    const want = (steps[i] || {}).placement;
+    let top = want === "top" && above >= 8 ? above : below;
+    if (want !== "top" && below + ch > innerHeight - 8 && above >= 8) top = above;
+    card.style.top = Math.max(8, Math.min(innerHeight - ch - 8, top)) + "px";
+    card.style.left = Math.max(8, Math.min(innerWidth - cw - 8, r.left)) + "px";
+  }
+  function show(n) {
+    while (n < steps.length && !el4(steps[n])) n++;
+    if (n >= steps.length) return end(true);
+    i = n;
+    target = el4(steps[i]);
+    const st = steps[i];
+    ttl.textContent = st.title || "";
+    bdy.textContent = st.body || "";
+    [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
+    back.disabled = i === 0;
+    next.textContent = i === steps.length - 1 ? "Done" : "Next";
+    try { target.scrollIntoView({ block: "center", behavior: noMotion() ? "auto" : "smooth" }); } catch {}
+    place();
+    card.focus({ preventScroll: true });
+    fire(document, "k:tour", { step: i });
+  }
+  function end(skipped) {
+    if (!live) return;
+    live = false;
+    removeEventListener("resize", place);
+    removeEventListener("scroll", place, true);
+    document.removeEventListener("keydown", onKey, true);
+    spot.remove();
+    card.remove();
+    const d = { step: Math.max(0, i) };
+    d[skipped ? "skipped" : "done"] = true;
+    fire(document, "k:tour", d);
+    if (prev && prev.focus) try { prev.focus(); } catch {}
+    if (opts && opts.onEnd) opts.onEnd(d);
+  }
+  const fwd = () => { if (i >= steps.length - 1) end(false); else show(i + 1); };
+  const bck = () => { if (i > 0) { const j = i - 1; i = -1; show(j); } };
+  skip.addEventListener("click", () => end(true));
+  back.addEventListener("click", bck);
+  next.addEventListener("click", fwd);
+  function onKey(e) {
+    if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); end(true); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); fwd(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); bck(); }
+  }
+  document.addEventListener("keydown", onKey, true);
+  addEventListener("resize", place);
+  addEventListener("scroll", place, true);
+  show(0);
+  return api;
+}
+
+/* ── onboard: one-time welcome dialog, dismissal in shell state ── */
+function onboard(cfg) {
+  cfg = cfg || {};
+  const steps = cfg.steps || [];
+  if (!steps.length) return null;
+  const s = window.ArtifactShell, key = "kit.onboard." + (cfg.id || "default");
+  if (s && (s.state.get() || {})[key]) return null;
+  const d = document.createElement("dialog");
+  d.className = "k-dialog k-onboard";
+  const art = document.createElement("div");
+  art.className = "k-onboard-art";
+  const body = document.createElement("div");
+  body.className = "k-dialog-body";
+  const h = document.createElement("h3");
+  const p = document.createElement("p");
+  const dots = document.createElement("div");
+  dots.className = "k-dots";
+  steps.forEach(() => dots.append(document.createElement("i")));
+  body.append(h, p, dots);
+  const foot = document.createElement("div");
+  foot.className = "k-dialog-foot k-onboard-foot";
+  const row = document.createElement("label");
+  row.className = "k-checkrow";
+  const chk = document.createElement("input");
+  chk.type = "checkbox";
+  chk.className = "k-check";
+  row.append(chk, "Don’t show again");
+  const gap = document.createElement("span");
+  gap.className = "k-gap";
+  const btn = (cls, txt) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "k-btn sm" + (cls ? " " + cls : "");
+    b.textContent = txt;
+    return b;
+  };
+  const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+  foot.append(row, gap, skip, back, next);
+  d.append(art, body, foot);
+  document.body.append(d);
+  let i = 0, fin = false;
+  const paint = () => {
+    const st = steps[i] || {};
+    art.textContent = st.art || "";
+    art.hidden = !st.art;
+    h.textContent = st.title || "";
+    p.textContent = st.body || "";
+    [...dots.children].forEach((el, j) => el.classList.toggle("on", j === i));
+    back.disabled = i === 0;
+    next.textContent = i === steps.length - 1 ? "Done" : "Next";
+  };
+  skip.addEventListener("click", () => d.close());
+  back.addEventListener("click", () => { i = Math.max(0, i - 1); paint(); });
+  next.addEventListener("click", () => {
+    if (i >= steps.length - 1) { fin = true; d.close(); }
+    else { i++; paint(); }
+  });
+  d.addEventListener("close", () => {
+    if (s && (fin || chk.checked)) {
+      const st = Object.assign({}, s.state.get());
+      st[key] = true;
+      s.state.set(st);
+    }
+    d.remove();
+    if (fin && cfg.onDone) cfg.onDone();
+  });
+  paint();
+  d.showModal();
+  return d;
+}
+
 /* ── refresh: (re)prime everything; delegation keeps it idempotent ── */
 function refresh(root = document) {
   $("[data-k-sortable]", root).forEach(c => { if (!sorters.has(c)) sortable(c); });
@@ -438,7 +803,9 @@ function refresh(root = document) {
   });
   $(".k-board", root).forEach(b => {
     $(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
-    if (!boards.has(b)) kupdate(b);
+    $(".k-col", b).forEach(prepCol);
+    prepGhost(b);
+    kupdate(b);
   });
   $(".k-rating", root).forEach(paintStars);
   $(".k-range", root).forEach(syncRange);
@@ -459,5 +826,5 @@ if (document.readyState === "loading")
   document.addEventListener("DOMContentLoaded", () => refresh());
 else refresh();
 
-window.ArtifactKit = { version: 1, kanban, refresh, sortable };
+window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
 })();

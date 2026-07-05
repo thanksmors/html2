@@ -1771,8 +1771,8 @@ var Motion=(()=>{var Se=Object.defineProperty;var Jt=Object.getOwnPropertyDescri
 .k-toolbar,.k-stat,.k-btn,.k-input,.k-textarea,.k-select,.k-seg,.k-stepper,.k-tags,.k-menu,.k-acc,.k-sort-item,.k-tier,.k-col{border-radius:var(--radius-m)}
 .k-chip,.k-search,.k-switch,.k-avatar,.k-badge,.k-tier-chip,.k-progress,.k-col-count{border-radius:var(--radius-full)}
 .k-panel-head,.k-stat-label,.k-col-head,.k-table th,.k-wiz-steps button{font:600 11px/1.3 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
-.k-x,.k-kdel,.k-todo-del{border:0;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;line-height:1;padding:2px 5px}
-.k-kdel:hover,.k-todo-del:hover{color:var(--negative)}
+.k-x,.k-kdel,.k-todo-del,.k-cdel{border:0;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;line-height:1;padding:2px 5px}
+.k-kdel:hover,.k-todo-del:hover,.k-cdel:hover{color:var(--negative)}
 .k-input,.k-textarea,.k-select,.k-search input,.k-tags input,.k-stepper input{font:inherit;font-size:13.5px;color:var(--ink)}
 .k-input::placeholder,.k-textarea::placeholder,.k-search input::placeholder,.k-tags input::placeholder{color:var(--ink-muted)}
 .k-card,.k-panel{box-shadow:var(--shadow-1)}
@@ -1972,6 +1972,20 @@ var Motion=(()=>{var Se=Object.defineProperty;var Jt=Object.getOwnPropertyDescri
 .k-col-body{display:grid;gap:7px;padding:6px 8px;min-block-size:40px}
 .k-col-add{display:block;inline-size:calc(100% - 16px);margin:0 8px 8px;border:1px dashed var(--line-strong);border-radius:var(--radius-s);background:none;cursor:pointer;padding:5px;font:500 12px/1.3 var(--font-body);color:var(--ink-muted)}
 .k-col-add:hover{color:var(--ink);background:var(--surface)}
+.k-col-head{cursor:grab}
+.k-col-head:active{cursor:grabbing}
+.k-col-head:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-radius:var(--radius-s)}
+.k-col.k-dragging{opacity:.4}
+.k-col.k-drop-before{box-shadow:inset 3px 0 0 var(--accent)}
+.k-col-label[contenteditable]{cursor:text;outline:1.5px dashed color-mix(in oklch,var(--accent) 55%,transparent);outline-offset:2px;border-radius:2px}
+.k-col-label[contenteditable]:focus{outline:2px solid var(--accent)}
+.k-cdel{margin-inline-start:auto;opacity:0;transition:opacity var(--dur-1)}
+.k-col-head:hover .k-cdel,.k-col-head:focus-within .k-cdel{opacity:1}
+.k-colghost{border:2px dashed var(--line);border-radius:var(--radius-m);min-block-size:76px;display:grid;align-content:start;padding:8px;transition:border-color var(--dur-1)}
+.k-colghost:hover{border-color:var(--line-strong)}
+.k-colghost>button{border:0;background:none;cursor:pointer;padding:9px 6px;font:500 12.5px/1.3 var(--font-body);color:var(--ink-muted);border-radius:var(--radius-s)}
+.k-colghost>button:hover{color:var(--ink);background:var(--surface)}
+.k-colghost .k-input{font-size:12.5px;padding:6px 9px}
 .k-kcard{position:relative;padding:9px 11px;font-size:13px;border-radius:var(--radius-s);box-shadow:var(--shadow-1)}
 .k-kdel{position:absolute;inset-block-start:3px;inset-inline-end:4px;opacity:0;transition:opacity var(--dur-1)}
 .k-kcard:hover .k-kdel,.k-kdel:focus-visible{opacity:1}
@@ -1989,10 +2003,28 @@ li.done .k-todo-text{color:var(--ink-muted);text-decoration-color:var(--ink-mute
 .k-clps{interpolate-size:allow-keywords;block-size:auto;overflow:clip;transition:block-size var(--dur-2) var(--ease-out),opacity var(--dur-2),display var(--dur-2) allow-discrete}
 .k-clps[hidden]{display:none;block-size:0;opacity:0}
 }
+.k-spot{position:fixed;z-index:1200;pointer-events:none;border-radius:var(--radius-m);box-shadow:0 0 0 100vmax color-mix(in oklch,var(--ink) 45%,transparent);transition:left var(--dur-2) var(--ease-out),top var(--dur-2) var(--ease-out),width var(--dur-2) var(--ease-out),height var(--dur-2) var(--ease-out)}
+.k-coach{position:fixed;z-index:1201;inline-size:min(88vw,300px);display:grid;gap:7px;padding:14px;background:var(--surface);border:var(--border-w) var(--line-style) var(--line);border-radius:var(--radius-l);color:var(--ink);box-shadow:var(--shadow-2);transition:left var(--dur-2) var(--ease-out),top var(--dur-2) var(--ease-out)}
+.k-coach:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.k-coach-title{font-weight:650;font-size:14px}
+.k-coach-body{font-size:13px;line-height:1.5;color:var(--ink-subtle)}
+.k-dots{display:flex;gap:5px}
+.k-dots i{inline-size:7px;block-size:7px;border-radius:50%;background:var(--line-strong);transition:background var(--dur-1),scale var(--dur-1) var(--ease-spring)}
+.k-dots i.on{background:var(--accent);scale:1.25}
+.k-coach-nav{display:flex;align-items:center;gap:6px;margin-block-start:3px}
+.k-coach-nav .k-gap{flex:1}
+@media (prefers-reduced-motion:reduce){.k-spot,.k-coach{transition:none}}
+.k-onboard{inline-size:min(92vw,400px)}
+.k-onboard-art{display:grid;place-items:center;font-size:38px;padding:24px 16px;background:var(--tint);border-block-end:1px var(--line-style) var(--line)}
+.k-onboard-art[hidden]{display:none}
+.k-onboard h3{margin:0;font-size:16px;color:var(--ink)}
+.k-onboard-foot{align-items:center}
+.k-onboard-foot .k-checkrow{font-size:12px;color:var(--ink-muted)}
+.k-onboard-foot .k-gap{flex:1}
 @media print {
 .k-card,.k-panel,.k-stat,.k-col,.k-acc{break-inside:avoid}
 .k-skeleton{animation:none}
-.k-kdel,.k-todo-del,.k-col-add,.k-menu{display:none!important}
+.k-kdel,.k-todo-del,.k-col-add,.k-menu,.k-cdel,.k-colghost,.k-spot,.k-coach{display:none!important}
 }
 }
 </style>
@@ -2004,10 +2036,10 @@ const fire = (el, n, d) => el.dispatchEvent(new CustomEvent(n, { detail: d, bubb
 const noMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const closest = (t, s) => t && t.closest ? t.closest(s) : null;
 const boards = new WeakMap(), sorters = new WeakMap();
-function flip(scope, mutate) {
+function flip(scope, mutate, sel = "[data-k-item]") {
 const M = window.Motion;
 if (!M || noMotion()) { mutate(); return; }
-const els = $("[data-k-item]", scope);
+const els = $(sel, scope);
 const pos = new Map(els.map(el => [el, el.getBoundingClientRect()]));
 mutate();
 els.forEach(el => {
@@ -2075,22 +2107,43 @@ if (el) c.append(el);
 });
 $(":scope>[data-k-item]", c).forEach(prepItem);
 }
+const colRef = (b, x) => $(".k-col", b).find(c => c !== drag.col &&
+x < c.getBoundingClientRect().left + c.getBoundingClientRect().width / 2) || null;
 document.addEventListener("dragstart", e => {
 const it = closest(e.target, "[data-k-item]"), z = it && zone(it);
-if (!z) return;
+if (!z) {
+const h = closest(e.target, ".k-col-head"), col = h && h.closest(".k-col");
+const b = col && col.closest(".k-board");
+if (!b || !h.draggable) return;
+drag = { col, g: b };
+col.classList.add("k-dragging");
+e.dataTransfer.effectAllowed = "move";
+e.dataTransfer.setData("text/plain", col.dataset.kCol || "");
+return;
+}
 drag = { it, g: groupOf(z) };
 it.classList.add("k-dragging");
 e.dataTransfer.effectAllowed = "move";
 e.dataTransfer.setData("text/plain", it.dataset.kItem || "");
 });
 document.addEventListener("dragend", () => {
-if (drag) drag.it.classList.remove("k-dragging");
+if (drag) (drag.it || drag.col).classList.remove("k-dragging");
 drag = null;
 clearMarks();
 });
 document.addEventListener("dragover", e => {
 const dz = closest(e.target, "[data-k-drop]");
 if (dz && !drag) { e.preventDefault(); dz.classList.add("is-over"); return; }
+if (drag && drag.col) {
+const b = closest(e.target, ".k-board");
+if (b !== drag.g) return;
+e.preventDefault();
+e.dataTransfer.dropEffect = "move";
+clearMarks();
+const ref = colRef(b, e.clientX);
+if (ref) ref.classList.add("k-drop-before");
+return;
+}
 const z = zone(e.target);
 if (!drag || !z || groupOf(z) !== drag.g) return;
 e.preventDefault();
@@ -2112,6 +2165,16 @@ const f = e.dataTransfer && e.dataTransfer.files;
 if (f && f.length) fire(dz, "k:files", { files: f });
 return;
 }
+if (drag && drag.col) {
+const b = closest(e.target, ".k-board");
+if (b !== drag.g) return;
+e.preventDefault();
+const ref = colRef(b, e.clientX), col = drag.col;
+flip(b, () => b.insertBefore(col, ref || b.querySelector(".k-colghost")), ".k-col");
+kupdate(b);
+clearMarks();
+return;
+}
 const z = zone(e.target);
 if (!drag || !z || groupOf(z) !== drag.g) return;
 e.preventDefault();
@@ -2123,6 +2186,14 @@ const o = {};
 $(".k-col", b).forEach(c => { o[c.dataset.kCol] = $(".k-kcard", c).map(k => k.dataset.kItem); });
 return o;
 }
+function kdata(b) {
+const defs = {};
+$(".k-col", b).forEach(c => {
+const l = c.querySelector(".k-col-label");
+defs[c.dataset.kCol] = (l ? l.textContent : c.dataset.kCol || "").trim();
+});
+return { cols: byCol(b), order: $(".k-col", b).map(c => c.dataset.kCol), defs };
+}
 function kupdate(b) {
 if (!b) return;
 $(".k-col", b).forEach(c => {
@@ -2132,7 +2203,7 @@ const cnt = c.querySelector(".k-col-count");
 if (cnt) cnt.textContent = n;
 });
 const o = boards.get(b);
-if (o && o.onChange) o.onChange(byCol(b));
+if (o && o.onChange) o.onChange(kdata(b));
 }
 function ensureDel(card) {
 if (card.querySelector(".k-kdel")) return;
@@ -2142,11 +2213,140 @@ x.textContent = "×";
 x.setAttribute("aria-label", "Delete card");
 card.append(x);
 }
+function prepCol(col) {
+const h = col.querySelector(".k-col-head");
+if (!h) return;
+if (!h.querySelector(".k-col-label")) {
+const tn = [...h.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+const l = document.createElement("span");
+l.className = "k-col-label";
+if (tn) { l.textContent = tn.textContent.trim(); tn.replaceWith(l); }
+else { l.textContent = col.dataset.kCol || ""; h.prepend(l); }
+}
+if (!h.querySelector(".k-cdel")) {
+const x = document.createElement("button");
+x.type = "button";
+x.className = "k-cdel";
+x.textContent = "×";
+x.setAttribute("aria-label", "Delete column");
+h.append(x);
+}
+h.draggable = true;
+if (h.tabIndex < 0) h.tabIndex = 0;
+}
+function prepGhost(b) {
+if (b.querySelector(":scope>.k-colghost")) return;
+const g = document.createElement("div");
+g.className = "k-colghost";
+const btn = document.createElement("button");
+btn.type = "button";
+btn.textContent = "＋ Add column";
+g.append(btn);
+b.append(g);
+}
+function colKey(b, name) {
+const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "col";
+let key = base, i = 2;
+while ($(".k-col", b).some(c => c.dataset.kCol === key)) key = base + "-" + i++;
+return key;
+}
+function addColumn(b, name, before) {
+const col = document.createElement("div");
+col.className = "k-col";
+col.dataset.kCol = colKey(b, name);
+const h = document.createElement("div");
+h.className = "k-col-head";
+const l = document.createElement("span");
+l.className = "k-col-label";
+l.textContent = name;
+const cnt = document.createElement("span");
+cnt.className = "k-col-count";
+cnt.textContent = "0";
+h.append(l, " ", cnt);
+const body = document.createElement("div");
+body.className = "k-col-body";
+const add = document.createElement("button");
+add.type = "button";
+add.className = "k-col-add";
+add.textContent = "＋ Add card";
+col.append(h, body, add);
+b.insertBefore(col, before || null);
+prepCol(col);
+kupdate(b);
+return col;
+}
+function ghostInput(g) {
+const btn = g.querySelector("button");
+if (g.querySelector("input")) return;
+const inp = document.createElement("input");
+inp.className = "k-input";
+inp.placeholder = "Column name…";
+btn.hidden = true;
+g.append(inp);
+inp.focus();
+let done = false;
+const close = ok => {
+if (done) return;
+done = true;
+const v = inp.value.trim();
+inp.remove();
+btn.hidden = false;
+if (ok && v) addColumn(g.closest(".k-board"), v, g);
+};
+inp.addEventListener("keydown", e => {
+if (e.key === "Enter") close(true);
+if (e.key === "Escape") close(false);
+});
+inp.addEventListener("blur", () => close(true));
+}
+function delColumn(col) {
+const b = col.closest(".k-board");
+const cols = $(".k-col", b), idx = cols.indexOf(col);
+const rest = cols.filter(c => c !== col);
+if (!rest.length) return;
+const cards = $(".k-kcard", col);
+const label = (col.querySelector(".k-col-label") || col).textContent.trim();
+rest[0].querySelector(".k-col-body").append(...cards);
+col.remove();
+kupdate(b);
+const s = window.ArtifactShell;
+if (s && s.toast) s.toast("Deleted column “" + label + "” — cards moved", {
+label: "Undo",
+action() {
+if (!b.isConnected || col.isConnected) return;
+b.insertBefore(col, $(".k-col", b)[idx] || b.querySelector(".k-colghost"));
+col.querySelector(".k-col-body").append(...cards.filter(c => c.isConnected));
+kupdate(b);
+},
+});
+}
+function renameCol(l) {
+if (l.isContentEditable) return;
+const h = l.closest(".k-col-head"), old = l.textContent;
+if (h) h.draggable = false;
+l.setAttribute("contenteditable", "plaintext-only");
+l.focus();
+try { getSelection().selectAllChildren(l); } catch {}
+const kd = e => {
+if (e.key === "Enter") { e.preventDefault(); l.blur(); }
+if (e.key === "Escape") { e.stopPropagation(); l.textContent = old; l.blur(); }
+};
+l.addEventListener("keydown", kd);
+l.addEventListener("blur", () => {
+l.removeEventListener("keydown", kd);
+l.removeAttribute("contenteditable");
+if (h) h.draggable = true;
+if (!l.textContent.trim()) l.textContent = old;
+kupdate(l.closest(".k-board"));
+}, { once: true });
+}
 function kanban(b, opts) {
 boards.set(b, opts || {});
 $(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
+$(".k-col", b).forEach(prepCol);
+prepGhost(b);
 kupdate(b);
-return { update: () => kupdate(b), cards: () => byCol(b) };
+return { update: () => kupdate(b), cards: () => byCol(b), data: () => kdata(b) };
 }
 function addCard(btn) {
 const col = btn.closest(".k-col"), b = btn.closest(".k-board");
@@ -2286,6 +2486,10 @@ del.closest(".k-kcard").remove();
 kupdate(b);
 return;
 }
+const cdel = closest(t, ".k-cdel");
+if (cdel) { delColumn(cdel.closest(".k-col")); return; }
+const gh = closest(t, ".k-colghost");
+if (gh && t.closest("button")) { ghostInput(gh); return; }
 const add = closest(t, ".k-col-add");
 if (add) { addCard(add); return; }
 const star = closest(t, ".k-rating button");
@@ -2363,6 +2567,23 @@ roll(list);
 document.addEventListener("input", e => {
 if (e.target.matches && e.target.matches(".k-range")) syncRange(e.target);
 });
+document.addEventListener("dblclick", e => {
+const l = closest(e.target, ".k-board .k-col-label");
+if (l) renameCol(l);
+});
+document.addEventListener("a2:editmode", e => {
+const on = !!(e.detail && e.detail.editing);
+$(".k-board .k-col-label").forEach(l => {
+if (on) l.setAttribute("contenteditable", "plaintext-only");
+else l.removeAttribute("contenteditable");
+});
+$(".k-board .k-col-head").forEach(h => { h.draggable = !on; });
+});
+document.addEventListener("focusout", e => {
+const t = e.target;
+if (t && t.matches && t.matches(".k-board .k-col-label[contenteditable]"))
+kupdate(closest(t, ".k-board"));
+});
 document.addEventListener("keydown", e => {
 const t = e.target;
 if (e.key === "Escape") {
@@ -2370,6 +2591,19 @@ $(".k-menu.is-open").forEach(m => m.classList.remove("is-open"));
 $("[data-k-menu-for]").forEach(x => x.setAttribute("aria-expanded", "false"));
 }
 if (!t || !t.matches) return;
+if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && t.matches(".k-col-head")) {
+const col = t.closest(".k-col"), b = col && col.closest(".k-board");
+if (!b) return;
+e.preventDefault();
+const cols = $(".k-col", b), i = cols.indexOf(col);
+const j = e.key === "ArrowLeft" ? i - 1 : i + 1;
+if (j < 0 || j >= cols.length) return;
+flip(b, () => b.insertBefore(col,
+e.key === "ArrowLeft" ? cols[j] : cols[j].nextSibling), ".k-col");
+kupdate(b);
+t.focus();
+return;
+}
 if ((e.key === "ArrowUp" || e.key === "ArrowDown") && t.matches("[data-k-item]")) {
 const z = zone(t);
 if (!z) return;
@@ -2407,6 +2641,165 @@ e.preventDefault();
 sortTable(t);
 }
 });
+function tour(steps, opts) {
+steps = (steps || []).filter(Boolean);
+const api = { end: () => end(true) };
+if (!steps.length) return api;
+const spot = document.createElement("div");
+spot.className = "k-spot";
+const card = document.createElement("div");
+card.className = "k-coach";
+card.tabIndex = -1;
+card.setAttribute("role", "dialog");
+card.setAttribute("aria-label", "Tour");
+const mk = (tag, cls) => { const el = document.createElement(tag); el.className = cls; return el; };
+const ttl = mk("div", "k-coach-title"), bdy = mk("div", "k-coach-body");
+const dots = mk("div", "k-dots"), nav = mk("div", "k-coach-nav");
+steps.forEach(() => dots.append(document.createElement("i")));
+const btn = (cls, txt) => {
+const b = mk("button", "k-btn sm" + (cls ? " " + cls : ""));
+b.type = "button";
+b.textContent = txt;
+return b;
+};
+const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+const gap = mk("span", "k-gap");
+nav.append(skip, gap, back, next);
+card.append(ttl, bdy, dots, nav);
+document.body.append(spot, card);
+const prev = document.activeElement;
+let i = -1, target = null, live = true;
+const el4 = st => typeof st.target === "string" ? document.querySelector(st.target) : st.target;
+function place() {
+if (!live || !target || !target.isConnected) return;
+const r = target.getBoundingClientRect(), pad = 6;
+spot.style.left = r.left - pad + "px";
+spot.style.top = r.top - pad + "px";
+spot.style.width = r.width + pad * 2 + "px";
+spot.style.height = r.height + pad * 2 + "px";
+const ch = card.offsetHeight, cw = card.offsetWidth;
+const below = r.bottom + pad + 12, above = r.top - pad - 12 - ch;
+const want = (steps[i] || {}).placement;
+let top = want === "top" && above >= 8 ? above : below;
+if (want !== "top" && below + ch > innerHeight - 8 && above >= 8) top = above;
+card.style.top = Math.max(8, Math.min(innerHeight - ch - 8, top)) + "px";
+card.style.left = Math.max(8, Math.min(innerWidth - cw - 8, r.left)) + "px";
+}
+function show(n) {
+while (n < steps.length && !el4(steps[n])) n++;
+if (n >= steps.length) return end(true);
+i = n;
+target = el4(steps[i]);
+const st = steps[i];
+ttl.textContent = st.title || "";
+bdy.textContent = st.body || "";
+[...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
+back.disabled = i === 0;
+next.textContent = i === steps.length - 1 ? "Done" : "Next";
+try { target.scrollIntoView({ block: "center", behavior: noMotion() ? "auto" : "smooth" }); } catch {}
+place();
+card.focus({ preventScroll: true });
+fire(document, "k:tour", { step: i });
+}
+function end(skipped) {
+if (!live) return;
+live = false;
+removeEventListener("resize", place);
+removeEventListener("scroll", place, true);
+document.removeEventListener("keydown", onKey, true);
+spot.remove();
+card.remove();
+const d = { step: Math.max(0, i) };
+d[skipped ? "skipped" : "done"] = true;
+fire(document, "k:tour", d);
+if (prev && prev.focus) try { prev.focus(); } catch {}
+if (opts && opts.onEnd) opts.onEnd(d);
+}
+const fwd = () => { if (i >= steps.length - 1) end(false); else show(i + 1); };
+const bck = () => { if (i > 0) { const j = i - 1; i = -1; show(j); } };
+skip.addEventListener("click", () => end(true));
+back.addEventListener("click", bck);
+next.addEventListener("click", fwd);
+function onKey(e) {
+if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); end(true); }
+else if (e.key === "ArrowRight") { e.preventDefault(); fwd(); }
+else if (e.key === "ArrowLeft") { e.preventDefault(); bck(); }
+}
+document.addEventListener("keydown", onKey, true);
+addEventListener("resize", place);
+addEventListener("scroll", place, true);
+show(0);
+return api;
+}
+function onboard(cfg) {
+cfg = cfg || {};
+const steps = cfg.steps || [];
+if (!steps.length) return null;
+const s = window.ArtifactShell, key = "kit.onboard." + (cfg.id || "default");
+if (s && (s.state.get() || {})[key]) return null;
+const d = document.createElement("dialog");
+d.className = "k-dialog k-onboard";
+const art = document.createElement("div");
+art.className = "k-onboard-art";
+const body = document.createElement("div");
+body.className = "k-dialog-body";
+const h = document.createElement("h3");
+const p = document.createElement("p");
+const dots = document.createElement("div");
+dots.className = "k-dots";
+steps.forEach(() => dots.append(document.createElement("i")));
+body.append(h, p, dots);
+const foot = document.createElement("div");
+foot.className = "k-dialog-foot k-onboard-foot";
+const row = document.createElement("label");
+row.className = "k-checkrow";
+const chk = document.createElement("input");
+chk.type = "checkbox";
+chk.className = "k-check";
+row.append(chk, "Don’t show again");
+const gap = document.createElement("span");
+gap.className = "k-gap";
+const btn = (cls, txt) => {
+const b = document.createElement("button");
+b.type = "button";
+b.className = "k-btn sm" + (cls ? " " + cls : "");
+b.textContent = txt;
+return b;
+};
+const skip = btn("ghost", "Skip"), back = btn("", "Back"), next = btn("primary", "Next");
+foot.append(row, gap, skip, back, next);
+d.append(art, body, foot);
+document.body.append(d);
+let i = 0, fin = false;
+const paint = () => {
+const st = steps[i] || {};
+art.textContent = st.art || "";
+art.hidden = !st.art;
+h.textContent = st.title || "";
+p.textContent = st.body || "";
+[...dots.children].forEach((el, j) => el.classList.toggle("on", j === i));
+back.disabled = i === 0;
+next.textContent = i === steps.length - 1 ? "Done" : "Next";
+};
+skip.addEventListener("click", () => d.close());
+back.addEventListener("click", () => { i = Math.max(0, i - 1); paint(); });
+next.addEventListener("click", () => {
+if (i >= steps.length - 1) { fin = true; d.close(); }
+else { i++; paint(); }
+});
+d.addEventListener("close", () => {
+if (s && (fin || chk.checked)) {
+const st = Object.assign({}, s.state.get());
+st[key] = true;
+s.state.set(st);
+}
+d.remove();
+if (fin && cfg.onDone) cfg.onDone();
+});
+paint();
+d.showModal();
+return d;
+}
 function refresh(root = document) {
 $("[data-k-sortable]", root).forEach(c => { if (!sorters.has(c)) sortable(c); });
 $(".k-tiers", root).forEach(tr => {
@@ -2415,7 +2808,9 @@ $("[data-k-item]", tr).forEach(prepItem);
 });
 $(".k-board", root).forEach(b => {
 $(".k-kcard", b).forEach(c => { ensureDel(c); prepItem(c); });
-if (!boards.has(b)) kupdate(b);
+$(".k-col", b).forEach(prepCol);
+prepGhost(b);
+kupdate(b);
 });
 $(".k-rating", root).forEach(paintStars);
 $(".k-range", root).forEach(syncRange);
@@ -2434,7 +2829,7 @@ b.setAttribute("aria-controls", tgt.id);
 if (document.readyState === "loading")
 document.addEventListener("DOMContentLoaded", () => refresh());
 else refresh();
-window.ArtifactKit = { version: 1, kanban, refresh, sortable };
+window.ArtifactKit = { version: 1, kanban, refresh, sortable, tour, onboard };
 })();
 </script>
 <!-- ═══ /artifact-kit ═══ -->
@@ -2539,7 +2934,7 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable };
       notice when we ignore them. Drag cards to move work along; when the week
       is over, copy the whole board out as markdown for the retro doc.
     </p>
-    <div class="hintline">drag cards between columns · click a severity chip to filter · E edits titles</div>
+    <div class="hintline">drag cards between columns · drag a column header to reorder · dblclick a header to rename · ＋ adds a column · E edits titles</div>
   </header>
 
   <div class="k-toolbar board-toolbar" data-block="toolbar" data-reveal>
@@ -2605,7 +3000,6 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable };
   const S = window.ArtifactShell;
   const $ = (s, r = document) => [...r.querySelectorAll(s)];
 
-  const COLS = { backlog: "Backlog", doing: "In progress", review: "Review", done: "Done" };
   const SEV = { p0: ["P0", "bad"], p1: ["P1", "warn"], p2: ["P2", ""], p3: ["P3", "mute"] };
 
   const board = document.getElementById("board");
@@ -2618,20 +3012,24 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable };
 
   /* ---------- snapshot / persist ---------- */
   function snap() {
-    const cols = {};
+    const d = { order: [], defs: {}, cols: {} };
     $(".k-col", board).forEach(col => {
-      cols[col.dataset.kCol] = $(".k-kcard", col).map(c => ({
+      const k = col.dataset.kCol;
+      d.order.push(k);
+      d.defs[k] = col.querySelector(".k-col-label")?.textContent.trim()
+        || col.querySelector(".k-col-head")?.childNodes[0]?.textContent.trim() || k;
+      d.cols[k] = $(".k-kcard", col).map(c => ({
         id: c.dataset.kItem,
         t: cardTitle(c),
         sev: c.dataset.sev || null,
         ref: c.querySelector(".k-kmeta")?.childNodes[0]?.textContent.trim() || "",
       }));
     });
-    return cols;
+    return d;
   }
   function save() {
     if (!S || restoring) return;
-    S.state.set(Object.assign({}, S.state.get(), { cols: snap(), filter }));
+    S.state.set(Object.assign({}, S.state.get(), snap(), { filter }));
   }
 
   /* ---------- rebuild from state ---------- */
@@ -2658,14 +3056,46 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable };
     }
     return c;
   }
+  function buildCol(k) {
+    const col = document.createElement("div");
+    col.className = "k-col";
+    col.dataset.kCol = k;
+    const head = document.createElement("div");
+    head.className = "k-col-head";
+    const label = document.createElement("span");
+    label.className = "k-col-label";
+    const count = document.createElement("span");
+    count.className = "k-col-count";
+    count.textContent = "0";
+    head.append(label, " ", count);
+    const body = document.createElement("div");
+    body.className = "k-col-body";
+    const add = document.createElement("button");
+    add.className = "k-col-add";
+    add.textContent = "＋ Add card";
+    col.append(head, body, add);
+    return col;
+  }
   function restore(v) {
     if (!v || !v.cols) return;
     restoring = true;
-    $(".k-col", board).forEach(col => {
-      const cards = v.cols[col.dataset.kCol];
-      if (!Array.isArray(cards)) return;
-      col.querySelector(".k-col-body").replaceChildren(...cards.map(buildCard));
+    window.ArtifactKit?.refresh();                /* prime labels + ghost first */
+    const order = Array.isArray(v.order) && v.order.length ? v.order : Object.keys(v.cols);
+    const defs = v.defs || {};
+    const have = {};
+    $(".k-col", board).forEach(c => { have[c.dataset.kCol] = c; });
+    const ghost = board.querySelector(".k-colghost");
+    order.forEach(k => {
+      const col = have[k] || buildCol(k);         /* reuse keeps WIP limits/badges */
+      delete have[k];
+      const l = col.querySelector(".k-col-label");
+      if (l && defs[k]) l.textContent = defs[k];
+      board.insertBefore(col, ghost);
+      const cards = v.cols[k];
+      if (Array.isArray(cards))
+        col.querySelector(".k-col-body").replaceChildren(...cards.map(buildCard));
     });
+    Object.values(have).forEach(c => c.remove()); /* columns the user deleted */
     filter = v.filter || null;
     window.ArtifactKit?.refresh();
     restoring = false;
@@ -2697,13 +3127,13 @@ window.ArtifactKit = { version: 1, kanban, refresh, sortable };
 
   /* ---------- copy as markdown ---------- */
   function markdown() {
-    const cols = snap();
+    const d = snap();
     const lines = ["# Acme platform — week 28 board", ""];
-    Object.keys(COLS).forEach(k => {
-      const rows = cols[k] || [];
-      lines.push("## " + COLS[k] + " (" + rows.length + ")", "");
-      rows.forEach(d => lines.push("- **" + (d.ref || d.id.toUpperCase()) + "** " +
-        d.t + (d.sev && SEV[d.sev] ? " — " + SEV[d.sev][0] : "")));
+    d.order.forEach(k => {
+      const rows = d.cols[k] || [];
+      lines.push("## " + (d.defs[k] || k) + " (" + rows.length + ")", "");
+      rows.forEach(c => lines.push("- **" + (c.ref || c.id.toUpperCase()) + "** " +
+        c.t + (c.sev && SEV[c.sev] ? " — " + SEV[c.sev][0] : "")));
       lines.push("");
     });
     return lines.join("\n");
