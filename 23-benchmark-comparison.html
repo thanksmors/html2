@@ -1821,6 +1821,10 @@ get motion() { return window.Motion ?? null; },
     text-transform: uppercase; color: var(--ink-muted);
   }
   .ctl-group { display: flex; align-items: center; gap: 10px; }
+  @media (max-width: 640px) {
+    .ctl-group { flex-wrap: wrap; }
+    .controls { padding: 14px 12px; }
+  }
 
   .switch {
     appearance: none; margin: 0; cursor: pointer; flex: none;

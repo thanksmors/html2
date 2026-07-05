@@ -2106,6 +2106,13 @@ get motion() { return window.Motion ?? null; },
     color: var(--ink-subtle);
   }
 
+  @media (max-width: 640px) {
+    details.file-collapsed summary { flex-wrap: wrap; }
+    details.file-collapsed summary > span { flex-wrap: wrap; }
+    .file-head { flex-wrap: wrap; }
+    .file-path { overflow-wrap: anywhere; min-width: 0; }
+  }
+
   /* ---------- Footer ---------- */
   footer.next-steps {
     border: 1.5px solid var(--line);

@@ -2072,6 +2072,10 @@ var Motion=(()=>{var Se=Object.defineProperty;var Jt=Object.getOwnPropertyDescri
   }
   .stagewrap.v-dock .tb-sep { min-height: 22px; }
 
+  @media (max-width: 640px) {
+    /* min-height transfers to min-width via aspect-ratio and overflows 375px viewports */
+    .stage { min-height: 0; }
+  }
   @media (max-width: 560px) {
     .tool { width: 30px; height: 30px; }
     .tool svg { width: 15px; height: 15px; }

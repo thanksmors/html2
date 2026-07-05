@@ -1782,7 +1782,8 @@ get motion() { return window.Motion ?? null; },
   }
 
   @media (max-width: 960px) {
-    .page { grid-template-columns: 1fr; }
+    .page { grid-template-columns: minmax(0, 1fr); }
+    .page > main, .page > aside, .page > header { min-width: 0; }
   }
 
   /* ---------- Header ---------- */
@@ -1844,7 +1845,7 @@ get motion() { return window.Motion ?? null; },
   /* ---------- Walkthrough ---------- */
   .step {
     display: grid;
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: 44px minmax(0, 1fr);
     gap: 18px;
     padding: 20px 0;
     border-bottom: 1.5px solid var(--surface-2);

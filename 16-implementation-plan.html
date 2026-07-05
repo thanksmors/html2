@@ -2046,8 +2046,8 @@ get motion() { return window.Motion ?? null; },
     /* ---------- code panel ---------- */
 
     .code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-    @media (max-width: 980px) { .code-grid { grid-template-columns: 1fr; } }
-    .code-block { display: flex; flex-direction: column; gap: 10px; }
+    @media (max-width: 980px) { .code-grid { grid-template-columns: minmax(0, 1fr); } }
+    .code-block { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
     .code-block .file-label {
       font-family: var(--font-mono);
       font-size: 12px;

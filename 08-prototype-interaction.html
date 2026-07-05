@@ -1816,6 +1816,14 @@ var Motion=(()=>{var Se=Object.defineProperty;var Jt=Object.getOwnPropertyDescri
     align-items: start;
   }
 
+  @media (max-width: 900px) {
+    .bench { grid-template-columns: minmax(0, 1fr); }
+    .bench > * { min-width: 0; }
+  }
+  @media (max-width: 640px) {
+    .sidebar { width: 100%; max-width: 320px; }
+  }
+
   /* ---------- sidebar mock ---------- */
   .sidebar {
     width: 260px;

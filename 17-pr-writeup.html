@@ -1834,7 +1834,7 @@ get motion() { return window.Motion ?? null; },
       gap: 48px;
       align-items: start;
     }
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .toc { display: none; } }
+    @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } .layout > main { min-width: 0; } .toc { display: none; } }
 
     section { margin-bottom: 56px; scroll-margin-top: 24px; }
     h2 {

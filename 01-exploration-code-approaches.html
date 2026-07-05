@@ -1833,10 +1833,11 @@ get motion() { return window.Motion ?? null; },
     }
 
     @media (max-width: 1100px) {
-      .approaches { grid-template-columns: 1fr; }
+      .approaches { grid-template-columns: minmax(0, 1fr); }
     }
 
     .approach {
+      min-width: 0;
       background: var(--surface);
       border: 1.5px solid var(--line);
       border-radius: 12px;
