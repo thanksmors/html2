@@ -84,10 +84,15 @@ the artifact state object. Flatten keeps the kit fence — components are conten
 - Type/finish tokens the shell owns: `--display-weight --display-track --lh-body
   --radius-full` — pages may consume, never redefine. Never hardcode font
   shorthand that locks out `var(--font-display/body/mono)`
-- **Firefox + file:// caveat:** localStorage is partitioned per directory, so
-  unknowns/ can't share settings with root files when opened by double-click.
-  `tools/serve.sh` serves one origin and fixes it. Never style panel visibility
-  via `:popover-open` or use anchor positioning — class-driven state only
+- **Firefox + file:// caveat:** every file:// page is a unique opaque origin —
+  localStorage never crosses pages. The shell carries settings through internal
+  links via the `#o=` hash instead; `tools/serve.sh` gives one origin and full
+  persistence. Never style panel visibility via `:popover-open` or use anchor
+  positioning — class-driven state only
+- **Chrome isolation:** all shell chrome lives in a shadow root on
+  `<offprint-ui>` (block handles are `<offprint-handle>`), so page CSS can
+  never restyle it. Pages must not reach into shell DOM — the sanctioned
+  check is `ArtifactShell?.panelOpen?.()`
 
 ## Editing & portability
 
@@ -133,6 +138,16 @@ the artifact state object. Flatten keeps the kit fence — components are conten
   `Motion.spring({...})` THROWS in the mini bundle — never call it),
   always behind a `prefers-reduced-motion` check and a `window.Motion` null-check
 - Durations 120–450ms; no infinite animation outside explicit demos
+
+## Responsive (standard)
+
+- No horizontal page scroll at 375px; wide content (tables, code, charts,
+  boards, SVGs) scrolls inside its own `overflow-x: auto` container
+- Breakpoints: **640px** single column, **900px** 2-col collapse / dots nav
+  hidden, **1200px** sidebar tier. Grid/flex children that can overflow get
+  `min-width: 0`
+- Verify at 375 / 768 / 1280: `document.documentElement.scrollWidth <=
+  innerWidth + 1`
 
 ## Print & accessibility
 

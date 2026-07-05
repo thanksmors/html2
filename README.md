@@ -37,9 +37,10 @@ Every artifact embeds the same fenced shell block (master copies in
   [`21-theme-lab.html`](21-theme-lab.html) — the Recipe Lab — is the live mixer
   and reference with a WCAG contrast grid and a copyable shell block.
 
-  > Firefox + double-clicked files: `file://` storage is partitioned per
-  > folder, so `unknowns/` can't follow the main folder's recipe. Run
-  > `tools/serve.sh` (then open `http://localhost:8907`) for full sync.
+  > Firefox + double-clicked files: every `file://` page is its own storage
+  > origin, so nothing persists between pages there — instead your choices
+  > ride along the links you click. For real persistence run
+  > `tools/serve.sh` (then open `http://localhost:8907`).
 - **Inline editing & reordering** — press **E** (or flip Edit mode in the gear):
   headline text becomes editable in place, and sections grow drag handles so
   you can reorder the page; interactive artifacts (boards, editors, matrices)
