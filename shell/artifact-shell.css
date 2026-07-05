@@ -356,9 +356,11 @@
       --positive: #5C6F44; --warning: #8A6320; --negative: #A04024;
       --shadow-1: none; --shadow-2: none;
     }
+    offprint-ui, offprint-handle,
     .a2-gear, .a2-toast, .a2-veil, .a2-panel, .a2-editpill, .a2-handle,
     .a3-nav, .a3-burger { display: none !important; }
     body.a3-with-sidebar { margin-inline-start: 0 !important; }
+    body.a3-with-topbar, body.a3-with-tabs { padding-block-start: 0 !important; }
     [data-edit] { outline: none !important; text-decoration: none !important; }
     details { &::details-content { content-visibility: visible; display: block; } }
     details > summary { list-style: none; }
@@ -384,7 +386,7 @@
      top-layer + light dismiss; never style via :popover-open. */
   .a2-panel {
     position: fixed; inset: auto 16px 72px auto; z-index: 1000;
-    margin: 0; padding: 12px; inline-size: 316px;
+    margin: 0; padding: 12px; inline-size: min(316px, calc(100vw - 24px));
     max-block-size: min(70vh, 560px); overflow: auto; overscroll-behavior: contain;
     border: var(--border-w) var(--line-style) var(--line);
     border-radius: var(--radius-l);
@@ -445,6 +447,18 @@
 
   /* palette swatches */
   .a2-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .a2-swatch-random {
+    background: var(--surface);
+    border-style: dashed;
+    color: var(--ink-muted);
+    font: 700 15px var(--font-mono);
+    display: grid; place-items: center;
+    &[aria-checked="true"] { color: var(--accent); }
+  }
+  .a2-note {
+    margin: 10px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-muted);
+    & code { font-family: var(--font-mono); }
+  }
   .a2-swatch {
     aspect-ratio: 1; border-radius: var(--radius-s); cursor: pointer; padding: 0;
     border: var(--border-w) solid var(--line);
@@ -589,17 +603,19 @@
   .a3-nav a[aria-current] { color: var(--accent); }
 
   .a3-dock {
+    /* chrome silhouette is intentionally constant across finishes */
     position: fixed; inset-block-end: 14px; inset-inline: 0; z-index: 998;
     margin-inline: auto; inline-size: max-content;
     display: flex; align-items: center; gap: 4px; padding: 6px;
-    border: var(--border-w) var(--line-style) var(--line);
-    border-radius: var(--radius-full);
-    background: var(--surface); box-shadow: var(--shadow-2);
-    font-family: var(--font-body); font-size: 15px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface); box-shadow: 0 12px 32px var(--shadow-color);
+    font-family: var(--font-body); font-size: 15px; line-height: 1;
   }
   .a3-ic {
     display: grid; place-items: center; inline-size: 34px; block-size: 34px;
-    border: 0; border-radius: var(--radius-full); cursor: pointer;
+    margin: 0; padding: 0;
+    border: 0; border-radius: 999px; cursor: pointer;
     background: none; color: var(--ink); font-size: 16px; line-height: 1;
     transition: background var(--dur-1);
     &:hover { background: var(--surface-2); }
@@ -624,8 +640,11 @@
       &:hover { background: var(--surface-2); } }
   }
 
+  body.a3-with-topbar { padding-block-start: 46px; }
+  body.a3-with-tabs { padding-block-start: 42px; }
   .a3-topbar {
-    position: sticky; inset-block-start: 0; z-index: 998;
+    position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 998;
+    block-size: 42px;
     display: flex; align-items: center; gap: 10px;
     padding: 8px 18px;
     background: color-mix(in oklch, var(--bg) 85%, transparent);
@@ -668,7 +687,7 @@
   }
 
   .a3-tabs {
-    position: sticky; inset-block-start: 0; z-index: 998;
+    position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 998;
     display: flex; gap: 4px; padding: 0 14px;
     background: color-mix(in oklch, var(--bg) 88%, transparent);
     backdrop-filter: blur(8px);

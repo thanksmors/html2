@@ -320,9 +320,11 @@ color-scheme: light;
 --positive: #5C6F44; --warning: #8A6320; --negative: #A04024;
 --shadow-1: none; --shadow-2: none;
 }
+offprint-ui, offprint-handle,
 .a2-gear, .a2-toast, .a2-veil, .a2-panel, .a2-editpill, .a2-handle,
 .a3-nav, .a3-burger { display: none !important; }
 body.a3-with-sidebar { margin-inline-start: 0 !important; }
+body.a3-with-topbar, body.a3-with-tabs { padding-block-start: 0 !important; }
 [data-edit] { outline: none !important; text-decoration: none !important; }
 details { &::details-content { content-visibility: visible; display: block; } }
 details > summary { list-style: none; }
@@ -343,7 +345,7 @@ transition: rotate var(--dur-2) var(--ease-spring), box-shadow var(--dur-1) var(
 }
 .a2-panel {
 position: fixed; inset: auto 16px 72px auto; z-index: 1000;
-margin: 0; padding: 12px; inline-size: 316px;
+margin: 0; padding: 12px; inline-size: min(316px, calc(100vw - 24px));
 max-block-size: min(70vh, 560px); overflow: auto; overscroll-behavior: contain;
 border: var(--border-w) var(--line-style) var(--line);
 border-radius: var(--radius-l);
@@ -398,6 +400,18 @@ font-size: 12px; line-height: 1; padding: 2px 4px; border-radius: var(--radius-s
 }
 }
 .a2-swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.a2-swatch-random {
+background: var(--surface);
+border-style: dashed;
+color: var(--ink-muted);
+font: 700 15px var(--font-mono);
+display: grid; place-items: center;
+&[aria-checked="true"] { color: var(--accent); }
+}
+.a2-note {
+margin: 10px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-muted);
+& code { font-family: var(--font-mono); }
+}
 .a2-swatch {
 aspect-ratio: 1; border-radius: var(--radius-s); cursor: pointer; padding: 0;
 border: var(--border-w) solid var(--line);
@@ -528,14 +542,15 @@ transition: opacity var(--dur-2), display var(--dur-2) allow-discrete;
 position: fixed; inset-block-end: 14px; inset-inline: 0; z-index: 998;
 margin-inline: auto; inline-size: max-content;
 display: flex; align-items: center; gap: 4px; padding: 6px;
-border: var(--border-w) var(--line-style) var(--line);
-border-radius: var(--radius-full);
-background: var(--surface); box-shadow: var(--shadow-2);
-font-family: var(--font-body); font-size: 15px;
+border: 1.5px solid var(--line);
+border-radius: 999px;
+background: var(--surface); box-shadow: 0 12px 32px var(--shadow-color);
+font-family: var(--font-body); font-size: 15px; line-height: 1;
 }
 .a3-ic {
 display: grid; place-items: center; inline-size: 34px; block-size: 34px;
-border: 0; border-radius: var(--radius-full); cursor: pointer;
+margin: 0; padding: 0;
+border: 0; border-radius: 999px; cursor: pointer;
 background: none; color: var(--ink); font-size: 16px; line-height: 1;
 transition: background var(--dur-1);
 &:hover { background: var(--surface-2); }
@@ -559,8 +574,11 @@ transition: opacity var(--dur-2) var(--ease-out), display var(--dur-2) allow-dis
 & a { display: block; padding: 6px 10px; border-radius: var(--radius-s);
 &:hover { background: var(--surface-2); } }
 }
+body.a3-with-topbar { padding-block-start: 46px; }
+body.a3-with-tabs { padding-block-start: 42px; }
 .a3-topbar {
-position: sticky; inset-block-start: 0; z-index: 998;
+position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 998;
+block-size: 42px;
 display: flex; align-items: center; gap: 10px;
 padding: 8px 18px;
 background: color-mix(in oklch, var(--bg) 85%, transparent);
@@ -601,7 +619,7 @@ border-inline-start: 2px solid transparent;
 body.a3-with-sidebar { margin-inline-start: 220px; }
 }
 .a3-tabs {
-position: sticky; inset-block-start: 0; z-index: 998;
+position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 998;
 display: flex; gap: 4px; padding: 0 14px;
 background: color-mix(in oklch, var(--bg) 88%, transparent);
 backdrop-filter: blur(8px);
@@ -719,7 +737,7 @@ solarized: { palette: "solarized", type: "humanist",   finish: "soft"     },
 };
 const DEFAULTS = { v: 3, palette: "swiss", type: "grotesk", finish: "hairline",
 recipe: "studio", accent: null, mode: "light", density: "cozy", textSize: "m",
-nav: "dock", customPalette: null };
+nav: "drawer", customPalette: null };
 const NAVS = ["none", "dock", "topbar", "sidebar", "tabs", "drawer", "dots"];
 const CP_TOKENS = ["bg", "surface", "surface-2", "ink", "ink-muted",
 "accent", "accent-contrast", "line"];
@@ -744,7 +762,7 @@ function migrateSettings(raw) {
 if (!raw || typeof raw !== "object") return null;
 if (raw.v === 3) return Object.assign({}, DEFAULTS, raw);
 if (raw.v === 2) {
-const s = Object.assign({}, DEFAULTS, raw, { v: 3, nav: "dock", customPalette: null });
+const s = Object.assign({}, DEFAULTS, raw, { v: 3, nav: "drawer", customPalette: null });
 if (raw.palette === "swiss" && raw.type === "grotesk" && raw.finish === "sharp" &&
 !raw.accent && raw.recipe === "swiss") {
 s.finish = "hairline"; s.recipe = "studio";
@@ -763,6 +781,39 @@ return null;
 }
 let settings = migrateSettings(store.read(KEY.settings, null)) || Object.assign({}, DEFAULTS);
 let recipes = store.read(KEY.recipes, {});
+/* settings travel with navigation: on file:// Firefox every page is a
+unique origin, so localStorage never crosses pages — the #o= hash does */
+(function adoptHash() {
+const m = location.hash.match(/^#o=([A-Za-z0-9_-]+)$/);
+if (!m) return;
+try {
+const json = decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))));
+const doc = JSON.parse(json);
+const mig = migrateSettings(doc.s || doc);
+if (mig) { settings = mig; store.write(KEY.settings, settings); }
+if (doc.r && typeof doc.r === "object") {
+recipes = Object.assign({}, recipes, doc.r);
+store.write(KEY.recipes, recipes);
+}
+history.replaceState(null, "", location.pathname + location.search);
+} catch {}
+})();
+function settingsHash() {
+let json = JSON.stringify(Object.keys(recipes).length ? { s: settings, r: recipes } : { s: settings });
+if (json.length > 2048) json = JSON.stringify({ s: settings });
+return "#o=" + btoa(unescape(encodeURIComponent(json)))
+.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function carryLinks(node) {
+node.addEventListener("click", e => {
+const a = e.composedPath ? e.composedPath().find(x => x.tagName === "A" && x.href) : e.target.closest?.("a[href]");
+if (!a) return;
+const href = a.getAttribute("href") || "";
+if (!/\.html?(#.*)?$/.test(href) || /^(https?:|mailto:)/.test(href)) return;
+a.href = href.split("#")[0] + settingsHash();
+}, true);
+}
+carryLinks(document);
 function setAttr(name, value) {
 if (value) root.setAttribute(name, value); else root.removeAttribute(name);
 }
@@ -776,7 +827,7 @@ root.style.setProperty("--" + t, settings.customPalette.colors[t] || "");
 for (const t of CP_TOKENS) root.style.removeProperty("--" + t);
 setAttr("data-palette", settings.palette !== "claude" && settings.palette);
 }
-setAttr("data-nav", settings.nav !== "dock" && settings.nav);
+setAttr("data-nav", settings.nav !== "drawer" && settings.nav);
 setAttr("data-type", settings.type !== "editorial" && settings.type);
 setAttr("data-finish", settings.finish !== "soft" && settings.finish);
 setAttr("data-mode", settings.mode !== "system" && settings.mode);
@@ -986,9 +1037,11 @@ document.querySelectorAll("[data-block].a2-blockhost").forEach(el => el.classLis
 if (!on) return;
 blockGroups.forEach(group => group.forEach(el => {
 el.classList.add("a2-blockhost");
-const h = document.createElement("button");
+const h = document.createElement("offprint-handle");
 h.className = "a2-handle";
 h.textContent = "⠿";
+h.tabIndex = 0;
+h.setAttribute("role", "button");
 h.draggable = true;
 h.setAttribute("aria-label", `Reorder section ${el.dataset.block} (arrow keys)`);
 h.addEventListener("keydown", e => {
@@ -1140,8 +1193,8 @@ blocks: { order: () => [], set: () => {}, reset: () => {} },
 get motion() { return window.Motion ?? null; } });
 <\/script>`;
 const doc = root.cloneNode(true);
-doc.querySelectorAll(".a2-gear,.a2-panel,.a2-toast,.a2-veil,.a2-editpill,.a2-handle," +
-".a3-nav,.a3-burger,#artifact-shell-css,#artifact-shell").forEach(el => el.remove());
+doc.querySelectorAll("offprint-ui,offprint-handle,.a2-gear,.a2-panel,.a2-toast,.a2-veil," +
+".a2-editpill,.a2-handle,.a3-nav,.a3-burger,#artifact-shell-css,#artifact-shell").forEach(el => el.remove());
 const walker = document.createTreeWalker(doc, NodeFilter.SHOW_COMMENT);
 const dead = [];
 while (walker.nextNode())
@@ -1155,7 +1208,7 @@ el.removeAttribute("data-reveal"); el.removeAttribute("contenteditable");
 el.style?.removeProperty("--reveal-i");
 if (el.getAttribute("style") === "") el.removeAttribute("style");
 });
-doc.querySelector("body")?.classList.remove("a3-with-sidebar");
+doc.querySelector("body")?.classList.remove("a3-with-sidebar", "a3-with-topbar", "a3-with-tabs");
 doc.querySelector("head")?.insertAdjacentHTML("afterbegin",
 "\n" + staticCss + "\n" + stub + "\n");
 const html = "<!doctype html>\n" + doc.outerHTML;
@@ -1306,13 +1359,13 @@ map.get(e.target)?.setAttribute("aria-current", "true");
 map.forEach((_, el) => spy.observe(el));
 }
 function renderNav(force) {
-if (!document.body || (!force && settings.nav === lastNav)) return;
+if (!document.body || !shadow || (!force && settings.nav === lastNav)) return;
 lastNav = settings.nav;
 spy?.disconnect(); spy = null;
 navRoot?.remove(); navRoot = null;
-document.querySelector(".a3-burger")?.remove();
-document.body.classList.remove("a3-with-sidebar");
-if (gear) { gear.classList.remove("a2-in-dock"); document.body.append(gear); }
+shadow.querySelector(".a3-burger")?.remove();
+document.body.classList.remove("a3-with-sidebar", "a3-with-topbar", "a3-with-tabs");
+if (gear) { gear.classList.remove("a2-in-dock"); shadow.append(gear); }
 const kind = settings.nav || "dock";
 if (kind === "none") return;
 const sections = discoverSections();
@@ -1328,11 +1381,11 @@ navRoot.innerHTML = `
 <a class="a3-ic" href="${homeHref()}" title="Gallery" aria-label="Gallery">⌂</a>
 ${prev ? `<a class="a3-ic" href="${prev.path}" title="${prev.title}" aria-label="Previous: ${prev.title}">‹</a>`
 : `<span class="a3-ic" aria-hidden="true" data-dim>‹</span>`}
-${sections.length > 1 ? `<button class="a3-ic" data-pop aria-expanded="false" aria-label="Sections">¶</button>
-<div class="a3-pop">${sections.map(secLink).join("")}</div>` : ""}
+<button class="a3-ic" data-pop aria-expanded="false" aria-label="Sections"${sections.length < 2 ? " data-dim disabled" : ""}>¶</button>
+<div class="a3-pop">${sections.map(secLink).join("")}</div>
 ${next ? `<a class="a3-ic" href="${next.path}" title="${next.title}" aria-label="Next: ${next.title}">›</a>`
 : `<span class="a3-ic" aria-hidden="true" data-dim>›</span>`}`;
-document.body.append(navRoot);
+shadow.append(navRoot);
 if (gear) { gear.classList.add("a2-in-dock"); navRoot.append(gear); }
 const pop = navRoot.querySelector(".a3-pop");
 const popBtn = navRoot.querySelector("[data-pop]");
@@ -1343,7 +1396,7 @@ pop.classList.toggle("is-open", on);
 popBtn.setAttribute("aria-expanded", on);
 });
 document.addEventListener("pointerdown", e => {
-if (!navRoot?.contains(e.target)) pop?.classList.remove("is-open");
+if (!e.composedPath().includes(navRoot)) pop?.classList.remove("is-open");
 });
 pop.addEventListener("click", () => pop.classList.remove("is-open"));
 }
@@ -1353,17 +1406,19 @@ navRoot.innerHTML = `
 ${switcherHTML("a3-switch")}
 <span class="a3-flex"></span>
 <span class="a3-seclinks">${sections.map(secLink).join("")}</span>`;
-document.body.prepend(navRoot);
+shadow.append(navRoot);
+document.body.classList.add("a3-with-topbar");
 } else if (kind === "sidebar") {
 navRoot.innerHTML = `
 <a class="a3-side-home" href="${homeHref()}">⌂ Gallery</a>
 ${switcherHTML("a3-switch")}
 <div class="a3-side-secs">${sections.map(secLink).join("")}</div>`;
-document.body.prepend(navRoot);
+shadow.append(navRoot);
 document.body.classList.add("a3-with-sidebar");
 } else if (kind === "tabs") {
 navRoot.innerHTML = sections.map(secLink).join("");
-document.body.prepend(navRoot);
+shadow.append(navRoot);
+document.body.classList.add("a3-with-tabs");
 } else if (kind === "drawer") {
 const burger = document.createElement("button");
 burger.className = "a3-burger";
@@ -1378,7 +1433,7 @@ navRoot.innerHTML = `
 `<h4>${c}</h4>` + ARTIFACTS.filter(a => a.category === c).map(a =>
 `<a href="${a.path}"${ARTIFACTS.indexOf(a) === idx ? ' aria-current="true"' : ""}>${a.title}</a>`).join("")
 ).join("")}`;
-document.body.append(burger, navRoot);
+shadow.append(burger, navRoot);
 const setOpen = on => {
 navRoot.classList.toggle("is-open", on);
 burger.setAttribute("aria-expanded", on);
@@ -1389,19 +1444,20 @@ addEventListener("keydown", e => {
 if (e.key === "Escape" && navRoot?.classList.contains("is-open")) { setOpen(false); burger.focus(); }
 });
 document.addEventListener("pointerdown", e => {
+const path = e.composedPath();
 if (navRoot?.classList.contains("is-open") &&
-!navRoot.contains(e.target) && !burger.contains(e.target)) setOpen(false);
+!path.includes(navRoot) && !path.includes(burger)) setOpen(false);
 });
 navRoot.querySelectorAll(".a3-drawer-secs a").forEach(a =>
 a.addEventListener("click", () => setOpen(false)));
 } else if (kind === "dots") {
 navRoot.innerHTML = sections.map(s =>
 `<a href="#${s.id}" data-sec="${s.id}" aria-label="${s.label}"><i></i><b>${s.label}</b></a>`).join("");
-document.body.append(navRoot);
+shadow.append(navRoot);
 if (sections.length < 3) navRoot.hidden = true;
 }
 navRoot.querySelectorAll(".a3-switch").forEach(sel =>
-sel.addEventListener("change", () => { if (sel.value) location.href = sel.value; }));
+sel.addEventListener("change", () => { if (sel.value) location.href = sel.value + settingsHash(); }));
 if (["sidebar", "tabs", "dots"].includes(kind)) {
 const map = new Map(sections.map(s =>
 [s.el, navRoot.querySelector(`[data-sec="${s.id}"]`)]).filter(([, l]) => l));
@@ -1409,7 +1465,10 @@ setupSpy(map);
 }
 }
 document.addEventListener("a2:blocks", () => renderNav(true));
-let panel, gear, pill, veil;
+/* All chrome lives in a shadow root on <offprint-ui>: page CSS (bare
+nav{}/button{}/*-resets) can never restyle it, while design tokens
+still inherit through the host. */
+let ui, shadow, panel, gear, pill, veil;
 const GEAR_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09c0 .68.4 1.3 1.03 1.56a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.63.88 1.03 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z"/></svg>`;
 const hasPopover = "popover" in HTMLElement.prototype;
 function setPanelOpen(on) {
@@ -1453,6 +1512,7 @@ ${["recipes", "mix", "options"].map((t, i) =>
 <h3>Palette</h3>
 <div class="a2-swatches" role="radiogroup" aria-label="Color palette">
 ${PALETTES.map(p => `<button class="a2-swatch" role="radio" data-palette="${p}" data-pick-palette="${p}" aria-checked="false" aria-label="${p}" title="${p}"></button>`).join("")}
+<button class="a2-swatch a2-swatch-random" role="radio" data-act="random-palette" aria-checked="false" aria-label="Random palette" title="Random palette — always readable, new roll each click">?</button>
 </div>
 <h3>Type</h3>
 <div class="a2-typerows" role="radiogroup" aria-label="Typography">
@@ -1462,9 +1522,6 @@ ${Object.entries(TYPES).map(([k, [sub, stack]]) =>
 <h3>Finish</h3>
 <div class="a2-finchips" role="radiogroup" aria-label="Finish">
 ${FINISHES.map(f => `<button class="a2-finchip" role="radio" data-finish="${f}" data-pick-finish="${f}" aria-checked="false">${f}</button>`).join("")}
-</div>
-<div class="a2-btnrow">
-<button class="a2-btn" data-act="random-palette" title="Generate a random palette (always readable)">⚄ Random palette</button>
 </div>
 <h3>Accent</h3>
 <div class="a2-accentrow">
@@ -1496,6 +1553,9 @@ ${seg("textsize", ["s", "m", "l", "xl"], settings.textSize)}
 <button class="a2-btn" data-act="flatten" title="Download a static copy with the current look, edits and layout baked in — no shell, no settings">⤓ Flatten</button>
 </div>
 <input type="file" accept=".json,application/json" hidden>
+${location.protocol === "file:" && navigator.userAgent.includes("Firefox")
+? `<p class="a2-note">Firefox can’t store settings for file:// pages — your choices follow
+the links you click instead. Run <code>tools/serve.sh</code> for full persistence.</p>` : ""}
 </div>`;
 pill = document.createElement("div");
 pill.className = "a2-editpill";
@@ -1515,7 +1575,13 @@ veil = document.createElement("div");
 veil.className = "a2-veil";
 veil.hidden = true;
 veil.textContent = "Drop .edits.json to import";
-document.body.append(gear, panel, pill, toastEl, veil);
+ui = document.createElement("offprint-ui");
+shadow = ui.attachShadow({ mode: "open" });
+const chromeStyle = document.createElement("style");
+chromeStyle.textContent = document.getElementById("artifact-shell-css")?.textContent || "";
+shadow.append(chromeStyle, gear, panel, pill, toastEl, veil);
+document.body.append(ui);
+carryLinks(shadow);
 gear.addEventListener("click", () => {
 const on = !panelOpen();
 setPanelOpen(on);
@@ -1525,7 +1591,8 @@ addEventListener("keydown", e => {
 if (e.key === "Escape" && panelOpen()) { setPanelOpen(false); gear.focus(); }
 });
 document.addEventListener("pointerdown", e => {
-if (panelOpen() && !panel.contains(e.target) && !gear.contains(e.target)) setPanelOpen(false);
+const path = e.composedPath();
+if (panelOpen() && !path.includes(panel) && !path.includes(gear)) setPanelOpen(false);
 });
 panel.querySelectorAll("input[name=a2-tab]").forEach(r =>
 r.addEventListener("change", () => {
@@ -1640,7 +1707,8 @@ if (!panel) return;
 panel.querySelectorAll("[data-recipe]").forEach(t =>
 t.setAttribute("aria-checked", t.dataset.recipe === settings.recipe));
 panel.querySelectorAll("[data-pick-palette]").forEach(s =>
-s.setAttribute("aria-checked", s.dataset.pickPalette === settings.palette));
+s.setAttribute("aria-checked", !settings.customPalette && s.dataset.pickPalette === settings.palette));
+panel.querySelector(".a2-swatch-random")?.setAttribute("aria-checked", !!settings.customPalette);
 panel.querySelectorAll("[data-pick-type]").forEach(s =>
 s.setAttribute("aria-checked", s.dataset.pickType === settings.type));
 panel.querySelectorAll("[data-pick-finish]").forEach(s =>
@@ -1685,6 +1753,7 @@ delete rest.theme;
 if (Object.keys(rest).length) setSettings(rest, animate);
 },
 readSettings: () => Object.assign({}, settings),
+panelOpen: () => panelOpen(),
 setEditing, isEditing,
 get motion() { return window.Motion ?? null; },
 };
